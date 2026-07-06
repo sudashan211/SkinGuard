@@ -74,6 +74,8 @@ async def shutdown_event():
 
 
 # Configure CORS
+# Log CORS origins for debugging
+logger.info(f"Configuring CORS with origins: {settings.cors_origins}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
