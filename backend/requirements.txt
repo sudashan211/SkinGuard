@@ -7,6 +7,9 @@ python-multipart==0.0.6
 # Supabase client
 supabase==2.3.4
 
+# PostgreSQL adapter
+psycopg2-binary==2.9.9
+
 # Authentication and security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
