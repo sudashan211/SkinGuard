@@ -22,10 +22,10 @@ python-dotenv==1.0.0
 # HTTP client
 httpx==0.25.2
 
-# Image processing
+# Image processing (headless version for server deployment)
 Pillow==10.2.0
 numpy==1.26.3
-opencv-python-headless==4.9.0.80
+opencv-python-headless==4.9.0.80  # Headless version - no GUI dependencies required
 
 # AI/ML Libraries
 torch==2.2.0
