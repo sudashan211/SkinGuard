@@ -17,6 +17,7 @@ from typing import List, Dict, Any
 import logging
 
 from .config import settings
+from .ai_models import get_model_manager, ModelConfig  # Always import for fallback
 
 # Try to import Hugging Face model, fallback to original if not available
 try:
@@ -30,7 +31,6 @@ except ImportError as e:
     logger.warning(f"Hugging Face model not available: {e}")
     logger.warning("Falling back to EfficientNet-B7 (0-20% accuracy)")
     logger.warning("Install transformers to use high-accuracy model: pip install transformers")
-    from .ai_models import get_model_manager, ModelConfig
 
 
 class CancerPrediction:
