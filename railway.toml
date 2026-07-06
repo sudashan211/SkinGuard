@@ -1,0 +1,14 @@
+# Railway Configuration for SkinGuard Monorepo
+
+# This file is not needed if you set Root Directory in Railway dashboard
+# But it provides documentation of the expected structure
+
+# Backend Service Configuration:
+# - Root Directory: backend
+# - Build Command: pip install -r requirements.txt
+# - Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+# Frontend Service Configuration:
+# - Root Directory: frontend
+# - Build Command: npm install && npm run build
+# - Start Command: npm run preview -- --host 0.0.0.0 --port $PORT
