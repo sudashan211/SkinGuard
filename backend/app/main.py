@@ -76,9 +76,10 @@ async def shutdown_event():
 # Configure CORS
 # Log CORS origins for debugging
 logger.info(f"Configuring CORS with origins: {settings.cors_origins}")
+# Temporarily use wildcard for testing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],  # Temporary wildcard for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
