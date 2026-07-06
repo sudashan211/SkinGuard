@@ -28,7 +28,10 @@ try:
 except ImportError as e:
     HUGGINGFACE_AVAILABLE = False
     logger = logging.getLogger(__name__)
-    logger.warning(f"Hugging Face model not available: {e}")
+    logger.error(f"❌ Hugging Face model import failed: {e}")
+    logger.error(f"Error type: {type(e).__name__}")
+    import traceback
+    logger.error(f"Traceback: {traceback.format_exc()}")
     logger.warning("Falling back to EfficientNet-B7 (0-20% accuracy)")
     logger.warning("Install transformers to use high-accuracy model: pip install transformers")
 
