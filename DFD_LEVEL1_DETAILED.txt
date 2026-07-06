@@ -1,0 +1,519 @@
+================================================================================
+LEVEL 1 DATA FLOW DIAGRAM (DFD) - SKINGUARD SYSTEM
+================================================================================
+
+This is a DETAILED Level 1 DFD matching your reference diagram style exactly.
+It shows processes (P1-P7), data stores (D1-D8), external entities, and all
+data flows within the "Operational Boundary" of the SkinGuard system.
+
+To create this diagram, use draw.io, Visio, or PowerPoint following the
+exact layout and components described below.
+
+================================================================================
+DIAGRAM STRUCTURE
+================================================================================
+
+BOUNDARY BOX:
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Operational Logs                                │
+│  ┌──────────────────────────────────────────────────────────────────┐ │
+│  │                                                                  │ │
+│  │        [All processes, data stores, and internal flows]          │ │
+│  │                                                                  │ │
+│  └──────────────────────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+COMPONENTS TO DRAW
+================================================================================
+
+EXTERNAL ENTITIES (Outside the boundary - rectangles):
+┌─────────────┐
+│   Patient   │
+└─────────────┘
+
+┌──────────────────┐
+│  Hospital Staff  │
+└──────────────────┘
+
+┌────────────────────────────┐
+│  Vision Transformer AI     │
+│    (Hugging Face)          │
+└────────────────────────────┘
+
+┌──────────────────┐
+│ Google Maps API  │
+└──────────────────┘
+
+┌──────────────────┐
+│  Email System    │
+│     (SMTP)       │
+└──────────────────┘
+
+================================================================================
+PROCESSES (Inside boundary - rounded rectangles with P# labels):
+
+┌──────────────────┐
+│       P1         │
+│  Authentication  │
+│   & User Mgmt    │
+└──────────────────┘
+
+┌──────────────────┐
+│       P2         │
+│  Image Upload    │
+│  & Validation    │
+│  (NSFW Filter)   │
+└──────────────────┘
+
+┌──────────────────┐
+│       P3         │
+│   AI Analysis    │
+│      & Risk      │
+│   Assessment     │
+└──────────────────┘
+
+┌──────────────────┐
+│       P4         │
+│    Hospital      │
+│   Search &       │
+│   Navigation     │
+└──────────────────┘
+
+┌──────────────────┐
+│       P5         │
+│   Appointment    │
+│   Management     │
+└──────────────────┘
+
+┌──────────────────┐
+│       P6         │
+│  Notification    │
+│    Service       │
+└──────────────────┘
+
+┌──────────────────┐
+│       P7         │
+│   Audit &        │
+│    Logging       │
+└──────────────────┘
+
+================================================================================
+DATA STORES (Inside boundary - open-ended rectangles with D# labels):
+
+D1 ║ User Accounts
+
+D2 ║ Patient Profiles
+
+D3 ║ Analysis Reports
+
+D4 ║ Image Storage
+
+D5 ║ Appointments
+
+D6 ║ Hospitals
+
+D7 ║ Email Queue
+
+D8 ║ Audit Logs & Monitoring
+
+================================================================================
+COMPLETE DATA FLOWS (Arrows with labels):
+================================================================================
+
+FROM PATIENT TO SYSTEM:
+────────────────────────
+Patient → P1: Login Credentials
+Patient → P2: Skin Lesion Images
+Patient → P3: Symptom Responses
+Patient → P4: Hospital Search Request
+Patient → P4: Location Data
+Patient → P5: Appointment Request
+
+FROM SYSTEM TO PATIENT:
+────────────────────────
+P1 → Patient: Authentication Token
+P2 → Patient: Validation Result
+P3 → Patient: AI Analysis Results
+P3 → Patient: Risk Assessment
+P4 → Patient: Hospital List
+P4 → Patient: Directions
+P5 → Patient: Appointment Status
+P6 → Patient: Email Notifications
+
+FROM HOSPITAL STAFF TO SYSTEM:
+───────────────────────────────
+Hospital Staff → P1: Login Credentials
+Hospital Staff → P5: Appointment Decision
+Hospital Staff → P5: Medical Notes
+
+FROM SYSTEM TO HOSPITAL STAFF:
+───────────────────────────────
+P1 → Hospital Staff: Authentication Token
+P5 → Hospital Staff: Pending Reports
+P5 → Hospital Staff: Patient Medical History
+P5 → Hospital Staff: Dashboard Data
+P6 → Hospital Staff: Email Notifications
+
+EXTERNAL SERVICE INTERACTIONS:
+───────────────────────────────
+P3 → Vision Transformer AI: Image Data
+Vision Transformer AI → P3: Cancer Classification
+Vision Transformer AI → P3: Confidence Scores
+
+P4 → Google Maps API: Location + Search Params
+Google Maps API → P4: Hospital Data + Directions
+
+P6 → Email System (SMTP): Email Request
+Email System (SMTP) → P6: Delivery Status
+
+PROCESS TO DATA STORE FLOWS:
+─────────────────────────────
+P1 ↔ D1: User credentials, login events
+P2 → D4: Validated images
+P2 → D8: Validation logs
+P3 ↔ D2: Patient health profiles
+P3 → D3: Analysis reports
+P3 ↔ D4: Image storage (read/write)
+P3 → D8: Analysis logs
+P4 ↔ D6: Hospital data (cache)
+P5 ↔ D2: Patient medical history
+P5 ↔ D3: Analysis reports (attach to appointment)
+P5 ↔ D5: Appointment records
+P5 ↔ D6: Hospital information
+P5 → D8: Appointment logs, privacy access logs
+P6 ↔ D7: Email queue
+P6 → D8: Email delivery logs
+P7 → D8: All audit logs (from all processes)
+
+INTER-PROCESS FLOWS:
+────────────────────
+P2 → P3: Validated Image Data
+P5 → P6: Email Notification Triggers
+All Processes → P7: Event Data for Logging
+
+================================================================================
+RECOMMENDED LAYOUT (To match your reference diagram style):
+================================================================================
+
+Use this layout when drawing in draw.io, Visio, or PowerPoint:
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│                          Operational Logs                                 │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │                                                                     │ │
+│  │  ┌──────┐                                                          │ │
+│  │  │Patient│                                                         │ │
+│  │  └───┬──┘                                                          │ │
+│  │      │ Login Creds, Images, Symptoms, Search, Appointment         │ │
+│  │      ↓                                                             │ │
+│  │  ┌───────┐     ┌────────┐                                         │ │
+│  │  │  P1   │────→│   D1   │ User Accounts                          │ │
+│  │  │ Auth  │     └────────┘                                         │ │
+│  │  └───┬───┘                                                         │ │
+│  │      │                                                             │ │
+│  │      ↓                                                             │ │
+│  │  ┌───────┐     ┌────────┐                                         │ │
+│  │  │  P2   │────→│   D4   │ Image Storage                          │ │
+│  │  │ Image │     └────────┘                                         │ │
+│  │  │Validat│───┐                                                    │ │
+│  │  └───┬───┘   │                                                    │ │
+│  │      │       │                                                    │ │
+│  │      ↓       │                                                    │ │
+│  │  ┌───────┐  │  ┌────────┐     ┌─────────────────────┐           │ │
+│  │  │  P3   │←─┘  │   D2   │     │Vision Transformer AI│           │ │
+│  │  │  AI   │←────│Patient │     │   (Hugging Face)    │           │ │
+│  │  │Analysi│←───→│Profiles│     └─────────┬───────────┘           │ │
+│  │  │  s    │     └────────┘               │                        │ │
+│  │  └───┬───┘                              │                        │ │
+│  │      │                                   │ Classification        │ │
+│  │      │ Results              Image Data   │                        │ │
+│  │      ↓                         ↑─────────┘                        │ │
+│  │  ┌────────┐                                                       │ │
+│  │  │   D3   │ Analysis Reports                                     │ │
+│  │  └────┬───┘                                                       │ │
+│  │       │                                                           │ │
+│  │       ↓                                                           │ │
+│  │  ┌───────┐     ┌────────┐     ┌──────────────┐                  │ │
+│  │  │  P4   │────→│   D6   │     │Google Maps   │                  │ │
+│  │  │Hospita│←───→│Hospital│←───→│    API       │                  │ │
+│  │  │Search │     │  Data  │     └──────────────┘                  │ │
+│  │  └───┬───┘     └────────┘                                        │ │
+│  │      │                                                            │ │
+│  │      ↓                                                            │ │
+│  │  ┌───────┐     ┌────────┐                                        │ │
+│  │  │  P5   │────→│   D5   │ Appointments                           │ │
+│  │  │Appoint│←────┤        │                                        │ │
+│  │  │ ment  │     └────────┘         ┌──────────────┐              │ │
+│  │  └───┬───┘                        │Hospital Staff│              │ │
+│  │      │                            └───────┬──────┘              │ │
+│  │      │ Trigger Email                     │                      │ │
+│  │      ↓                                    │ Decision, Notes      │ │
+│  │  ┌───────┐     ┌────────┐               │                      │ │
+│  │  │  P6   │────→│   D7   │ Email Queue   │                      │ │
+│  │  │Notify │←───→│        │                │                      │ │
+│  │  │       │     └────────┘←───────────────┘                      │ │
+│  │  └───┬───┘          ↓                                            │ │
+│  │      │              │                                            │ │
+│  │      │   Email     ↓          ┌─────────────┐                   │ │
+│  │      └──────────────────────→ │Email System │                   │ │
+│  │                                │   (SMTP)    │                   │ │
+│  │                                └─────────────┘                   │ │
+│  │                                                                   │ │
+│  │  ┌────────────────────┐                                          │ │
+│  │  │All Process Logs    │                                          │ │
+│  │  ↓                    ↓                                          │ │
+│  │  ┌───────┐     ┌────────┐                                        │ │
+│  │  │  P7   │────→│   D8   │ Audit Logs & Monitoring               │ │
+│  │  │ Audit │←────│        │                                        │ │
+│  │  │       │     └────────┘                                        │ │
+│  │  └───────┘                                                        │ │
+│  │                                                                   │ │
+│  └─────────────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+STEP-BY-STEP DRAWING INSTRUCTIONS (draw.io)
+================================================================================
+
+1. CREATE OUTER BOUNDARY BOX:
+   - Insert → Rectangle
+   - Size: Large enough to contain everything
+   - Label at top: "Operational Logs"
+   - Style: Dashed border, No fill
+
+2. PLACE EXTERNAL ENTITIES (5 total) - OUTSIDE the boundary:
+   - Patient (top left, outside)
+   - Hospital Staff (right side, outside)
+   - Vision Transformer AI (Hugging Face) (right side, outside)
+   - Google Maps API (right side, outside)
+   - Email System (SMTP) (bottom right, outside)
+   - Style: Solid rectangle, Light gray fill
+
+3. PLACE PROCESSES (7 total) - INSIDE the boundary:
+   Position vertically in flow order:
+   - P1: Authentication & User Mgmt (top)
+   - P2: Image Upload & Validation (below P1)
+   - P3: AI Analysis & Risk Assessment (below P2)
+   - P4: Hospital Search & Navigation (below P3)
+   - P5: Appointment Management (below P4)
+   - P6: Notification Service (below P5)
+   - P7: Audit & Logging (bottom)
+   - Style: Rounded rectangle, Light blue fill
+
+4. PLACE DATA STORES (8 total) - INSIDE the boundary:
+   Position next to their related processes:
+   - D1: User Accounts (next to P1)
+   - D2: Patient Profiles (next to P3)
+   - D3: Analysis Reports (below P3)
+   - D4: Image Storage (next to P2)
+   - D5: Appointments (next to P5)
+   - D6: Hospitals (next to P4)
+   - D7: Email Queue (next to P6)
+   - D8: Audit Logs & Monitoring (next to P7, right side)
+   - Style: Open-ended rectangle (missing right border), Light yellow fill
+
+5. DRAW DATA FLOWS (Arrows):
+   
+   FROM PATIENT (start from Patient entity):
+   - Patient → P1: "Login Credentials"
+   - Patient → P2: "Skin Lesion Images"
+   - Patient → P3: "Symptom Responses"
+   - Patient → P4: "Hospital Search Request"
+   - Patient → P5: "Appointment Request"
+   
+   TO PATIENT (end at Patient entity):
+   - P1 → Patient: "Authentication Token"
+   - P2 → Patient: "Validation Result"
+   - P3 → Patient: "AI Results, Risk Assessment"
+   - P4 → Patient: "Hospital List, Directions"
+   - P5 → Patient: "Appointment Status"
+   - P6 → Patient: "Email Notifications"
+   
+   FROM HOSPITAL STAFF:
+   - Hospital Staff → P1: "Login Credentials"
+   - Hospital Staff → P5: "Appointment Decision, Medical Notes"
+   
+   TO HOSPITAL STAFF:
+   - P5 → Hospital Staff: "Pending Reports, Patient History, Dashboard"
+   - P6 → Hospital Staff: "Email Notifications"
+   
+   EXTERNAL SERVICES:
+   - P3 ↔ Vision Transformer AI: "Image Data" / "Classification, Confidence"
+   - P4 ↔ Google Maps API: "Location, Search" / "Hospital Data, Directions"
+   - P6 ↔ Email System (SMTP): "Email Request" / "Delivery Status"
+   
+   PROCESS TO DATA STORE:
+   - P1 ↔ D1 (bidirectional)
+   - P2 → D4
+   - P3 ↔ D2 (bidirectional)
+   - P3 → D3
+   - P3 ↔ D4 (bidirectional)
+   - P4 ↔ D6 (bidirectional)
+   - P5 ↔ D2, D3, D5, D6 (bidirectional)
+   - P6 ↔ D7 (bidirectional)
+   - P7 → D8
+   
+   INTER-PROCESS:
+   - P2 → P3: "Validated Image Data"
+   - P5 → P6: "Email Trigger"
+   - All Processes → P7: "Event Logs"
+   
+   Style: Solid line with arrowhead, Label on line
+
+6. ADD SPECIAL FLOWS TO D8 (Audit Logs):
+   Draw arrows from ALL processes (P1-P7) converging to D8:
+   - P1 → D8: "Auth Logs"
+   - P2 → D8: "Validation Logs"
+   - P3 → D8: "Analysis Logs"
+   - P5 → D8: "Appointment Logs, Privacy Access"
+   - P6 → D8: "Email Logs"
+   - These can converge into D8 from multiple directions
+
+7. ADD LEGEND (bottom left, inside or outside boundary):
+   □ Rectangle = External Entity
+   ⬭ Rounded Rectangle = Process
+   ║ Open Rectangle = Data Store
+   → Arrow = Data Flow
+
+8. ADD TITLE AND LABELS:
+   - Main title above diagram: "Level 1 DFD - SkinGuard System"
+   - Caption below: "Figure 4.X: Data Flow Diagram"
+   - Boundary label: "Operational Logs" at top of outer box
+
+================================================================================
+KEY DIFFERENCES FROM YOUR REFERENCE vs SKINGUARD:
+================================================================================
+
+YOUR FRIEND'S SYSTEM (Reference):
+- User → P1 Data Collection → D1 User Data
+- P2 Data Preprocessing → P3 Model Training → P4 Model Evaluation
+- P5 Dashboard Interaction → P6 System Administration
+- Admin, Medical Professionals as external entities
+- Focus: ML model training and evaluation workflow
+
+SKINGUARD SYSTEM (Your system):
+- Patient → P1 Authentication → D1 User Accounts
+- P2 Image Validation (NSFW Filter) → P3 AI Analysis → Risk Assessment
+- P4 Hospital Search → P5 Appointment Management → P6 Notifications
+- P7 Audit & Logging for privacy compliance
+- Patient, Hospital Staff, External APIs as external entities
+- Focus: Real-time AI screening + appointment booking workflow
+
+KEY FEATURES IN YOUR DFD:
+1. ✅ NSFW Filter (P2) - Your poster detection feature!
+2. ✅ External Vision Transformer AI integration (P3)
+3. ✅ Google Maps API for hospital search (P4)
+4. ✅ Appointment workflow with privacy protection (P5)
+5. ✅ Email notifications via SMTP (P6)
+6. ✅ Comprehensive audit logging (P7) - Privacy compliance
+7. ✅ 8 data stores (vs 5 in reference)
+8. ✅ 5 external entities (vs 3 in reference)
+
+================================================================================
+SUMMARY TABLE OF COMPONENTS
+================================================================================
+
+COMPONENT TYPE       | COUNT | LABELS
+---------------------|-------|----------------------------------------
+External Entities    |   5   | Patient, Hospital Staff, ViT AI,
+                     |       | Google Maps API, Email System (SMTP)
+---------------------|-------|----------------------------------------
+Processes            |   7   | P1-Authentication, P2-Image Validation,
+                     |       | P3-AI Analysis, P4-Hospital Search,
+                     |       | P5-Appointment, P6-Notification,
+                     |       | P7-Audit Logging
+---------------------|-------|----------------------------------------
+Data Stores          |   8   | D1-User Accounts, D2-Patient Profiles,
+                     |       | D3-Analysis Reports, D4-Image Storage,
+                     |       | D5-Appointments, D6-Hospitals,
+                     |       | D7-Email Queue, D8-Audit Logs
+---------------------|-------|----------------------------------------
+Data Flows (approx.) |  50+  | Patient inputs, System outputs,
+                     |       | External API calls, Inter-process flows,
+                     |       | Data store access
+================================================================================
+
+COLOR CODING SUGGESTIONS (Optional but helpful):
+================================================================================
+
+ENTITIES:
+- Patient: Light Blue
+- Hospital Staff: Light Green
+- External Services: Light Gray
+
+PROCESSES:
+- P1 (Auth): Light Blue
+- P2 (Validation): Light Yellow (Security feature)
+- P3 (AI Analysis): Light Orange (Core feature)
+- P4 (Hospital Search): Light Purple
+- P5 (Appointment): Light Green
+- P6 (Notification): Light Pink
+- P7 (Audit): Light Red (Critical for privacy)
+
+DATA STORES:
+- All data stores: Light Yellow or White with thick borders
+
+DATA FLOWS:
+- Standard flows: Black arrows
+- Critical/sensitive flows: Red arrows (e.g., Patient Identity Reveal)
+- External API calls: Green arrows
+
+================================================================================
+FINAL CHECKLIST BEFORE SUBMISSION:
+================================================================================
+
+✅ Outer "Operational Logs" boundary box drawn
+✅ 5 external entities placed OUTSIDE boundary
+✅ 7 processes (P1-P7) placed INSIDE boundary with rounded rectangles
+✅ 8 data stores (D1-D8) placed INSIDE boundary with open-ended rectangles
+✅ All arrows have descriptive labels
+✅ Bidirectional arrows (↔) where data flows both ways
+✅ All processes connect to D8 (Audit Logs)
+✅ Legend included
+✅ Title and figure caption added
+✅ Clear, readable layout without crossing arrows where possible
+✅ Consistent styling (same shapes, fonts, colors)
+
+================================================================================
+ALTERNATIVE: SIMPLIFIED VERSION
+================================================================================
+
+If the full diagram is too complex, you can create a SIMPLIFIED version by:
+
+1. COMBINING some processes:
+   - Merge P1 (Auth) into general "User Management"
+   - Merge P2 + P3 into "AI Analysis Pipeline"
+   - Merge P6 + P7 into "Notifications & Logging"
+   
+   This reduces to 4-5 processes (easier to draw)
+
+2. SHOWING only MAJOR data flows:
+   - Patient → System → External Services → Patient
+   - Skip some internal inter-process flows
+   
+3. USING a TWO-TIER approach:
+   - Draw a simplified Level 1 DFD
+   - Create detailed descriptions in text (like what I provided)
+   - Reference: "See Section X.X for detailed data flow descriptions"
+
+Let me know if you want me to create a simplified version!
+
+================================================================================
+FILES CREATED
+================================================================================
+
+✅ DFD_LEVEL1_DETAILED.txt - This file (proper Level 1 DFD)
+✅ DFD_DIAGRAMS.txt - Previous file (had Context Diagram)
+
+USE THIS FILE (DFD_LEVEL1_DETAILED.txt) for your thesis!
+
+This matches the style of your reference diagram with:
+- Operational boundary
+- External entities outside
+- Processes (P#) inside
+- Data stores (D#) inside
+- All data flows labeled
+- Same rectangular layout approach
+
+READY TO DRAW! 🎓

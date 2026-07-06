@@ -1,0 +1,84 @@
+# SkinGuard Backend Production Dockerfile
+# Multi-stage build for optimized production image
+
+# ============================================================================
+# Stage 1: Builder - Install dependencies and download models
+# ============================================================================
+FROM python:3.10-slim as builder
+
+WORKDIR /build
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY backend/requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Download AI models (optional - can be mounted as volume)
+RUN mkdir -p /build/models
+# Uncomment to download models during build:
+# COPY scripts/download_models.py .
+# RUN python download_models.py --output /build/models
+
+# ============================================================================
+# Stage 2: Runtime - Minimal production image
+# ============================================================================
+FROM python:3.10-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/root/.local/bin:$PATH \
+    MODEL_CACHE_DIR=/opt/models
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN useradd -m -u 1000 skinguard && \
+    mkdir -p /app /opt/models /var/log/skinguard && \
+    chown -R skinguard:skinguard /app /opt/models /var/log/skinguard
+
+# Copy Python dependencies from builder
+COPY --from=builder --chown=skinguard:skinguard /root/.local /root/.local
+
+# Copy AI models from builder (if downloaded during build)
+# COPY --from=builder --chown=skinguard:skinguard /build/models /opt/models
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
+COPY --chown=skinguard:skinguard backend/ ./backend/
+COPY --chown=skinguard:skinguard database/ ./database/
+
+# Switch to non-root user
+USER skinguard
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Start application with Gunicorn
+CMD ["gunicorn", "backend.app.main:app", \
+     "--workers", "4", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--bind", "0.0.0.0:8000", \
+     "--timeout", "120", \
+     "--access-logfile", "/var/log/skinguard/access.log", \
+     "--error-logfile", "/var/log/skinguard/error.log", \
+     "--log-level", "info"]

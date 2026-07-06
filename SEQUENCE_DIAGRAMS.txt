@@ -1,0 +1,722 @@
+================================================================================
+SEQUENCE DIAGRAMS FOR SKINGUARD SYSTEM
+================================================================================
+
+RECOMMENDED: Create 4 key sequence diagrams (not all 28 use cases)
+
+1. Patient Login with JWT Authentication (SD001) - Replaces old "Admin Login"
+2. Complete AI Analysis Workflow (SD002) - CORE FEATURE
+3. Book Appointment with Notifications (SD003) - Multi-actor interaction
+4. Hospital Staff Confirms Appointment (SD004) - Facility workflow
+
+Each diagram shows message flow and timing between actors/systems.
+Generate images at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+WHY ONLY 4 SEQUENCE DIAGRAMS (NOT ALL 28)?
+================================================================================
+
+ACADEMIC STANDARD:
+✅ 3-5 sequence diagrams is the recommended practice
+✅ Focus on interactions involving multiple actors/systems
+✅ Show external API integrations (Google Maps, Email, AI)
+✅ Demonstrate timing and order of operations
+
+SKIP SEQUENCE DIAGRAMS FOR:
+❌ Simple CRUD operations (view profile, update profile)
+❌ Single-actor flows (logout, view history)
+❌ Workflows already well-shown in activity diagrams
+
+SEQUENCE DIAGRAMS ARE BEST FOR:
+✅ API calls and responses
+✅ Database transactions
+✅ Email/notification flows
+✅ Multi-system integrations
+✅ Asynchronous operations
+
+================================================================================
+DIAGRAM 1: PATIENT LOGIN WITH JWT AUTHENTICATION (SD001)
+================================================================================
+Replaces your old "Admin Login" sequence diagram
+Shows: Patient → Login Page → Auth Controller → Database → JWT Generation
+
+@startuml
+title Sequence Diagram: Patient Login with JWT Authentication (SD001)
+
+actor Patient
+participant "Login Page" as LoginPage
+participant "Auth Controller" as AuthController
+participant "Database" as DB
+participant "JWT Service" as JWT
+
+Patient -> LoginPage: Enter email and password
+Patient -> LoginPage: Click "Login" button
+LoginPage -> AuthController: login(email, password)
+activate AuthController
+
+AuthController -> AuthController: Validate email format
+alt Email format invalid
+    AuthController --> LoginPage: return error "Invalid email format"
+    LoginPage --> Patient: Display error message
+else Email format valid
+    AuthController -> DB: getUserByEmail(email)
+    activate DB
+    
+    alt User not found
+        DB --> AuthController: return null
+        deactivate DB
+        AuthController --> LoginPage: return error "Account not found"
+        LoginPage --> Patient: Display error message
+    else User found
+        DB --> AuthController: return user data
+        deactivate DB
+        
+        AuthController -> AuthController: verifyPassword(password, hashedPassword)
+        
+        alt Password incorrect
+            AuthController -> DB: incrementFailedAttempts(userId)
+            activate DB
+            DB --> AuthController: return attempt count
+            deactivate DB
+            
+            alt Failed attempts >= 5
+                AuthController -> DB: lockAccount(userId, 15 minutes)
+                activate DB
+                DB --> AuthController: return locked status
+                deactivate DB
+                AuthController --> LoginPage: return error "Account locked"
+                LoginPage --> Patient: Display "Account locked for 15 minutes"
+            else Failed attempts < 5
+                AuthController --> LoginPage: return error "Invalid password"
+                LoginPage --> Patient: Display error message
+            end
+        else Password correct
+            AuthController -> DB: resetFailedAttempts(userId)
+            activate DB
+            DB --> AuthController: return success
+            deactivate DB
+            
+            AuthController -> JWT: generateAccessToken(userId, role)
+            activate JWT
+            JWT --> AuthController: return accessToken (30 min expiry)
+            deactivate JWT
+            
+            AuthController -> JWT: generateRefreshToken(userId)
+            activate JWT
+            JWT --> AuthController: return refreshToken (7 days expiry)
+            deactivate JWT
+            
+            AuthController -> DB: logLoginEvent(userId, timestamp, ipAddress)
+            activate DB
+            DB --> AuthController: return success
+            deactivate DB
+            
+            AuthController --> LoginPage: return {accessToken, refreshToken, userData}
+            deactivate AuthController
+            LoginPage -> LoginPage: Store tokens in localStorage
+            LoginPage --> Patient: Redirect to Patient Dashboard
+            Patient -> Patient: Successfully logged in
+        end
+    end
+end
+
+@enduml
+
+================================================================================
+DIAGRAM 2: COMPLETE AI ANALYSIS WORKFLOW (SD002)
+================================================================================
+Shows: Patient → Upload → NSFW Filter → AI Model → Risk Assessment → Display
+Most important - demonstrates core AI feature with external services
+
+@startuml
+title Sequence Diagram: Complete AI Analysis Workflow (SD002)
+
+actor Patient
+participant "Upload Page" as UploadPage
+participant "Image Validator" as Validator
+participant "NSFW Filter" as NSFWFilter
+participant "Questionnaire" as Quiz
+participant "AI Controller" as AIController
+participant "Vision Transformer\n(Hugging Face)" as ViTModel
+participant "Risk Assessor" as RiskAssessor
+participant "Database" as DB
+participant "Results Page" as ResultsPage
+
+Patient -> UploadPage: Click "New Analysis"
+UploadPage --> Patient: Display upload interface
+
+Patient -> UploadPage: Select/capture skin lesion image
+Patient -> UploadPage: Confirm upload
+UploadPage -> Validator: validateImage(imageFile)
+activate Validator
+
+Validator -> Validator: Check file format (JPG/PNG)
+Validator -> Validator: Check file size (<10MB)
+
+alt Invalid file
+    Validator --> UploadPage: return error "Invalid format or size"
+    UploadPage --> Patient: Display error message
+else Valid file
+    Validator --> UploadPage: return success
+    deactivate Validator
+    
+    UploadPage -> NSFWFilter: checkContent(imageData)
+    activate NSFWFilter
+    
+    NSFWFilter -> NSFWFilter: Preprocess image (224x224, normalize)
+    NSFWFilter -> NSFWFilter: Calculate skin percentage (4 criteria)
+    
+    alt Skin percentage < 25%
+        NSFWFilter --> UploadPage: return error "Not a skin lesion"
+        UploadPage --> Patient: Display "Upload actual skin photo"
+    else Skin percentage >= 25%
+        NSFWFilter -> NSFWFilter: Detect text/graphics
+        
+        alt Text/graphics detected
+            NSFWFilter --> UploadPage: return error "Poster detected"
+            UploadPage --> Patient: Display "Upload skin photo, not poster"
+        else No text/graphics
+            NSFWFilter -> NSFWFilter: Calculate NSFW score
+            
+            alt NSFW score > 0.35
+                NSFWFilter --> UploadPage: return error "Inappropriate content"
+                UploadPage --> Patient: Display error message
+            else NSFW score <= 0.35
+                NSFWFilter --> UploadPage: return validation passed
+                deactivate NSFWFilter
+                
+                UploadPage -> Quiz: displayQuestionnaire()
+                Quiz --> Patient: Display 8 symptom questions
+                Patient -> Quiz: Answer all questions
+                Patient -> Quiz: Submit questionnaire
+                
+                Quiz -> Quiz: Validate all required answers
+                alt Incomplete questionnaire
+                    Quiz --> Patient: Highlight missing questions
+                else Complete questionnaire
+                    Quiz -> DB: saveQuestionnaireResponses(patientId, responses)
+                    activate DB
+                    DB --> Quiz: return success
+                    deactivate DB
+                    
+                    Quiz -> AIController: analyzeImage(imageData, symptoms)
+                    activate AIController
+                    AIController --> Patient: Display "Analyzing..." progress
+                    
+                    AIController -> ViTModel: loadModel("dima806/skin_cancer_detection_vit")
+                    activate ViTModel
+                    ViTModel --> AIController: return model loaded
+                    
+                    AIController -> ViTModel: predict(preprocessedImage)
+                    ViTModel -> ViTModel: Perform neural network forward pass
+                    ViTModel -> ViTModel: Generate probabilities for 7 classes
+                    ViTModel --> AIController: return predictions {mel: 0.87, bcc: 0.05, ...}
+                    deactivate ViTModel
+                    
+                    AIController -> AIController: Identify highest probability
+                    AIController -> AIController: Convert to confidence percentage
+                    AIController -> AIController: Perform lesion localization
+                    
+                    AIController -> RiskAssessor: assessRisk(cancerType, confidence, symptoms)
+                    activate RiskAssessor
+                    
+                    alt Melanoma OR Confidence >= 85%
+                        RiskAssessor -> RiskAssessor: Assign risk = URGENT, color = Red
+                    else Basal Cell OR Actinic Keratoses
+                        RiskAssessor -> RiskAssessor: Assign risk = HIGH, color = Orange
+                    else Confidence 60-85% OR Concerning symptoms
+                        RiskAssessor -> RiskAssessor: Assign risk = MEDIUM, color = Yellow
+                    else Benign types with high confidence
+                        RiskAssessor -> RiskAssessor: Assign risk = LOW, color = Green
+                    end
+                    
+                    RiskAssessor -> RiskAssessor: Generate risk justification
+                    RiskAssessor -> RiskAssessor: Calculate urgency score (0-100)
+                    RiskAssessor --> AIController: return riskAssessment
+                    deactivate RiskAssessor
+                    
+                    AIController -> DB: saveAnalysisReport(patientId, predictions, risk, image)
+                    activate DB
+                    DB --> AIController: return reportId
+                    deactivate DB
+                    
+                    AIController --> ResultsPage: return analysisResults
+                    deactivate AIController
+                    
+                    ResultsPage -> ResultsPage: Display risk level banner with color
+                    ResultsPage -> ResultsPage: Show cancer type and confidence %
+                    ResultsPage -> ResultsPage: Show all 7 classes with probabilities
+                    ResultsPage -> ResultsPage: Display image with lesion bounding box
+                    ResultsPage -> ResultsPage: Show symptom summary
+                    ResultsPage -> ResultsPage: Provide recommended actions
+                    ResultsPage -> ResultsPage: Display medical disclaimer (84% accuracy)
+                    ResultsPage --> Patient: Show complete analysis results
+                    Patient -> Patient: Review results and decide next action
+                end
+            end
+        end
+    end
+end
+
+@enduml
+
+================================================================================
+DIAGRAM 3: BOOK APPOINTMENT WITH NOTIFICATIONS (SD003)
+================================================================================
+Shows: Patient → Google Maps API → Hospital → Email System
+Demonstrates multi-actor interaction with external services
+
+@startuml
+title Sequence Diagram: Book Appointment with Notifications (SD003)
+
+actor Patient
+participant "Hospital Finder" as HospitalFinder
+participant "Google Maps API" as GoogleMaps
+participant "Booking Page" as BookingPage
+participant "Appointment Controller" as ApptController
+participant "Database" as DB
+participant "Email Service\n(SMTP)" as EmailService
+participant "Hospital Staff" as Staff
+
+Patient -> HospitalFinder: Click "Find Nearby Hospitals"
+HospitalFinder -> Patient: Request location permission
+Patient -> HospitalFinder: Grant GPS access
+HospitalFinder -> HospitalFinder: Get current location (lat, lng)
+
+HospitalFinder -> GoogleMaps: searchPlaces(location, radius=50km, type="hospital")
+activate GoogleMaps
+GoogleMaps -> GoogleMaps: Search within 50km radius
+GoogleMaps -> GoogleMaps: Filter by "dermatology" OR "hospital"
+GoogleMaps --> HospitalFinder: return hospitalList (up to 180 results)
+deactivate GoogleMaps
+
+HospitalFinder -> HospitalFinder: Sort by rating (4.5+ first) then distance
+HospitalFinder --> Patient: Display map view and list view
+
+Patient -> HospitalFinder: Select hospital from list
+Patient -> HospitalFinder: Click "Book Appointment"
+
+HospitalFinder -> BookingPage: openBookingForm(hospitalId)
+BookingPage --> Patient: Display booking form
+
+Patient -> BookingPage: Select analysis report from history
+BookingPage -> DB: getAnalysisReport(reportId)
+activate DB
+DB --> BookingPage: return report {cancerType, riskLevel, date}
+deactivate DB
+
+BookingPage --> Patient: Display report summary
+BookingPage --> Patient: Auto-suggest urgency based on risk
+
+Patient -> BookingPage: Select preferred date
+Patient -> BookingPage: Select preferred time slot
+Patient -> BookingPage: Enter additional notes (optional)
+Patient -> BookingPage: Check "Confirm info correct"
+Patient -> BookingPage: Click "Submit Appointment Request"
+
+BookingPage -> ApptController: createAppointment(patientId, hospitalId, reportId, preferences)
+activate ApptController
+
+ApptController -> ApptController: Validate all required fields
+ApptController -> ApptController: Check date is not in past
+
+alt Validation failed
+    ApptController --> BookingPage: return error "Invalid data"
+    BookingPage --> Patient: Display error message
+else Validation passed
+    ApptController -> DB: insertAppointment(appointmentData)
+    activate DB
+    DB -> DB: Create record with status = "Pending"
+    DB -> DB: Link patient, hospital, and report
+    DB --> ApptController: return appointmentId
+    deactivate DB
+    
+    ApptController -> EmailService: sendStaffNotification(hospitalId, appointmentId)
+    activate EmailService
+    EmailService -> EmailService: Compose notification email
+    EmailService -> EmailService: Include: Risk level, Cancer type, Preferred date
+    EmailService -> Staff: Send email "New appointment request"
+    EmailService --> ApptController: return emailSent = true
+    deactivate EmailService
+    
+    ApptController --> BookingPage: return success {appointmentId, status: "Pending"}
+    deactivate ApptController
+    
+    BookingPage --> Patient: Display "Request submitted successfully!"
+    BookingPage --> Patient: Show "Hospital will confirm within 24-48 hours"
+    BookingPage -> BookingPage: Redirect to "My Appointments" page
+    BookingPage --> Patient: Display appointment status "Pending"
+    
+    note over Staff
+        Hospital staff receives email
+        and can review in dashboard
+    end note
+end
+
+@enduml
+
+================================================================================
+DIAGRAM 4: HOSPITAL STAFF CONFIRMS APPOINTMENT (SD004)
+================================================================================
+Shows: Hospital Staff → Database → Email → Patient
+Demonstrates privacy reveal and notification workflow
+
+@startuml
+title Sequence Diagram: Hospital Staff Confirms Appointment (SD004)
+
+actor "Hospital Staff" as Staff
+participant "Staff Dashboard" as Dashboard
+participant "Review Page" as ReviewPage
+participant "Confirmation Form" as ConfirmForm
+participant "Appointment Controller" as ApptController
+participant "Database" as DB
+participant "Calendar Service" as Calendar
+participant "Email Service\n(SMTP)" as EmailService
+actor Patient
+
+Staff -> Dashboard: Login to hospital dashboard
+Dashboard -> DB: getPendingAppointments(hospitalId)
+activate DB
+DB --> Dashboard: return appointmentList (organized by urgency)
+deactivate DB
+
+Dashboard --> Staff: Display reports by urgency (Urgent, High, Medium, Low)
+note over Dashboard
+    Patient identity HIDDEN
+    Only anonymized report data shown
+end note
+
+Staff -> Dashboard: Select report to review
+Dashboard -> ReviewPage: openReport(reportId)
+ReviewPage -> DB: getReportDetails(reportId)
+activate DB
+DB --> ReviewPage: return {aiResults, symptoms, images, appointmentRequest}
+deactivate DB
+
+ReviewPage --> Staff: Display complete report
+ReviewPage --> Staff: Show: Risk level, AI classification, Lesion images, Symptoms
+ReviewPage --> Staff: Display privacy notice
+
+Staff -> ReviewPage: Review AI analysis results
+Staff -> ReviewPage: Examine skin lesion image
+Staff -> ReviewPage: Read symptom responses
+Staff -> ReviewPage: Check appointment preferences
+
+Staff -> ReviewPage: Click "Confirm Appointment"
+ReviewPage -> ConfirmForm: openConfirmationForm(appointmentId)
+ConfirmForm --> Staff: Display confirmation form with calendar
+
+Staff -> ConfirmForm: Select available date/time from calendar
+Staff -> ConfirmForm: Select consultation type
+Staff -> ConfirmForm: Estimate duration (15/30/45/60 min)
+Staff -> ConfirmForm: Enter special instructions for patient (optional)
+Staff -> ConfirmForm: Click "Confirm and Notify Patient"
+
+ConfirmForm -> ApptController: confirmAppointment(appointmentId, confirmedDetails, staffId)
+activate ApptController
+
+ApptController -> DB: updateAppointmentStatus(appointmentId, "Confirmed")
+activate DB
+DB -> DB: Update status: Pending → Confirmed
+DB -> DB: Store confirmed date, time, consultation type, duration
+DB -> DB: Record confirmed_by = staffId, confirmed_at = timestamp
+DB --> ApptController: return success
+deactivate DB
+
+ApptController -> DB: revealPatientIdentity(appointmentId, staffId)
+activate DB
+DB -> DB: Log privacy access event
+DB --> ApptController: return patientData {name, email, phone, medicalHistory}
+deactivate DB
+
+note over ApptController
+    Patient identity NOW revealed to staff
+    Staff gains access to full medical history
+end note
+
+ApptController -> Calendar: addAppointmentToCalendar(hospitalId, appointmentDetails)
+activate Calendar
+Calendar -> Calendar: Create calendar event
+Calendar --> ApptController: return calendarEventId
+deactivate Calendar
+
+ApptController -> EmailService: sendConfirmationEmail(patientEmail, appointmentDetails)
+activate EmailService
+EmailService -> EmailService: Compose confirmation email
+EmailService -> EmailService: Include: Hospital details, Date/Time, Doctor name
+EmailService -> EmailService: Include: What to bring, Directions, Calendar invite
+EmailService -> Patient: Send email "Appointment Confirmed"
+EmailService --> ApptController: return emailSent = true
+deactivate EmailService
+
+ApptController -> DB: grantStaffAccessToHistory(staffId, patientId, appointmentId)
+activate DB
+DB -> DB: Log history access permission
+DB --> ApptController: return accessGranted = true
+deactivate DB
+
+ApptController --> ConfirmForm: return confirmationSuccess
+deactivate ApptController
+
+ConfirmForm --> Staff: Display "Appointment confirmed! Patient notified."
+ConfirmForm -> Dashboard: Update dashboard (move to Confirmed list)
+Dashboard --> Staff: Show confirmed appointment with patient details
+
+note over Patient
+    Patient receives confirmation email
+    with appointment details and
+    calendar invite attachment
+end note
+
+Staff -> DB: viewPatientMedicalHistory(patientId)
+activate DB
+DB --> Staff: return fullMedicalHistory {conditions, medications, allergies, previousAnalyses}
+deactivate DB
+
+note over Staff
+    Staff can now access patient's
+    complete medical history for
+    consultation preparation
+end note
+
+@enduml
+
+================================================================================
+SYNTAX NOTES
+================================================================================
+
+PlantUML Sequence Diagram Syntax:
+✅ actor "Name" as Alias - defines human actors
+✅ participant "Name" as Alias - defines system components
+✅ -> solid arrow (synchronous call)
+✅ --> dashed arrow (return/response)
+✅ activate/deactivate - shows active processing
+✅ alt/else/end - conditional flows
+✅ note over - adds explanatory notes
+✅ note left/right - adds side notes
+
+All 4 diagrams verified for correct PlantUML syntax!
+
+================================================================================
+HOW TO GENERATE SEQUENCE DIAGRAMS
+================================================================================
+
+METHOD 1: ONLINE PLANTUML (EASIEST)
+1. Go to: http://www.plantuml.com/plantuml/uml/
+2. Copy one sequence diagram code (from @startuml to @enduml)
+3. Paste into the text box
+4. Click "Submit"
+5. Download as PNG or SVG
+
+METHOD 2: VS CODE EXTENSION
+1. Install "PlantUML" extension in VS Code
+2. Create new file: sequence1.puml
+3. Paste PlantUML code
+4. Press Alt+D to preview
+5. Right-click preview → Export to PNG/SVG
+
+METHOD 3: COMMAND LINE (if you have Java + PlantUML installed)
+1. Save each diagram as separate .puml file
+2. Run: java -jar plantuml.jar sequence1.puml
+3. Generates sequence1.png
+
+================================================================================
+COMPARISON: OLD vs NEW SEQUENCE DIAGRAM
+================================================================================
+
+OLD SEQUENCE DIAGRAM (Your "Admin Login"):
+❌ Shows "Admin" actor (removed in new system)
+❌ Shows "Admin Controller" (no longer exists)
+❌ Shows "Admin Forgot Password Page" (removed feature)
+❌ References getAdmin(email, password) method (incorrect)
+❌ Shows displayDashboardPage() for admin (removed)
+✅ Basic structure is good (actors, lifelines, messages)
+
+NEW SEQUENCE DIAGRAM (Patient Login - SD001):
+✅ Shows "Patient" actor (correct for new system)
+✅ Shows "Auth Controller" (actual component name)
+✅ Shows "JWT Service" (modern authentication)
+✅ References getUserByEmail(email) method (correct)
+✅ Shows JWT token generation (access + refresh tokens)
+✅ Shows account locking after 5 failed attempts (security)
+✅ Shows redirect to Patient Dashboard (correct destination)
+✅ More detailed with proper activation bars
+
+================================================================================
+RECOMMENDED APPROACH FOR YOUR THESIS
+================================================================================
+
+INCLUDE THESE 4 SEQUENCE DIAGRAMS:
+
+1. ✅ Patient Login with JWT Authentication (SD001)
+   - Replaces your old "Admin Login"
+   - Shows authentication flow with database interaction
+   - Demonstrates JWT token generation (modern auth)
+   - Shows security features (account locking, password hashing)
+   - Participants: Patient, Login Page, Auth Controller, Database, JWT Service
+
+2. ✅ Complete AI Analysis Workflow (SD002) - MOST IMPORTANT
+   - Shows entire AI analysis process end-to-end
+   - Demonstrates NSFW validation (your poster detection!)
+   - Shows Vision Transformer integration (Hugging Face API)
+   - Shows risk assessment logic
+   - Most complex diagram - demonstrates core feature
+   - Participants: Patient, Upload Page, Validator, NSFW Filter, 
+                  Questionnaire, AI Controller, ViT Model, Risk Assessor,
+                  Database, Results Page
+
+3. ✅ Book Appointment with Notifications (SD003)
+   - Shows Google Maps API integration
+   - Demonstrates external service calls
+   - Shows email notification to hospital staff
+   - Multi-actor interaction (Patient + Staff)
+   - Participants: Patient, Hospital Finder, Google Maps API,
+                  Booking Page, Appointment Controller, Database,
+                  Email Service, Hospital Staff
+
+4. ✅ Hospital Staff Confirms Appointment (SD004)
+   - Shows staff workflow from dashboard to confirmation
+   - Demonstrates privacy reveal (identity hidden → revealed)
+   - Shows email notification to patient
+   - Shows calendar integration
+   - Demonstrates medical history access grant
+   - Participants: Hospital Staff, Dashboard, Review Page,
+                  Confirmation Form, Appointment Controller, Database,
+                  Calendar Service, Email Service, Patient
+
+================================================================================
+WHY THESE 4 DIAGRAMS?
+================================================================================
+
+COVERAGE:
+✅ Authentication & Security (SD001)
+✅ Core AI Feature (SD002)
+✅ External API Integrations (SD003 - Google Maps, SD001/SD003/SD004 - Email)
+✅ Multi-Actor Workflows (SD003, SD004)
+✅ Privacy Protection (SD004)
+✅ Database Transactions (All 4)
+
+DEMONSTRATES:
+✅ Synchronous calls (solid arrows)
+✅ Asynchronous responses (dashed arrows)
+✅ Activation bars (showing processing time)
+✅ Alternative flows (alt/else blocks)
+✅ External system integration
+✅ Error handling
+✅ Complex business logic
+
+ACADEMIC VALUE:
+✅ Shows technical depth
+✅ Demonstrates understanding of system architecture
+✅ Proves multi-tier architecture (Frontend → Backend → Database → External APIs)
+✅ Shows security considerations
+✅ Demonstrates modern practices (JWT, SMTP, REST APIs)
+
+================================================================================
+THESIS ORGANIZATION SUGGESTION (UPDATED)
+================================================================================
+
+CHAPTER 4: SYSTEM DESIGN
+├── 4.1 Use Case Diagram (1 diagram - 28 use cases)
+│   └── Figure 4.1: Use Case Diagram
+│
+├── 4.2 Use Case Descriptions (28 use cases in tables)
+│   ├── Table 4.1: Functional Requirements (28 use cases)
+│   ├── Table 4.2: Actor Description (5 actors)
+│   └── Tables 4.3-4.30: Detailed Use Case Descriptions
+│
+├── 4.3 Activity Diagrams (5 key workflows)
+│   ├── Figure 4.2: Patient Login (AD001)
+│   ├── Figure 4.3: Complete AI Analysis Workflow (AD002) ⭐
+│   ├── Figure 4.4: Book Appointment (AD003)
+│   ├── Figure 4.5: Hospital Staff Review & Confirm (AD004)
+│   └── Figure 4.6: Image Validation with NSFW Filter (AD005)
+│
+├── 4.4 Sequence Diagrams (4 key interactions) ⭐ NEW
+│   ├── Figure 4.7: Patient Login with JWT (SD001)
+│   ├── Figure 4.8: Complete AI Analysis Workflow (SD002) ⭐
+│   ├── Figure 4.9: Book Appointment with Notifications (SD003)
+│   └── Figure 4.10: Hospital Staff Confirms Appointment (SD004)
+│
+├── 4.5 Class Diagram (database schema - optional)
+│   └── Figure 4.11: Entity Relationship Diagram
+│
+└── 4.6 System Architecture Diagram (high-level)
+    └── Figure 4.12: System Architecture Overview
+
+================================================================================
+WHAT MAKES GOOD SEQUENCE DIAGRAMS?
+================================================================================
+
+GOOD PRACTICE:
+✅ Clear actor/participant labels
+✅ Activation bars show processing time
+✅ Dashed arrows for returns
+✅ Alt/else blocks for error handling
+✅ Notes explain complex logic
+✅ Left-to-right flow (chronological)
+✅ Not too many participants (5-10 max)
+
+AVOID:
+❌ Too many nested alt blocks (max 2-3 levels)
+❌ Crossing arrows (confusing)
+❌ Too many participants (hard to read)
+❌ Missing return arrows
+❌ Unclear labels (use descriptive method names)
+
+YOUR DIAGRAMS:
+✅ All 4 diagrams follow good practices
+✅ Clear participant separation
+✅ Proper activation/deactivation
+✅ Error handling with alt blocks
+✅ Explanatory notes for complex logic
+✅ Realistic method names from your code
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. ✅ GENERATE IMAGES:
+   - Go to http://www.plantuml.com/plantuml/uml/
+   - Copy SD001 code (from @startuml to @enduml)
+   - Paste and click Submit
+   - Download PNG → Save as "Figure_4_7_Patient_Login_Sequence.png"
+   - Repeat for SD002, SD003, SD004
+
+2. ✅ INSERT IN THESIS:
+   - Place in Chapter 4.4 (after Activity Diagrams)
+   - Add figure captions
+   - Write brief explanatory paragraph before each diagram
+   - Reference diagrams in text: "As shown in Figure 4.8..."
+
+3. ✅ WRITE EXPLANATORY TEXT:
+   Example for SD002:
+   "Figure 4.8 shows the sequence of interactions during the complete AI 
+   analysis workflow. The diagram illustrates how the patient's uploaded 
+   image flows through multiple validation layers (NSFW filter, skin content 
+   check) before being processed by the Vision Transformer model. The AI 
+   controller coordinates with the Hugging Face API to perform classification, 
+   then the Risk Assessor evaluates the results to assign an appropriate 
+   urgency level. Finally, the complete analysis report is stored in the 
+   database and displayed to the patient with recommended actions."
+
+================================================================================
+FILES CREATED
+================================================================================
+
+✅ SEQUENCE_DIAGRAMS.txt - This file with all 4 PlantUML sequence diagrams
+
+Previous files:
+✅ ACTIVITY_DIAGRAMS_FIXED.txt - All 5 corrected activity diagrams
+✅ USE_CASE_DESCRIPTIONS_ALL.txt - All 28 detailed use case descriptions
+✅ TABLE_4.1_GOOGLE_DOCS.txt - Functional Requirements Table
+✅ TABLE_4.2_GOOGLE_DOCS.txt - Actor Description Table
+✅ use_case_diagram.puml - Use Case Diagram (35 use cases)
+
+ALL READY FOR YOUR THESIS! 🎓
+
+SUMMARY:
+- Use Case Diagram: 1 diagram (all 28 use cases)
+- Activity Diagrams: 5 diagrams (key workflows)
+- Sequence Diagrams: 4 diagrams (key interactions)
+- Total: 10 UML diagrams for comprehensive system documentation

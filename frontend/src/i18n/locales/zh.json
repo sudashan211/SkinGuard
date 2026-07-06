@@ -1,0 +1,265 @@
+{
+  "common": {
+    "appName": "SkinGuard",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "confirm": "确认",
+    "search": "搜索",
+    "filter": "筛选",
+    "logout": "退出登录"
+  },
+  "auth": {
+    "login": "登录",
+    "signup": "注册",
+    "email": "电子邮箱",
+    "password": "密码",
+    "fullName": "全名",
+    "role": "角色",
+    "patient": "患者",
+    "doctor": "医生",
+    "admin": "管理员",
+    "loginButton": "登录",
+    "signupButton": "创建账户",
+    "alreadyHaveAccount": "已有账户？",
+    "dontHaveAccount": "还没有账户？",
+    "forgotPassword": "忘记密码？"
+  },
+  "landing": {
+    "hero": {
+      "title": "AI驱动的皮肤癌筛查",
+      "subtitle": "获取即时AI皮肤病变分析，并与经过验证的皮肤科医生联系",
+      "cta": "开始使用"
+    },
+    "features": {
+      "aiScreening": {
+        "title": "AI筛查",
+        "description": "先进的AI以94%的准确率分析您的皮肤病变"
+      },
+      "findDoctors": {
+        "title": "查找医生",
+        "description": "与您附近经过验证的皮肤科医生联系"
+      },
+      "secureHistory": {
+        "title": "安全历史记录",
+        "description": "通过加密存储跟踪您的皮肤健康"
+      }
+    }
+  },
+  "patient": {
+    "dashboard": "患者仪表板",
+    "uploadImage": "上传图片",
+    "dragDropImage": "将图片拖放到此处，或点击选择",
+    "takePhoto": "拍照",
+    "selectFile": "选择文件",
+    "analyzing": "分析中...",
+    "results": "结果",
+    "reportHistory": "报告历史",
+    "viewReport": "查看报告",
+    "compareReports": "比较报告",
+    "findDoctor": "查找医生",
+    "bookAppointment": "预约",
+    "myAppointments": "我的预约",
+    "healthProfile": "健康档案",
+    "age": "年龄",
+    "skinType": "皮肤类型",
+    "familyHistory": "家族史"
+  },
+  "symptomWizard": {
+    "title": "症状信息",
+    "step1": {
+      "title": "病变位置",
+      "description": "病变位于您身体的哪个部位？",
+      "bodyLocation": "身体位置"
+    },
+    "step2": {
+      "title": "感觉",
+      "description": "您有什么感觉？",
+      "itching": "瘙痒",
+      "pain": "疼痛",
+      "burning": "灼热",
+      "numbness": "麻木",
+      "none": "无"
+    },
+    "step3": {
+      "title": "视觉变化",
+      "description": "您注意到了什么变化？",
+      "color": "颜色变化",
+      "size": "大小增加",
+      "shape": "形状变化",
+      "border": "边界不规则",
+      "none": "无"
+    }
+  },
+  "results": {
+    "title": "分析结果",
+    "riskLevel": "风险等级",
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "urgent": "紧急",
+    "predictions": "癌症类型预测",
+    "probability": "概率",
+    "disclaimer": "这是94%的概率估计。请咨询经过验证的医生进行临床活检",
+    "urgentWarning": "检测到高风险病变。请立即就医。",
+    "emergencyConsultation": "紧急咨询",
+    "detectedLesions": "检测到的病变",
+    "processingTime": "处理时间"
+  },
+  "cancerTypes": {
+    "melanoma": "黑色素瘤",
+    "basalCellCarcinoma": "基底细胞癌",
+    "squamousCellCarcinoma": "鳞状细胞癌",
+    "actinticKeratosis": "光化性角化病",
+    "benignKeratosis": "良性角化病",
+    "dermatofibroma": "皮肤纤维瘤",
+    "vascularLesion": "血管病变"
+  },
+  "doctor": {
+    "dashboard": "医生仪表板",
+    "pendingReports": "待处理报告",
+    "urgentCases": "紧急病例",
+    "viewReport": "查看报告",
+    "addNotes": "添加咨询笔记",
+    "consultationNotes": "咨询笔记",
+    "patientInfo": "患者信息",
+    "appointments": "预约",
+    "myProfile": "我的资料",
+    "clinicName": "诊所名称",
+    "licenseNumber": "执照号码",
+    "specialization": "专业",
+    "rating": "评分",
+    "reviews": "评论"
+  },
+  "doctorLocator": {
+    "title": "查找附近的医生",
+    "searchPlaceholder": "按位置搜索...",
+    "nearbyDoctors": "附近的医生",
+    "distance": "距离",
+    "contactViaWhatsApp": "通过WhatsApp联系",
+    "bookAppointment": "预约",
+    "viewProfile": "查看资料",
+    "noResults": "该地区未找到医生"
+  },
+  "appointment": {
+    "title": "预约",
+    "selectDoctor": "选择医生",
+    "selectDate": "选择日期",
+    "selectTime": "选择时间",
+    "consultationType": "咨询类型",
+    "inPerson": "面对面",
+    "video": "视频咨询",
+    "notes": "附加说明",
+    "confirmBooking": "确认预约",
+    "status": {
+      "pending": "待处理",
+      "confirmed": "已确认",
+      "completed": "已完成",
+      "cancelled": "已取消"
+    },
+    "upcomingAppointments": "即将到来的预约",
+    "pastAppointments": "过去的预约",
+    "joinVideoCall": "加入视频通话",
+    "reschedule": "重新安排",
+    "cancelAppointment": "取消预约"
+  },
+  "admin": {
+    "dashboard": "管理员仪表板",
+    "doctorVerification": "医生验证",
+    "contentModeration": "内容审核",
+    "analytics": "分析",
+    "skinWikiEditor": "Skin-Wiki编辑器",
+    "pendingVerifications": "待验证",
+    "approve": "批准",
+    "reject": "拒绝",
+    "flaggedContent": "标记的内容",
+    "nsfwScore": "NSFW分数",
+    "reviewContent": "审查内容",
+    "dailyActiveUsers": "每日活跃用户",
+    "totalScreenings": "总筛查次数",
+    "averageProcessingTime": "平均处理时间",
+    "usagePatterns": "使用模式",
+    "createArticle": "创建文章",
+    "editArticle": "编辑文章",
+    "publishArticle": "发布文章"
+  },
+  "education": {
+    "skinWiki": "Skin-Wiki",
+    "learnMore": "了解更多",
+    "riskFactors": "风险因素",
+    "symptoms": "症状",
+    "treatment": "治疗",
+    "prevention": "预防",
+    "selfExamination": "自我检查指南",
+    "preventionTips": "预防提示",
+    "uvProtection": "紫外线防护",
+    "earlyDetection": "早期检测",
+    "bodyMap": "身体地图",
+    "checkRegularly": "定期检查您的皮肤变化"
+  },
+  "notifications": {
+    "title": "通知",
+    "markAsRead": "标记为已读",
+    "markAllAsRead": "全部标记为已读",
+    "noNotifications": "无通知",
+    "analysisComplete": "分析完成",
+    "appointmentConfirmed": "预约已确认",
+    "appointmentReminder": "预约提醒",
+    "verificationApproved": "验证已批准",
+    "followUpReminder": "随访提醒"
+  },
+  "privacy": {
+    "title": "隐私设置",
+    "dataSharing": "数据共享",
+    "optOutResearch": "选择退出研究数据共享",
+    "exportData": "导出我的数据",
+    "deleteAccount": "删除账户",
+    "deleteAccountWarning": "此操作无法撤消。您的所有数据将在30天内永久删除。",
+    "confirmDelete": "确认删除"
+  },
+  "errors": {
+    "generic": "发生错误。请重试。",
+    "networkError": "网络错误。请检查您的连接。",
+    "unauthorized": "您无权执行此操作。",
+    "imageQuality": "图像质量太低，无法进行准确分析",
+    "inappropriateContent": "检测到不当内容",
+    "fileTooLarge": "文件太大。最大大小为10MB。",
+    "invalidFormat": "无效的文件格式。请上传JPEG或PNG图像。",
+    "sessionExpired": "您的会话已过期。请重新登录。"
+  },
+  "validation": {
+    "required": "此字段为必填项",
+    "invalidEmail": "无效的电子邮件地址",
+    "passwordTooShort": "密码必须至少8个字符",
+    "passwordsDoNotMatch": "密码不匹配",
+    "invalidAge": "年龄必须在1到120之间",
+    "invalidPhoneNumber": "无效的电话号码"
+  },
+  "followUp": {
+    "suggestion": "距离您上次筛查已经6个月了。考虑安排随访。",
+    "scheduleNow": "立即安排"
+  },
+  "reviews": {
+    "title": "评论",
+    "writeReview": "写评论",
+    "rating": "评分",
+    "yourReview": "您的评论",
+    "submitReview": "提交评论",
+    "flagReview": "标记评论",
+    "helpful": "有帮助",
+    "notHelpful": "没有帮助"
+  },
+  "language": {
+    "selectLanguage": "选择语言",
+    "currentLanguage": "当前语言"
+  }
+}

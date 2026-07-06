@@ -1,0 +1,199 @@
+================================================================================
+COMPLETE LIST: ALL 28 USE CASES FOR SKINGUARD SYSTEM
+================================================================================
+
+STATUS: Detailed descriptions created for UC001-UC012
+        Remaining: UC013-UC028 (summaries below, can create detailed versions)
+
+================================================================================
+SECTION 1: AUTHENTICATION & USER MANAGEMENT (5 Use Cases)
+================================================================================
+
+✅ UC001: User Registration - DETAILED VERSION CREATED
+✅ UC002: User Login - DETAILED VERSION CREATED  
+✅ UC003: Password Reset - DETAILED VERSION CREATED
+✅ UC004: Hospital/Staff Login - DETAILED VERSION CREATED
+✅ UC005: Logout - DETAILED VERSION CREATED
+
+================================================================================
+SECTION 2: HEALTH PROFILE MANAGEMENT (3 Use Cases)
+================================================================================
+
+✅ UC006: Create Health Profile - DETAILED VERSION CREATED
+✅ UC007: Update Health Profile - DETAILED VERSION CREATED
+✅ UC008: View Health Profile - DETAILED VERSION CREATED
+
+================================================================================
+SECTION 3: IMAGE UPLOAD & AI ANALYSIS (10 Use Cases)
+================================================================================
+
+✅ UC009: Upload Skin Image - DETAILED VERSION CREATED
+✅ UC010: Capture Skin Image - DETAILED VERSION CREATED
+✅ UC011: Validate Image Content - DETAILED VERSION CREATED
+✅ UC012: Reject Non-Skin Images - DETAILED VERSION CREATED (PARTIAL)
+
+
+⏳ UC013: Complete Symptom Questionnaire - SUMMARY BELOW
+   - Patient answers guided questions about skin lesion symptoms
+   - Questions: duration, pain level, itching, bleeding, size changes, location
+   - Responses stored with analysis for doctor review
+   - Data used in AI risk assessment
+
+⏳ UC014: AI Lesion Analysis - SUMMARY BELOW  
+   - Vision Transformer (ViT) model analyzes validated skin image
+   - Detects and localizes lesion in image
+   - Classifies into 7 cancer types with confidence scores
+   - Processing time: <10 seconds
+   - Accuracy: 84% (validated on HAM10000 dataset)
+
+⏳ UC015: Display AI Results - SUMMARY BELOW
+   - Shows cancer type classification result
+   - Displays confidence percentage (0-100%)
+   - Shows risk level (Low/Medium/High/Urgent) with color coding
+   - Provides recommended next actions
+   - Includes disclaimers about screening vs diagnosis
+
+⏳ UC016: Generate Risk Assessment - SUMMARY BELOW
+   - AI assigns risk level based on cancer type + confidence
+   - Melanoma or High Confidence (>80%) = Urgent
+   - Basal Cell / Actinic Keratoses = High
+   - Moderate confidence (50-80%) = Medium
+   - Low confidence (<50%) or benign types = Low
+
+
+⏳ UC017: Save Analysis Report - SUMMARY BELOW
+   - System stores complete analysis in database
+   - Includes: image, AI predictions, symptom responses, risk level
+   - Linked to patient account and health profile
+   - Generates unique report ID
+   - Creates timestamp for tracking
+
+⏳ UC018: View Analysis History - SUMMARY BELOW
+   - Patient accesses all previous skin analyses
+   - Sorted chronologically (newest first)
+   - Shows date, cancer type detected, risk level
+   - Can click to view full report details
+   - Can download/print reports
+
+================================================================================
+SECTION 4: HOSPITAL FINDER & APPOINTMENTS (5 Use Cases)
+================================================================================
+
+⏳ UC019: Search Nearby Hospitals - SUMMARY BELOW
+   - Uses patient's GPS location or manual address input
+   - Searches via Google Maps API (Google Places)
+   - Finds dermatology hospitals + general hospitals
+   - Search radius: 50km (31 miles)
+   - Returns up to 180 results
+
+⏳ UC020: Filter Hospital Results - SUMMARY BELOW
+   - Sorts hospitals by rating (4.5+ stars first), then distance
+   - Displays rating stars, distance in km, operating hours
+   - Shows "Open Now" or "Closed" status
+   - Can filter by: currently open, rating threshold
+   - Shows hospital specialties if available
+
+
+⏳ UC021: View Hospital Details - SUMMARY BELOW
+   - Shows comprehensive facility information
+   - Address, phone number, website
+   - Operating hours (daily schedule)
+   - Specialties and services offered
+   - Patient reviews and ratings from Google
+   - Photos of facility
+
+⏳ UC022: Get Navigation Directions - SUMMARY BELOW
+   - Provides turn-by-turn directions to hospital
+   - Uses Google Maps integration
+   - Shows estimated travel time and distance
+   - Multiple route options (fastest, shortest)
+   - Can open in Google Maps app on mobile
+
+⏳ UC023: Book Appointment - SUMMARY BELOW
+   - Patient selects hospital from search results
+   - Patient chooses preferred date and time
+   - System attaches analysis report automatically
+   - Patient can add notes or concerns
+   - System submits appointment request to hospital
+   - Hospital staff must confirm (UC027) before appointment is final
+
+================================================================================
+SECTION 5: REPORT REVIEW (HOSPITAL STAFF) (4 Use Cases)
+================================================================================
+
+⏳ UC024: View Reports by Urgency - SUMMARY BELOW
+   - Hospital staff see incoming patient reports on dashboard
+   - Organized by risk level: Urgent → High → Medium → Low
+   - Color-coded for quick visual identification
+   - Shows: Report ID, Date, Cancer Type, Confidence, Risk Level
+   - Patient identity hidden until appointment confirmed
+
+
+⏳ UC025: Review Patient Report - SUMMARY BELOW
+   - Staff clicks on report to view details
+   - Can view: AI analysis results, skin lesion image, symptom responses
+   - Risk assessment and recommended urgency displayed
+   - Patient identity remains HIDDEN until appointment confirmed
+   - Staff can decide to confirm (UC027) or reject (UC028) appointment
+
+⏳ UC026: Access Patient History - SUMMARY BELOW
+   - Available ONLY AFTER appointment is confirmed
+   - Staff can view complete medical history
+   - Access to health profile: conditions, medications, allergies
+   - View previous skin analyses and results
+   - Privacy-protected: access is logged for audit trail
+
+================================================================================
+SECTION 6: APPOINTMENT MANAGEMENT (5 Use Cases)
+================================================================================
+
+⏳ UC027: Confirm Appointment - SUMMARY BELOW
+   - Hospital staff accepts appointment request
+   - Staff selects available time slot from schedule
+   - System reveals patient identity and contact info
+   - System sends confirmation email to patient automatically
+   - Appointment status changes to "Confirmed"
+   - Staff gains access to full patient medical history (UC026)
+
+⏳ UC028: Reject Appointment - SUMMARY BELOW
+   - Staff declines appointment with reason
+   - Reasons: fully booked, requires different specialist, etc.
+   - System sends rejection email to patient with reason
+   - System suggests alternative hospitals nearby
+   - Report remains available for patient to book elsewhere
+
+
+================================================================================
+SECTION 7: EXTERNAL INTEGRATIONS (Mentioned in Table 4.1, not separate UCs)
+================================================================================
+
+These are integrated within other use cases:
+- Vision Transformer AI: UC011, UC014, UC016
+- Google Maps API: UC019, UC020, UC021, UC022  
+- Email System (SMTP): UC001, UC003, UC027, UC028
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. OPTION A: I can create FULL DETAILED descriptions (like UC001-UC012) for:
+   - UC013-UC028 (remaining 16 use cases)
+   - Same format with Pre-conditions, Post-conditions, Normal Flow, 
+     Alternative Flow, Exception Flow
+
+2. OPTION B: You can specify which specific use cases you need detailed
+   - Example: "Create detailed UC014, UC019, UC024, UC027"
+   - I'll prioritize those for your thesis
+
+3. OPTION C: Use summaries above for now, expand specific ones as needed
+
+================================================================================
+FILE LOCATIONS
+================================================================================
+
+✅ Detailed Use Cases (UC001-UC012): USE_CASE_DESCRIPTIONS_ALL.txt
+✅ Complete Summary (All 28): THIS FILE (ALL_28_USE_CASES_SUMMARY.txt)
+✅ Functional Requirements Table: TABLE_4.1_GOOGLE_DOCS.txt
+✅ Actor Descriptions Table: TABLE_4.2_GOOGLE_DOCS.txt
+
+Which option would you like? Or should I continue creating all 28 in full detail?

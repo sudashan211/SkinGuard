@@ -1,0 +1,141 @@
+================================================================================
+Table 4.29   Use Case Description for <UC027 Confirm Appointment>
+================================================================================
+
+Use Case ID         | UC027
+
+Use Case Name       | Confirm Appointment
+
+Actors              | Hospital/Clinic Staff, Email System (SMTP), Patient (receives)
+
+Description         | How hospital staff accepts and schedules appointment requests
+                    | by selecting date/time, setting consultation type (in-person
+                    | or video), and revealing patient identity after confirmation.
+                    | System sends confirmation email with appointment details and
+                    | grants staff access to full patient medical history for
+                    | consultation preparation.
+
+Pre-conditions      | 1. Staff has reviewed patient report (UC025)
+                    | 2. Staff decides to accept appointment request
+                    | 3. Appointment status is currently "Pending"
+                    | 4. Hospital has available slots for consultation
+                    | 5. Patient identity is currently HIDDEN from staff
+
+Post-conditions     | 1. Appointment status changes to "Confirmed"
+                    | 2. Patient identity is REVEALED to staff
+                    | 3. Staff gains access to patient full medical history
+                    | 4. Patient receives confirmation email with date/time
+                    | 5. Appointment added to hospital calendar
+                    | 6. Appointment removed from pending queue
+                    | 7. Appointment appears in staff's confirmed appointments list
+
+Normal Flow (NF)    | 1. Staff reviews report (UC025), clicks "Confirm Appointment"
+                    | 2. System displays confirmation form; staff selects date from
+                    |    hospital calendar, then selects time slot (30-min intervals)
+                    | 3. Staff chooses consultation type (in-person/video), estimates
+                    |    duration (15-60 min based on risk), adds optional instructions
+                    | 4. Staff reviews details and clicks "Confirm and Notify Patient"
+                    | 5. System updates appointment status to "Confirmed", REVEALS
+                    |    patient identity to staff, grants access to medical history,
+                    |    adds to calendar, logs privacy access for HIPAA/GDPR compliance
+                    | 6. System sends confirmation email to patient with appointment
+                    |    details, hospital location/directions, preparation instructions,
+                    |    and calendar attachment links
+                    | 7. Staff dashboard updates: pending count decreases, confirmed
+                    |    count increases, patient name now visible, staff can access
+                    |    full medical history for consultation preparation
+
+Alternative Flow    | AF1-UC027: Video Consultation Setup
+(AF)                | Staff selects "Video Consultation"; system generates unique video
+                    | room URL, includes link in confirmation email (activates 15 min
+                    | before), sends SMS reminder, and provides separate host link to staff
+                    |
+                    | AF2-UC027: Urgent Case Priority Scheduling
+                    | For "URGENT" risk level reports, system highlights earliest slots
+                    | within 48 hours, allows schedule override, marks email as HIGH
+                    | PRIORITY, schedules multiple reminders, shows URGENT badge on dashboard
+                    |
+                    | AF3-UC027: Reschedule Existing Slot
+                    | If selected time is already booked, system displays "Time slot
+                    | unavailable" warning and suggests next 5 available slots for selection
+                    |
+                    | AF4-UC027: Request Additional Patient Information
+                    | Staff clicks "Request Information" before confirmation; system sends
+                    | anonymous email to patient; patient responds via secure portal; staff
+                    | receives notification and proceeds with confirmation after reviewing response
+
+Exception Flow (EF) | EF1: No Available Slots in Next 30 Days
+                    | System displays "No availability" warning and suggests extending
+                    | search to 60 days or recommending alternative hospital; for urgent
+                    | cases, staff must manually add extra slot or reject with referral
+                    |
+                    | EF2: Email Send Failed
+                    | SMTP error occurs; appointment still confirmed in database; system
+                    | logs error, queues retry, displays warning to staff to contact
+                    | patient by phone; patient can see confirmation in account dashboard
+                    |
+                    | EF3: Patient Has No Email Address
+                    | System displays warning before confirmation; staff must obtain valid
+                    | email/phone, contact patient directly, manually add to record
+                    |
+                    | EF4: Consultation Type Not Selected
+                    | "Please select consultation type" message appears; submit button
+                    | remains disabled until selection made (required for patient preparation)
+                    |
+                    | EF5: Calendar Sync Failed
+                    | External calendar integration error; appointment still saved in
+                    | SkinGuard database; system displays sync failure warning; staff can
+                    | manually add to external calendar; confirmation email still sent
+                    |
+                    | EF6: Privacy Access Logging Failed
+                    | Audit log write error; system blocks identity reveal until logging
+                    | succeeds; displays "Cannot reveal patient data - compliance logging
+                    | failed" warning; staff must retry to ensure HIPAA/GDPR compliance
+
+================================================================================
+WORKFLOW SUMMARY
+================================================================================
+
+STEPS OVERVIEW:
+1. Staff clicks "Confirm Appointment" (Decision made after UC025 review)
+2. Select date/time from calendar (Steps 4-8)
+3. Choose consultation type and duration (Steps 9-11)
+4. Add optional instructions (Steps 12-14)
+5. Review and submit confirmation (Steps 17-18)
+6. System processes and REVEALS patient identity (Steps 19-21)
+7. System adds to calendar and logs access (Steps 22-23)
+8. System sends confirmation email (Step 24)
+9. Dashboard updates and staff gains full access (Steps 25-28)
+
+PRIVACY PROTECTION MECHANISM:
+- Before confirmation: Patient identity HIDDEN (anonymized review)
+- During confirmation: Identity remains hidden until final submit
+- After confirmation: Identity REVEALED + access granted + audit logged
+- For rejections (UC028): Identity NEVER revealed (stays anonymous)
+
+KEY SYSTEM BEHAVIORS:
+✅ Two-phase process: Review anonymous → Confirm and reveal
+✅ Audit logging before identity reveal (compliance)
+✅ Automatic calendar blocking (prevents double-booking)
+✅ Risk-based scheduling suggestions (urgent cases prioritized)
+✅ Multiple reminder frequencies by priority level
+✅ Staff gains access to full medical history post-confirmation
+
+COMPLIANCE NOTES:
+- HIPAA: Patient identity access logged in audit trail
+- GDPR: Explicit purpose for data access (appointment confirmation)
+- Privacy-by-design: Identity hidden until commitment made
+- Audit trail: Staff ID, timestamp, reason logged
+
+================================================================================
+RELATED USE CASES
+================================================================================
+
+- UC025: Review Pending Appointment Request (Pre-condition)
+- UC026: View Patient Medical History (Enabled post-confirmation)
+- UC028: Reject Appointment Request (Alternative decision path)
+- UC029: Request Additional Information (Alternative flow AF4)
+- UC030: Reschedule Confirmed Appointment (Future action)
+- UC031: Cancel Confirmed Appointment (Future action)
+
+================================================================================

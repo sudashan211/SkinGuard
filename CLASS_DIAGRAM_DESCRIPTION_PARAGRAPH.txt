@@ -1,0 +1,451 @@
+================================================================================
+CLASS DIAGRAM DESCRIPTION PARAGRAPH - SKINGUARD SYSTEM
+================================================================================
+
+SIMPLE VERSION (Concise):
+-------------------------
+This UML class diagram illustrates the entity classes, their attributes, methods, 
+and relationships within the SkinGuard system. The diagram consists of 15 classes 
+organized into five functional areas: User Management (User, PatientProfile, 
+HospitalStaff), AI Analysis (AnalysisReport, SymptomQuestionnaire, 
+ImageValidation, AIModel, RiskAssessment), Appointment System (Appointment, 
+Hospital), Notification Management (EmailNotification), and System Monitoring 
+(AuditLog). External service integrations are represented with the <<external>> 
+stereotype, including VisionTransformerAI for skin cancer classification, 
+GoogleMapsAPI for hospital search within 50km radius, and SMTPService for email 
+delivery. The relationships demonstrate one-to-many associations between User and 
+AnalysisReport (1:*), composition relationships between AnalysisReport and its 
+validation components (1:1 with SymptomQuestionnaire, ImageValidation, 
+RiskAssessment), and dependency relationships with external AI and mapping 
+services.
+
+
+STANDARD VERSION (Recommended):
+--------------------------------
+Figure X.X presents the UML class diagram for the SkinGuard AI-Powered Skin 
+Cancer Detection System, illustrating the entity classes that represent database 
+tables, their attributes with data types, public methods, and the relationships 
+between classes following standard UML notation. The diagram contains 15 classes 
+organized into five functional areas. The User Management area includes the User 
+class storing authentication credentials (email, password_hash, role, verified 
+status) with methods for register(), login(), updateProfile(), and 
+resetPassword(); the PatientProfile class extending User with health-specific 
+attributes (age, skin_type using Fitzpatrick scale, family_history, 
+medical_conditions) and methods for createProfile(), calculateRiskFactors(); and 
+the HospitalStaff class extending User with professional credentials 
+(license_no, specialization, clinic_hours, geographic coordinates for Google 
+Maps integration) and methods for viewPendingReports(), confirmAppointment(), 
+rejectAppointment().
+
+The AI Analysis area, representing the core system functionality, includes six 
+classes: AnalysisReport storing complete AI workflow output with attributes 
+(image_url, cancer_type, confidence_score, risk_level enum, all_predictions in 
+JSON format, symptom_responses) and methods for saveReport(), generatePDF(), 
+shareWithDoctor(); SymptomQuestionnaire capturing patient-reported symptoms with 
+8 attributes (duration_noticed, size_changes, pain_level, bleeding_frequency) 
+and methods for validateResponses(), calculateSymptomScore(); ImageValidation 
+implementing NSFW filter with attributes (skin_percentage, nsfw_score, 
+text_detected, validation_passed) and methods for validateSkinContent() 
+enforcing 25% minimum threshold, detectTextGraphics(), checkNSFW(); AIModel 
+configuration class marked with <<config>> stereotype storing model metadata 
+(name, version, accuracy 84%, cancer_types supporting 7 classifications) and 
+methods for loadModel(), predict(), preprocessImage(); RiskAssessment applying 
+stratification logic with attributes (risk_level enum, urgency_score, timeline, 
+recommended_action) and methods for calculateRiskLevel(), 
+applyConservativeBias() elevating borderline melanoma cases to URGENT; and 
+VisionTransformerAI marked with <<external>> stereotype representing the Hugging 
+Face AI service with methods for classifyLesion(), localizeLesion().
+
+The Appointment System area manages the booking workflow through three classes: 
+Appointment linking patients with hospital staff through foreign key references 
+(patient_id, hospital_id, report_id) with attributes for scheduling 
+(preferred_date, confirmed_date, status enum tracking pending/confirmed/rejected/
+completed/cancelled lifecycle) and methods for createRequest(), 
+confirmByStaff() triggering patient identity reveal, rejectByStaff() maintaining 
+anonymity, sendReminder(); Hospital storing facility information retrieved from 
+Google Maps API with attributes (google_place_id, name, address, latitude, 
+longitude, rating, operating_hours in JSON, specialties) and methods for 
+searchNearby() within 50km radius, filterByRating(), sortByDistance(); and 
+GoogleMapsAPI external service class marked with <<external>> stereotype 
+providing methods for searchPlaces(), getPlaceDetails(), getDirections().
+
+The Notification Management area consists of EmailNotification class handling 
+automated email delivery with attributes (recipient_email, subject, body, 
+template_name for dynamic content, template_data in JSON, status enum, sent_at 
+timestamp) and methods for sendConfirmationEmail() after appointment approval, 
+sendRejectionEmail() for declined appointments, sendPasswordResetEmail(), 
+sendReminderEmail() for upcoming consultations, and retryFailedEmail() for error 
+recovery; connected to SMTPService external class marked with <<external>> 
+stereotype providing sendEmail() and validateEmailAddress() methods. The System 
+Monitoring area includes AuditLog class implementing comprehensive activity 
+tracking for HIPAA compliance with attributes (user_id, action string, 
+resource_type, resource_id, ip_address, user_agent, metadata JSON for flexible 
+logging) and methods for logAction(), logPrivacyAccess() recording patient 
+identity reveals, logLoginAttempt(), generateAuditReport().
+
+The class diagram demonstrates standard UML relationships including one-to-one 
+composition (User has PatientProfile 1:0..1, User has HospitalStaff 1:0..1, 
+AnalysisReport has SymptomQuestionnaire 1:1, AnalysisReport has ImageValidation 
+1:1, AnalysisReport has RiskAssessment 1:1), one-to-many associations (User 
+creates AnalysisReport 1:*, User books Appointment 1:*, PatientProfile owns 
+AnalysisReport 1:*, Appointment booked at Hospital *:1, Appointment reviewed by 
+HospitalStaff *:1), and dependency relationships shown with dashed arrows (AIModel 
+processes AnalysisReport, VisionTransformerAI analyzes AnalysisReport, 
+GoogleMapsAPI retrieves Hospital data, SMTPService sends EmailNotification). The 
+use of stereotypes (<<entity>> for database tables, <<config>> for configuration 
+classes, <<external>> for third-party API integrations) clarifies the 
+architectural role of each class, while the comprehensive attribute and method 
+definitions provide a complete specification for system implementation.
+
+
+DETAILED VERSION (Academic/Graduate Level):
+--------------------------------------------
+Figure X.X illustrates the Unified Modeling Language (UML) class diagram for the 
+SkinGuard AI-Powered Skin Cancer Detection System, providing a structural view of 
+the system's entity classes, their attributes, operations (methods), and 
+relationships according to standard UML 2.5 notation. The diagram employs class 
+stereotypes to distinguish between different architectural components: <<entity>> 
+for persistent domain objects mapped to database tables, <<config>> for 
+configuration and service classes, and <<external>> for third-party API 
+integration points. The 15 classes are organized into five cohesive functional 
+areas that together implement the system's core requirements: early skin cancer 
+detection through AI classification, appointment booking with privacy protection, 
+and regulatory compliance through comprehensive audit trails.
+
+The User Management functional area implements authentication and profile 
+management through three entity classes following a single-table inheritance 
+pattern. The User class serves as the base entity for all system actors, storing 
+authentication credentials (email as unique identifier, password_hash encrypted 
+using bcrypt algorithm, role enumeration distinguishing 'patient' and 'doctor' 
+roles with no admin role in current system), account status (verified boolean 
+flag requiring email confirmation before full access), profile information 
+(full_name, avatar_url for profile pictures, language_preference defaulting to 
+'en' for interface localization), and temporal attributes (created_at, 
+updated_at timestamps for audit trails). The User class exposes public methods 
+register() returning boolean success status, login(email, password) returning JWT 
+token for stateless authentication with 30-minute expiration, logout() 
+invalidating refresh tokens, updateProfile() for profile modifications, 
+resetPassword(email) initiating password reset workflow, and verifyEmail(token) 
+confirming email ownership. The PatientProfile class extends User through a one-
+to-one optional relationship (1:0..1) indicated by the foreign key user_id, 
+storing patient-specific health information essential for risk assessment 
+including age for melanoma risk factors (highest incidence over 50 years), gender 
+for statistical analysis, skin_type classified according to Fitzpatrick scale 
+(I-VI) evaluating photosensitivity and skin cancer susceptibility, 
+medical_conditions text field documenting chronic diseases that may affect 
+treatment options, current_medications for drug interaction screening, allergies 
+for patient safety, previous_skin_conditions providing clinical context, 
+family_history documenting hereditary cancer patterns particularly melanoma 
+familial risk, and sun_exposure_level categorizing occupational/recreational UV 
+exposure as low/moderate/high risk factor. The PatientProfile class provides 
+methods createProfile() invoked during patient registration, updateProfile() for 
+health information modifications, getHealthHistory() returning array of historical 
+data for longitudinal analysis, and calculateRiskFactors() computing composite 
+risk score based on age, family history, skin type, and sun exposure. The 
+HospitalStaff class similarly extends User through one-to-one optional 
+relationship storing professional credentials and facility information required 
+for appointment booking including license_no unique medical license identifier for 
+credential verification, hospital_name identifying affiliated medical facility, 
+specialization indicating expertise area (dermatology, oncology, general 
+practice), bio and education text fields for professional background presentation 
+to patients, certifications documenting additional qualifications, languages 
+spoken facilitating patient-provider communication, clinic_hours text describing 
+availability schedule, geographic coordinates (latitude, longitude) enabling 
+Google Maps integration for 50km radius hospital search, and computed fields 
+average_rating and review_count aggregated from patient reviews supporting search 
+result ranking. The HospitalStaff class exposes methods updateFacilityInfo() for 
+clinic information management, viewPendingReports() returning array of anonymized 
+patient reports awaiting review, confirmAppointment(id) accepting appointment 
+request and triggering patient identity reveal mechanism, rejectAppointment(id, 
+reason) declining request while maintaining patient anonymity, and 
+accessPatientHistory(id) retrieving medical reports after appointment 
+confirmation with audit log entry.
+
+The AI Analysis functional area, implementing the system's core value proposition 
+of automated skin cancer screening, comprises six classes that orchestrate the 
+image validation, symptom collection, AI classification, and risk assessment 
+workflow. The AnalysisReport entity class serves as the aggregate root storing 
+complete analysis results with attributes patient_id foreign key linking to User 
+table, image_url pointing to uploaded lesion photograph stored in cloud storage 
+(AWS S3, Google Cloud Storage), image_thumbnail for performance optimization in 
+list views, cancer_type string identifying the predicted classification from 
+seven supported types (melanoma, basal cell carcinoma, squamous cell carcinoma, 
+actinic keratosis, benign keratosis, dermatofibroma, vascular lesion), 
+confidence_score float representing model certainty (0.0-1.0 with threshold 0.60 
+for actionable predictions), risk_level enumeration (LOW, MEDIUM, HIGH, URGENT) 
+determined by stratification algorithm combining cancer type severity and 
+confidence score, risk_justification text explaining classification rationale for 
+medical transparency, all_predictions JSON object storing probability distribution 
+across all seven cancer types enabling result transparency, lesion_location and 
+body_location capturing anatomical position (face, arm, leg, trunk) influencing 
+melanoma risk, symptom_responses JSON containing 8-question wizard answers, 
+model_version tracking AI model iteration for reproducibility, and status enum 
+tracking report lifecycle (pending, reviewed, archived). The AnalysisReport class 
+provides methods saveReport() persisting analysis to database with transaction 
+atomicity, generatePDF() creating printable patient report with lesion image and 
+classification details, shareWithDoctor(email) transmitting report to specified 
+provider for second opinion, and getReportSummary() returning condensed object 
+for dashboard display. The SymptomQuestionnaire entity class implements a 
+composition relationship (1:1) with AnalysisReport, storing patient-reported 
+clinical information that supplements image analysis including duration_noticed 
+categorizing lesion age (<1 month, 1-6 months, >6 months, don't know), 
+size_changes tracking growth pattern (growing, stable, shrinking), pain_level 
+integer scale 0-10, itching_level (none, mild, moderate, severe), 
+bleeding_frequency (never, occasionally, frequently), lesion_location anatomical 
+description, sun_exposure recent UV exposure, and additional_notes free-text 
+field. The class exposes validateResponses() ensuring required fields completed, 
+calculateSymptomScore() computing integer urgency value (0-100), and 
+getRedFlags() returning array of concerning symptoms (rapid growth, bleeding, 
+asymmetry) that elevate risk assessment. The ImageValidation entity class 
+implements NSFW (Not Safe For Work) filter algorithm preventing poster uploads 
+and ensuring genuine medical images through four validation criteria stored as 
+attributes: skin_percentage float representing proportion of skin pixels (minimum 
+25% threshold rejects distant shots and posters), nsfw_score float from content 
+moderation API (maximum 0.35 threshold rejects inappropriate content), 
+text_detected boolean flagging promotional posters, validation_passed boolean 
+indicating overall pass/fail status, and rejection_reason text explaining failure 
+for user feedback. Methods include validateSkinContent() applying 25% threshold 
+with corrected comparison operator (>= instead of >) resolving boundary condition 
+defect identified during white box testing, detectTextGraphics() using OCR to 
+identify non-medical content, checkNSFW() invoking external content moderation 
+API, and logValidationResult() recording validation decision for quality 
+monitoring. The AIModel configuration class marked with <<config>> stereotype 
+stores metadata for the Vision Transformer model including name "ViT-H-14" 
+identifying Hugging Face model architecture, version tracking model iteration, 
+provider "Hugging Face" indicating model registry, model_path file system or URL 
+location, accuracy float documenting 84% classification accuracy on dermoscopic 
+image test set, dataset string "HAM10000" specifying training data, cancer_types 
+JSON array of seven supported classifications, and active boolean enabling model 
+version switching. Methods include loadModel() initializing neural network 
+weights into memory, predict(image) performing forward pass through transformer 
+architecture, preprocessImage(image) applying normalization and resizing, and 
+postprocessResults(output) converting logits to probability distribution. The 
+RiskAssessment entity class applies stratification logic with composition 
+relationship (1:1) to AnalysisReport, storing attributes report_id foreign key, 
+cancer_type and confidence duplicated for denormalization, risk_level enum result 
+of stratification algorithm, urgency_score integer 1-10 driving queue sorting, 
+timeline string providing patient guidance ("Consult within 48 hours" for URGENT, 
+"Consult within 1 week" for HIGH, "Consult within 1 month" for MEDIUM, "Monitor 
+and consult if changes" for LOW), and recommended_action text with next steps. 
+Methods include calculateRiskLevel() implementing stratification rules (melanoma 
+OR confidence>=85% = URGENT, basal cell OR actinic keratosis = HIGH, 
+confidence>=60% = MEDIUM, else = LOW), generateJustification() creating 
+human-readable explanation, applyConservativeBias() implementing safety-critical 
+logic to elevate borderline melanoma cases (confidence>=80% AND 
+cancer_type=melanoma) to URGENT classification resolving defect identified during 
+white box testing, and assignUrgencyScore() computing integer for appointment 
+queue prioritization. The VisionTransformerAI external service class marked with 
+<<external>> stereotype represents integration with Hugging Face model hub, 
+exposing methods classifyLesion(image) invoking remote API endpoint and returning 
+cancer_type prediction with confidence, and localizeLesion(image) optionally 
+generating bounding box coordinates for lesion region of interest.
+
+The Appointment System functional area implements the booking workflow connecting 
+patients with hospital staff through three classes that manage scheduling, 
+facility information, and geographic search. The Appointment entity class 
+orchestrates the appointment lifecycle through attributes patient_id and 
+hospital_id foreign keys establishing many-to-one relationships (*:1), report_id 
+optional foreign key linking triggering analysis (nullable to support standalone 
+consultations), preferred_date and preferred_time submitted by patient, 
+confirmed_date and confirmed_time set by hospital staff upon acceptance, 
+consultation_type enum (in_person, video_call) indicating format, duration 
+integer minutes for scheduling, patient_notes and staff_notes text fields for 
+communication, status enum tracking workflow states (pending anonymized review, 
+confirmed triggering identity reveal, rejected maintaining anonymity, completed 
+after consultation, cancelled by either party), urgency_level duplicating report 
+risk_level for efficient queue sorting, created_at submission timestamp, and 
+confirmed_at acceptance timestamp. The Appointment class exposes methods 
+createRequest() initiating booking workflow by inserting pending record with 
+anonymized patient reference, confirmByStaff(details) transitioning status to 
+confirmed, revealing patient identity (email, phone, full medical history) to 
+assigned staff member, generating audit log entry for HIPAA compliance tracking 
+privacy breach, and triggering EmailNotification for patient confirmation, 
+rejectByStaff(reason) declining request without identity disclosure and 
+triggering rejection email, cancel() allowing either party to cancel confirmed 
+appointment, sendReminder() scheduled job for 24-hour advance notification, and 
+updateStatus(status) managing state transitions with validation. The Hospital 
+entity class stores facility information retrieved from Google Maps Places API 
+with attributes google_place_id unique identifier for API correlation, name 
+facility title, address multi-line text, phone and email contact information, 
+website URL, latitude and longitude geographic coordinates for distance 
+calculations, rating float average from Google reviews, review_count integer 
+providing rating confidence, operating_hours JSON structured schedule (Monday-
+Sunday with open/close times), specialties JSON array of medical services 
+(dermatology, oncology, general practice), distance_km computed field calculated 
+from patient location, is_open boolean computed from current time and 
+operating_hours, created_at cache timestamp, and updated_at for cache 
+invalidation. The Hospital class provides methods searchNearby(lat, lng, radius) 
+querying Google Maps Places API within specified radius (default 50km), returning 
+array of up to 180 results sorted by distance and rating, filterByRating(min) 
+client-side filtering for quality threshold, sortByDistance() reordering results, 
+getDirections(origin) invoking Google Maps Directions API for route calculation, 
+and checkAvailability() determining current open/closed status. The GoogleMapsAPI 
+external service class marked with <<external>> stereotype abstracts Google Maps 
+integration with methods searchPlaces(location, type) wrapping Places API Nearby 
+Search, getPlaceDetails(placeId) retrieving comprehensive facility information, 
+getDirections(origin, dest) calculating route with estimated travel time, and 
+geocodeAddress(address) converting street address to coordinates for proximity 
+search.
+
+The Notification Management functional area handles automated email delivery for 
+appointment workflow events through two classes. The EmailNotification entity 
+class stores outbound messages with attributes recipient_email and recipient_name 
+for personalization, subject line and body HTML content, template_name 
+identifying reusable email template (confirmation, rejection, password_reset, 
+reminder), template_data JSON providing dynamic values for template rendering, 
+status enum tracking email lifecycle (pending, sent, failed, retrying), sent_at 
+timestamp for delivery confirmation, error_message text for debugging failed 
+deliveries, and created_at queue insertion time. The EmailNotification class 
+exposes methods sendConfirmationEmail() invoked by Appointment.confirmByStaff() 
+including appointment details (confirmed_date, confirmed_time, hospital_name, 
+hospital_address, staff_name), sendRejectionEmail() triggered by 
+Appointment.rejectByStaff() with rejection_reason and encouragement to seek 
+alternative consultation, sendPasswordResetEmail() generated by 
+User.resetPassword() with time-limited token link (30-minute expiration), 
+sendReminderEmail() scheduled job for 24-hour advance notification with 
+preparation instructions, and retryFailedEmail() implementing exponential backoff 
+retry strategy (3 attempts with 5/15/45 minute delays) for transient SMTP 
+failures. The SMTPService external class marked with <<external>> stereotype 
+represents SMTP server integration (Gmail, SendGrid, AWS SES) with configuration 
+attributes smtp_host, smtp_port (typically 587 for TLS), username for 
+authentication, and use_tls boolean enabling encryption. Methods include 
+sendEmail(to, subject, body) transmitting individual message with error handling, 
+sendBulkEmails(recipients) for batch delivery, and validateEmailAddress(email) 
+performing RFC 5322 format validation before queue insertion.
+
+The System Monitoring functional area implements comprehensive activity tracking 
+for regulatory compliance through the AuditLog entity class marked with <<entity>> 
+stereotype. The AuditLog class stores forensic data with attributes id primary key 
+UUID, user_id foreign key with soft reference (no constraint) allowing system-
+initiated events, action string describing operation performed (user_registration, 
+login_attempt, report_created, report_accessed, appointment_created, 
+appointment_confirmed triggering identity reveal, identity_revealed critical 
+privacy event, appointment_rejected, appointment_cancelled, email_sent, 
+password_reset_requested, profile_updated), resource_type categorizing affected 
+entity (user, patient_profile, hospital_staff, analysis_report, appointment, 
+email_notification), resource_id UUID of specific affected record, ip_address 
+VARCHAR(50) capturing request origin for security analysis, user_agent text 
+storing browser/device information, metadata JSON flexible field for context-
+specific details (previous_values for updates, failure_reasons for errors, 
+email_recipient for notifications, revealed_patient_id for identity disclosures), 
+and created_at timestamp with microsecond precision for event sequencing. The 
+AuditLog class exposes methods logAction(action, resource) generic logging 
+interface invoked throughout application, logPrivacyAccess() specialized method 
+recording patient identity reveals when hospital staff confirms appointments 
+(critical for HIPAA Section 164.312(b) audit control compliance), 
+logLoginAttempt() tracking authentication events including failed attempts for 
+security monitoring (detecting brute force attacks through repeated failures from 
+same IP), and generateAuditReport() producing compliance report filtering by date 
+range, user, action type for regulatory audits and security incident 
+investigations.
+
+The class diagram relationships follow standard UML notation to express 
+cardinality and relationship types. Composition relationships (solid diamond) 
+indicate strong ownership where the component cannot exist independently: User 
+has-a PatientProfile (1:0..1 cardinality allowing users without patient role), 
+User has-a HospitalStaff (1:0..1 similarly optional), AnalysisReport has-a 
+SymptomQuestionnaire (1:1 mandatory), AnalysisReport has-a ImageValidation (1:1 
+mandatory), and AnalysisReport has-a RiskAssessment (1:1 mandatory). Association 
+relationships (solid line) indicate references between independent entities: User 
+creates AnalysisReport (1:* allowing multiple reports per patient), User books 
+Appointment (1:* allowing multiple appointments), PatientProfile owns 
+AnalysisReport (1:* foreign key reference), Appointment booked-at Hospital (*:1 
+many appointments at one facility), Appointment reviewed-by HospitalStaff (*:1 
+many appointments reviewed by one staff member), and Appointment triggers 
+EmailNotification (1:0..* zero or more notifications per appointment for 
+confirmation, rejection, reminders). Dependency relationships (dashed arrow) 
+indicate usage without ownership: AIModel processes AnalysisReport (configuration 
+class used during analysis), VisionTransformerAI analyzes AnalysisReport 
+(external API invoked during processing), GoogleMapsAPI retrieves Hospital data 
+(external service populating local cache), and SMTPService sends 
+EmailNotification (external delivery mechanism). The cardinality notation follows 
+UML standards where 1 indicates exactly one, 0..1 zero or one (optional), * zero 
+or many, and 1..* one or many (at least one required).
+
+The strategic application of stereotypes (<<entity>>, <<config>>, <<external>>) 
+clarifies architectural roles and guides implementation decisions. Classes marked 
+<<entity>> map to database tables requiring persistence, transaction management, 
+and query optimization. The <<config>> stereotype applied to AIModel indicates a 
+service class managing application state without direct database mapping, suitable 
+for singleton pattern implementation. The <<external>> stereotype applied to 
+VisionTransformerAI, GoogleMapsAPI, and SMTPService identifies integration points 
+requiring adapter pattern implementation for testability (mock external services 
+during unit testing), resilience patterns (circuit breaker for API failures, 
+retry with exponential backoff for transient errors), and configuration management 
+(API keys stored in environment variables or secret management service, not 
+hardcoded in source). This class diagram provides a complete structural 
+specification enabling implementation teams to generate database schema (DDL 
+scripts from entity classes), implement service layer business logic (methods on 
+entity classes translate to service functions), establish API contracts (class 
+methods define REST endpoint operations), and develop automated tests (class 
+relationships define mock object requirements for unit testing isolation).
+
+
+VERY SHORT VERSION (Caption Only):
+-----------------------------------
+Figure X.X: UML Class Diagram showing 15 classes organized into User Management, 
+AI Analysis, Appointment System, Notification Management, and System Monitoring 
+functional areas with their attributes, methods, and relationships.
+
+
+BRIEF VERSION (One Paragraph):
+-------------------------------
+This UML class diagram illustrates the structural design of the SkinGuard system 
+through 15 classes marked with stereotypes (<<entity>> for database tables, 
+<<config>> for services, <<external>> for third-party APIs). The User Management 
+area includes User, PatientProfile, and HospitalStaff classes with authentication 
+and profile methods. The AI Analysis area contains AnalysisReport, 
+SymptomQuestionnaire, ImageValidation, AIModel, RiskAssessment, and 
+VisionTransformerAI classes implementing the 4-step workflow (upload → validate → 
+analyze → assess). The Appointment System includes Appointment, Hospital, and 
+GoogleMapsAPI classes for booking workflow with privacy protection. The 
+Notification Management area has EmailNotification and SMTPService for automated 
+communications. The System Monitoring area includes AuditLog for HIPAA compliance 
+tracking. Relationships show one-to-many associations (User creates multiple 
+AnalysisReports), composition (AnalysisReport has SymptomQuestionnaire), and 
+dependencies (VisionTransformerAI analyzes AnalysisReport).
+
+
+================================================================================
+WHICH VERSION TO USE?
+================================================================================
+
+FOR UNDERGRADUATE THESIS:
+→ Use "STANDARD VERSION (Recommended)"
+  Provides comprehensive explanation without overwhelming detail
+
+FOR GRADUATE/MASTERS THESIS:
+→ Use "DETAILED VERSION (Academic/Graduate Level)"
+  Demonstrates deep architectural understanding with rationale
+
+FOR DIAGRAM CAPTION ONLY:
+→ Use "VERY SHORT VERSION (Caption Only)"
+  Brief figure caption under the diagram
+
+FOR PRESENTATION SLIDES:
+→ Use "BRIEF VERSION (One Paragraph)"
+  Quick overview for audience comprehension
+
+FOR TECHNICAL DOCUMENTATION:
+→ Use "DETAILED VERSION"
+  Complete specification for implementation teams
+
+================================================================================
+PLACEMENT IN THESIS
+================================================================================
+
+TYPICAL PLACEMENT:
+Chapter 4: System Design
+Section 4.5: Class Diagram
+- Introduction paragraph
+- Figure 4.X: UML Class Diagram (insert PlantUML generated image)
+- Description paragraph (choose version above)
+- Optional: Table describing key classes (if required by thesis format)
+
+RECOMMENDED STRUCTURE:
+1. Brief intro: "The UML class diagram provides a structural view..."
+2. Insert diagram figure
+3. Insert one of the paragraphs above
+4. Optional subsections for each functional area if thesis is long-form
+
+================================================================================

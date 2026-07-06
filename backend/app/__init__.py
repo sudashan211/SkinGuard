@@ -1,0 +1,1 @@
+# SkinGuard Backend Application

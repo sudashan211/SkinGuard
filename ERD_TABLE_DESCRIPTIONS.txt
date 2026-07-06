@@ -1,0 +1,77 @@
+================================================================================
+TABLE DESCRIPTIONS FOR ERD DATABASE DESIGN
+================================================================================
+
+Simple format matching your reference image style.
+
+================================================================================
+TABLE DESCRIPTIONS (COPY-PASTE INTO WORD/GOOGLE DOCS)
+================================================================================
+
+Entity Name	Description
+
+profiles	Stores information about all registered users of the system including patients and hospital staff.
+
+patient_data	Stores health-specific information for users with patient role including age, skin type, and family history.
+
+doctors	Stores professional credentials and clinic information for hospital staff users.
+
+medical_reports	Stores details about skin lesion images uploaded by patients and AI-generated analysis results.
+
+appointments	Records patient appointment requests with hospitals, including scheduling and status tracking.
+
+reviews	Stores patient ratings and feedback for hospital staff after appointment completion.
+
+audit_logs	Tracks all system activities and user actions for security monitoring and HIPAA compliance.
+
+================================================================================
+HOW TO USE IN WORD/GOOGLE DOCS
+================================================================================
+
+METHOD 1: COPY-PASTE INTO WORD
+1. Copy the table section above (from "Entity Name" to "audit_logs" description)
+2. Open Microsoft Word
+3. Go to Insert > Table > Convert Text to Table
+4. Select "Tabs" as separator
+5. Click OK
+6. Format table borders and adjust column widths
+7. Set first row as header row with bold formatting
+
+METHOD 2: COPY-PASTE INTO GOOGLE DOCS
+1. Copy the table section above
+2. Open Google Docs
+3. Go to Insert > Table (2 columns x 8 rows)
+4. Paste data into cells (may need to paste each row separately)
+5. Format table with borders and header row styling
+
+METHOD 3: MANUAL TABLE CREATION (RECOMMENDED FOR MATCHING YOUR IMAGE)
+1. Create table with 2 columns and 8 rows (7 tables + 1 header)
+2. Column 1 header: "Entity Name"
+3. Column 2 header: "Description"
+4. Copy each entity name and description into respective cells
+5. Adjust column widths (Entity Name: ~30%, Description: ~70%)
+6. Apply borders to all cells
+
+================================================================================
+TABLE FORMAT SUMMARY
+================================================================================
+
+Total Tables: 7
+Description Style: Brief, one-sentence descriptions (matching your reference image)
+Format: Two-column table (Entity Name | Description)
+
+Column 1 (Entity Name):
+- profiles
+- patient_data
+- doctors
+- medical_reports
+- appointments
+- reviews
+- audit_logs
+
+Column 2 (Description):
+- Simple one-sentence explanation of table purpose
+- Concise and clear (not lengthy paragraphs)
+- Matches the style of your reference image
+
+================================================================================

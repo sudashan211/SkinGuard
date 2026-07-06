@@ -1,0 +1,38 @@
+{
+  "project_name": "skinguard-ai",
+  "description": "SkinGuard AI Skin Cancer Screening Platform Database",
+  "region": "us-east-1",
+  "database": {
+    "version": "14",
+    "extensions": [
+      "uuid-ossp",
+      "postgis"
+    ]
+  },
+  "storage": {
+    "buckets": [
+      {
+        "name": "medical-images",
+        "public": false,
+        "file_size_limit": 10485760,
+        "allowed_mime_types": [
+          "image/jpeg",
+          "image/png",
+          "image/jpg"
+        ],
+        "encryption": "AES-256"
+      }
+    ]
+  },
+  "auth": {
+    "site_url": "http://localhost:3000",
+    "additional_redirect_urls": [],
+    "jwt_expiry": 3600,
+    "enable_signup": true,
+    "email_confirm_required": true
+  },
+  "api": {
+    "max_rows": 1000,
+    "db_schema": "public"
+  }
+}

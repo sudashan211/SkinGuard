@@ -1,0 +1,573 @@
+================================================================================
+UML CLASS DIAGRAM FOR SKINGUARD SYSTEM
+================================================================================
+
+This class diagram shows the entity classes (database tables), their attributes,
+methods, and relationships following the same format as your reference diagram.
+
+Based on your actual database schema (database_setup.sql)
+Uses <<entity>> stereotype for database entities
+Shows attributes with data types
+Shows key methods for each class
+Shows relationships with cardinality
+
+Generate image at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+PLANTUML CODE - UML CLASS DIAGRAM
+================================================================================
+
+@startuml
+title UML Class Diagram - SkinGuard System
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+' ==================== CORE USER ENTITIES ====================
+
+class User <<entity>> {
+  - id: UUID
+  - email: VARCHAR(255)
+  - password_hash: VARCHAR(255)
+  - full_name: VARCHAR(100)
+  - role: ENUM
+  - verified: BOOLEAN
+  - avatar_url: VARCHAR(255)
+  - language_preference: VARCHAR(10)
+  - created_at: DATETIME
+  - updated_at: DATETIME
+  --
+  + register(): boolean
+  + login(email, password): token
+  + logout(): boolean
+  + updateProfile(): boolean
+  + resetPassword(email): boolean
+  + verifyEmail(token): boolean
+}
+
+class PatientProfile <<entity>> {
+  - id: UUID
+  - user_id: UUID
+  - age: INTEGER
+  - gender: VARCHAR(20)
+  - skin_type: ENUM
+  - medical_conditions: TEXT
+  - current_medications: TEXT
+  - allergies: TEXT
+  - previous_skin_conditions: TEXT
+  - family_history: TEXT
+  - sun_exposure_level: VARCHAR(20)
+  - created_at: DATETIME
+  - updated_at: DATETIME
+  --
+  + createProfile(): boolean
+  + updateProfile(): boolean
+  + getHealthHistory(): array
+  + calculateRiskFactors(): float
+}
+
+class HospitalStaff <<entity>> {
+  - id: UUID
+  - user_id: UUID
+  - license_no: VARCHAR(50)
+  - hospital_name: VARCHAR(200)
+  - specialization: VARCHAR(100)
+  - bio: TEXT
+  - education: TEXT
+  - certifications: TEXT
+  - languages: VARCHAR(100)
+  - clinic_hours: TEXT
+  - latitude: FLOAT
+  - longitude: FLOAT
+  - average_rating: FLOAT
+  - review_count: INTEGER
+  - created_at: DATETIME
+  - updated_at: DATETIME
+  --
+  + updateFacilityInfo(): boolean
+  + viewPendingReports(): array
+  + confirmAppointment(id): boolean
+  + rejectAppointment(id, reason): boolean
+  + accessPatientHistory(id): array
+}
+
+' ==================== AI ANALYSIS ENTITIES ====================
+
+class AnalysisReport <<entity>> {
+  - id: UUID
+  - patient_id: UUID
+  - image_url: VARCHAR(255)
+  - image_thumbnail: VARCHAR(255)
+  - cancer_type: VARCHAR(100)
+  - confidence_score: FLOAT
+  - risk_level: ENUM
+  - risk_justification: TEXT
+  - all_predictions: JSON
+  - lesion_location: VARCHAR(100)
+  - body_location: VARCHAR(50)
+  - symptom_responses: JSON
+  - model_version: VARCHAR(50)
+  - status: VARCHAR(20)
+  - created_at: DATETIME
+  - updated_at: DATETIME
+  --
+  + saveReport(): boolean
+  + generatePDF(): file
+  + shareWithDoctor(email): boolean
+  + getReportSummary(): object
+}
+
+class SymptomQuestionnaire <<entity>> {
+  - id: UUID
+  - report_id: UUID
+  - duration_noticed: VARCHAR(50)
+  - size_changes: VARCHAR(50)
+  - pain_level: INTEGER
+  - itching_level: VARCHAR(20)
+  - bleeding_frequency: VARCHAR(50)
+  - lesion_location: VARCHAR(100)
+  - sun_exposure: VARCHAR(20)
+  - additional_notes: TEXT
+  - created_at: DATETIME
+  --
+  + validateResponses(): boolean
+  + calculateSymptomScore(): integer
+  + getRedFlags(): array
+}
+
+class ImageValidation <<entity>> {
+  - id: UUID
+  - image_url: VARCHAR(255)
+  - skin_percentage: FLOAT
+  - nsfw_score: FLOAT
+  - text_detected: BOOLEAN
+  - validation_passed: BOOLEAN
+  - rejection_reason: TEXT
+  - created_at: DATETIME
+  --
+  + validateSkinContent(): boolean
+  + detectTextGraphics(): boolean
+  + checkNSFW(): boolean
+  + logValidationResult(): boolean
+}
+
+' ==================== AI MODEL CONFIGURATION ====================
+
+class AIModel <<config>> {
+  - model_id: INTEGER
+  - name: VARCHAR(100)
+  - version: VARCHAR(50)
+  - provider: VARCHAR(50)
+  - model_path: VARCHAR(255)
+  - accuracy: FLOAT
+  - dataset: VARCHAR(100)
+  - cancer_types: JSON
+  - active: BOOLEAN
+  - created_at: DATETIME
+  --
+  + loadModel(): object
+  + predict(image): predictions
+  + preprocessImage(image): array
+  + postprocessResults(output): object
+}
+
+class RiskAssessment <<entity>> {
+  - id: UUID
+  - report_id: UUID
+  - cancer_type: VARCHAR(100)
+  - confidence: FLOAT
+  - risk_level: ENUM
+  - urgency_score: INTEGER
+  - timeline: VARCHAR(100)
+  - recommended_action: TEXT
+  - created_at: DATETIME
+  --
+  + calculateRiskLevel(): string
+  + generateJustification(): text
+  + applyConservativeBias(): void
+  + assignUrgencyScore(): integer
+}
+
+' ==================== APPOINTMENT ENTITIES ====================
+
+class Appointment <<entity>> {
+  - id: UUID
+  - patient_id: UUID
+  - hospital_id: UUID
+  - report_id: UUID
+  - preferred_date: DATE
+  - preferred_time: VARCHAR(50)
+  - confirmed_date: DATETIME
+  - confirmed_time: TIME
+  - consultation_type: VARCHAR(50)
+  - duration: INTEGER
+  - patient_notes: TEXT
+  - staff_notes: TEXT
+  - status: ENUM
+  - urgency_level: VARCHAR(20)
+  - created_at: DATETIME
+  - confirmed_at: DATETIME
+  --
+  + createRequest(): boolean
+  + confirmByStaff(details): boolean
+  + rejectByStaff(reason): boolean
+  + cancel(): boolean
+  + sendReminder(): boolean
+  + updateStatus(status): boolean
+}
+
+class Hospital <<entity>> {
+  - id: UUID
+  - google_place_id: VARCHAR(255)
+  - name: VARCHAR(200)
+  - address: TEXT
+  - phone: VARCHAR(50)
+  - email: VARCHAR(100)
+  - website: VARCHAR(255)
+  - latitude: FLOAT
+  - longitude: FLOAT
+  - rating: FLOAT
+  - review_count: INTEGER
+  - operating_hours: JSON
+  - specialties: JSON
+  - distance_km: FLOAT
+  - is_open: BOOLEAN
+  - created_at: DATETIME
+  - updated_at: DATETIME
+  --
+  + searchNearby(lat, lng, radius): array
+  + filterByRating(min): array
+  + sortByDistance(): array
+  + getDirections(origin): object
+  + checkAvailability(): boolean
+}
+
+' ==================== NOTIFICATION ENTITIES ====================
+
+class EmailNotification <<entity>> {
+  - id: UUID
+  - recipient_email: VARCHAR(255)
+  - recipient_name: VARCHAR(100)
+  - subject: VARCHAR(255)
+  - body: TEXT
+  - template_name: VARCHAR(100)
+  - template_data: JSON
+  - status: ENUM
+  - sent_at: DATETIME
+  - error_message: TEXT
+  - created_at: DATETIME
+  --
+  + sendConfirmationEmail(): boolean
+  + sendRejectionEmail(): boolean
+  + sendPasswordResetEmail(): boolean
+  + sendReminderEmail(): boolean
+  + retryFailedEmail(): boolean
+}
+
+' ==================== AUDIT & LOGGING ====================
+
+class AuditLog <<entity>> {
+  - id: UUID
+  - user_id: UUID
+  - action: VARCHAR(100)
+  - resource_type: VARCHAR(50)
+  - resource_id: UUID
+  - ip_address: VARCHAR(50)
+  - user_agent: TEXT
+  - metadata: JSON
+  - created_at: DATETIME
+  --
+  + logAction(action, resource): boolean
+  + logPrivacyAccess(): boolean
+  + logLoginAttempt(): boolean
+  + generateAuditReport(): file
+}
+
+' ==================== EXTERNAL SERVICE INTEGRATION ====================
+
+class GoogleMapsAPI <<external>> {
+  - api_key: VARCHAR(100)
+  - search_radius: INTEGER
+  - max_results: INTEGER
+  --
+  + searchPlaces(location, type): array
+  + getPlaceDetails(placeId): object
+  + getDirections(origin, dest): object
+  + geocodeAddress(address): coordinates
+}
+
+class VisionTransformerAI <<external>> {
+  - model_name: VARCHAR(100)
+  - provider: VARCHAR(50)
+  - api_endpoint: VARCHAR(255)
+  - accuracy: FLOAT
+  --
+  + loadModel(): object
+  + predict(image): predictions
+  + classifyLesion(image): result
+  + localizeLesion(image): bbox
+}
+
+class SMTPService <<external>> {
+  - smtp_host: VARCHAR(100)
+  - smtp_port: INTEGER
+  - username: VARCHAR(100)
+  - use_tls: BOOLEAN
+  --
+  + sendEmail(to, subject, body): boolean
+  + sendBulkEmails(recipients): boolean
+  + validateEmailAddress(email): boolean
+}
+
+' ==================== RELATIONSHIPS ====================
+
+User "1" -- "0..1" PatientProfile : has >
+User "1" -- "0..1" HospitalStaff : has >
+User "1" -- "*" AnalysisReport : creates >
+User "1" -- "*" Appointment : books >
+User "1" -- "*" AuditLog : generates >
+
+PatientProfile "1" -- "*" AnalysisReport : owns >
+
+AnalysisReport "1" -- "1" SymptomQuestionnaire : includes >
+AnalysisReport "1" -- "1" ImageValidation : validated by >
+AnalysisReport "1" -- "1" RiskAssessment : has >
+AnalysisReport "1" -- "0..*" Appointment : attached to >
+
+Appointment "*" -- "1" Hospital : booked at >
+Appointment "*" -- "1" HospitalStaff : reviewed by >
+Appointment "1" -- "0..*" EmailNotification : triggers >
+
+AIModel "1" ..> "*" AnalysisReport : processes
+VisionTransformerAI ..> AnalysisReport : analyzes
+GoogleMapsAPI ..> Hospital : retrieves
+SMTPService ..> EmailNotification : sends
+
+@enduml
+
+================================================================================
+KEY RELATIONSHIPS EXPLAINED
+================================================================================
+
+COMPOSITION (filled diamond):
+- User HAS-A PatientProfile (1:0..1)
+- User HAS-A HospitalStaff (1:0..1)
+- AnalysisReport HAS-A SymptomQuestionnaire (1:1)
+- AnalysisReport HAS-A ImageValidation (1:1)
+- AnalysisReport HAS-A RiskAssessment (1:1)
+
+ASSOCIATION (line):
+- User CREATES AnalysisReport (1:*)
+- User BOOKS Appointment (1:*)
+- PatientProfile OWNS AnalysisReport (1:*)
+- Appointment BOOKED-AT Hospital (*:1)
+- Appointment REVIEWED-BY HospitalStaff (*:1)
+
+DEPENDENCY (dashed arrow):
+- AIModel PROCESSES AnalysisReport
+- VisionTransformerAI ANALYZES AnalysisReport
+- GoogleMapsAPI RETRIEVES Hospital data
+- SMTPService SENDS EmailNotification
+
+================================================================================
+CLASS STEREOTYPES USED
+================================================================================
+
+<<entity>>    - Database table/entity classes
+              - User, PatientProfile, HospitalStaff, AnalysisReport,
+                SymptomQuestionnaire, ImageValidation, RiskAssessment,
+                Appointment, Hospital, EmailNotification, AuditLog
+
+<<config>>    - Configuration/service classes
+              - AIModel
+
+<<external>>  - External API/service integration
+              - GoogleMapsAPI, VisionTransformerAI, SMTPService
+
+================================================================================
+CARDINALITY NOTATION
+================================================================================
+
+1         - Exactly one
+0..1      - Zero or one (optional)
+*         - Zero or many
+1..*      - One or many
+n..m      - Between n and m
+
+EXAMPLES IN YOUR SYSTEM:
+- User "1" -- "0..1" PatientProfile
+  (One user can have zero or one patient profile)
+
+- User "1" -- "*" AnalysisReport
+  (One user can create zero or many analysis reports)
+
+- Appointment "*" -- "1" Hospital
+  (Many appointments can be at one hospital)
+
+================================================================================
+KEY CLASSES BREAKDOWN
+================================================================================
+
+1. USER MANAGEMENT (3 classes):
+   - User: Core authentication and user data
+   - PatientProfile: Patient-specific health information
+   - HospitalStaff: Hospital/clinic staff information
+
+2. AI ANALYSIS (6 classes):
+   - AnalysisReport: Main analysis results storage
+   - SymptomQuestionnaire: Patient symptom responses
+   - ImageValidation: NSFW and skin content validation
+   - AIModel: AI model configuration
+   - RiskAssessment: Risk level calculation
+   - VisionTransformerAI: External AI service
+
+3. APPOINTMENT SYSTEM (3 classes):
+   - Appointment: Appointment booking and management
+   - Hospital: Hospital/clinic information from Google Maps
+   - GoogleMapsAPI: External mapping service
+
+4. NOTIFICATIONS (2 classes):
+   - EmailNotification: Email notification management
+   - SMTPService: External email service
+
+5. AUDIT & LOGGING (1 class):
+   - AuditLog: System activity and privacy access logging
+
+TOTAL: 15 classes (11 entities + 1 config + 3 external services)
+
+================================================================================
+COMPARISON TO YOUR REFERENCE DIAGRAM
+================================================================================
+
+YOUR REFERENCE DIAGRAM FORMAT:
+✅ <<entity>> stereotype for database tables
+✅ Attributes with data types (- private)
+✅ Methods with return types (+ public)
+✅ Clear relationships with diamonds and arrows
+✅ Relationship labels and cardinality
+
+SKINGUARD CLASS DIAGRAM (SAME FORMAT):
+✅ <<entity>> stereotype for database tables
+✅ <<config>> for configuration classes
+✅ <<external>> for external services
+✅ Attributes with data types (- private)
+✅ Methods with return types (+ public)
+✅ Clear relationships with proper UML notation
+✅ Relationship labels and cardinality
+✅ Grouped by functional areas
+
+IMPROVEMENTS IN SKINGUARD DIAGRAM:
+✅ Additional stereotypes (<<config>>, <<external>>)
+✅ More comprehensive attribute list
+✅ Realistic method names from actual code
+✅ Shows external API integrations clearly
+✅ Privacy and security classes (AuditLog)
+✅ Modern authentication (JWT tokens, password hashing)
+
+================================================================================
+HOW TO GENERATE THE DIAGRAM
+================================================================================
+
+METHOD 1: ONLINE PLANTUML (EASIEST)
+1. Go to: http://www.plantuml.com/plantuml/uml/
+2. Copy the PlantUML code above (from @startuml to @enduml)
+3. Paste into the text box
+4. Click "Submit"
+5. Download as PNG or SVG
+6. Save as: "Figure_4_11_UML_Class_Diagram.png"
+
+METHOD 2: VS CODE EXTENSION
+1. Install "PlantUML" extension in VS Code
+2. Create new file: class_diagram.puml
+3. Paste PlantUML code
+4. Press Alt+D to preview
+5. Right-click preview → Export to PNG/SVG
+
+METHOD 3: COMMAND LINE
+1. Save code as class_diagram.puml
+2. Run: java -jar plantuml.jar class_diagram.puml
+3. Generates class_diagram.png
+
+NOTE: The diagram may be large due to 15 classes. You can:
+- Generate as SVG for better scaling
+- Generate as PNG with high DPI
+- Split into multiple diagrams if needed (User Management, AI Analysis, Appointments)
+
+================================================================================
+ALTERNATIVE: SPLIT INTO MULTIPLE DIAGRAMS
+================================================================================
+
+If the full diagram is too large for your thesis, you can create 3 separate diagrams:
+
+DIAGRAM 1: USER MANAGEMENT & AUTHENTICATION
+- User, PatientProfile, HospitalStaff, AuditLog
+- Shows authentication and profile management
+
+DIAGRAM 2: AI ANALYSIS WORKFLOW (MOST IMPORTANT)
+- AnalysisReport, SymptomQuestionnaire, ImageValidation
+- AIModel, RiskAssessment, VisionTransformerAI
+- Shows core AI feature
+
+DIAGRAM 3: APPOINTMENT & NOTIFICATION SYSTEM
+- Appointment, Hospital, EmailNotification
+- GoogleMapsAPI, SMTPService
+- Shows booking and communication flow
+
+Let me know if you want me to create these 3 separate diagrams!
+
+================================================================================
+THESIS PLACEMENT
+================================================================================
+
+CHAPTER 4: SYSTEM DESIGN
+├── 4.1 Use Case Diagram
+├── 4.2 Use Case Descriptions
+├── 4.3 Activity Diagrams (5 diagrams)
+├── 4.4 Sequence Diagrams (4 diagrams)
+├── 4.5 Class Diagram ⭐ NEW
+│   └── Figure 4.11: UML Class Diagram
+│       OR (if split):
+│       ├── Figure 4.11: User Management Class Diagram
+│       ├── Figure 4.12: AI Analysis Class Diagram
+│       └── Figure 4.13: Appointment System Class Diagram
+└── 4.6 System Architecture Diagram
+
+EXPLANATORY TEXT TO WRITE:
+"Figure 4.11 presents the UML Class Diagram for the SkinGuard system, 
+illustrating the entity classes, their attributes, methods, and relationships. 
+The diagram shows 15 classes organized into five functional areas: User 
+Management (User, PatientProfile, HospitalStaff), AI Analysis (AnalysisReport, 
+SymptomQuestionnaire, ImageValidation, AIModel, RiskAssessment), Appointment 
+System (Appointment, Hospital), Notifications (EmailNotification), and Audit 
+Logging (AuditLog). External service integrations (VisionTransformerAI, 
+GoogleMapsAPI, SMTPService) are shown with <<external>> stereotypes. The 
+relationships demonstrate one-to-many associations between User and 
+AnalysisReport, composition relationships between AnalysisReport and its 
+components, and dependency relationships with external services."
+
+================================================================================
+FILES CREATED
+================================================================================
+
+✅ CLASS_DIAGRAM.txt - This file with complete UML class diagram
+
+Previous files:
+✅ SEQUENCE_DIAGRAMS.txt - 4 sequence diagrams
+✅ ACTIVITY_DIAGRAMS_FIXED.txt - 5 activity diagrams
+✅ USE_CASE_DESCRIPTIONS_ALL.txt - 28 use case descriptions
+✅ TABLE_4.1_GOOGLE_DOCS.txt - Functional Requirements
+✅ TABLE_4.2_GOOGLE_DOCS.txt - Actor Descriptions
+✅ use_case_diagram.puml - Use Case Diagram
+
+COMPLETE UML DOCUMENTATION:
+- Use Case Diagram: 1 diagram
+- Activity Diagrams: 5 diagrams
+- Sequence Diagrams: 4 diagrams
+- Class Diagram: 1 diagram (or 3 if split)
+- TOTAL: 11-13 UML diagrams
+
+ALL READY FOR YOUR THESIS! 🎓

@@ -1,0 +1,307 @@
+================================================================================
+SKINGUARD DATABASE - NORMALIZED TABLES
+================================================================================
+
+This document contains all 7 database tables in the normalized table format
+with Attribute, Data Type, and Constraints columns.
+
+Format matches the reference: Table 4.4.1 User Normalize Table
+
+================================================================================
+TABLE 1: PROFILES (USER ACCOUNTS)
+================================================================================
+
+Table 4.4.1 Profiles Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| user_id                | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| email                  | VARCHAR(255)     | Unique, NOT NULL                 |
++------------------------+------------------+----------------------------------+
+| full_name              | VARCHAR(100)     |                                  |
++------------------------+------------------+----------------------------------+
+| role                   | VARCHAR(20)      | NOT NULL                         |
+|                        |                  | (patient, doctor, admin)         |
++------------------------+------------------+----------------------------------+
+| verified               | BOOLEAN          | Default: FALSE                   |
++------------------------+------------------+----------------------------------+
+| avatar_url             | TEXT             |                                  |
++------------------------+------------------+----------------------------------+
+| language_preference    | VARCHAR(10)      | Default: 'en'                    |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+| updated_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+TABLE 2: PATIENT_DATA (PATIENT HEALTH PROFILES)
+================================================================================
+
+Table 4.4.2 Patient Data Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| id                     | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| user_id                | UUID             | FK: profiles.user_id             |
+|                        |                  | Unique, NOT NULL                 |
++------------------------+------------------+----------------------------------+
+| age                    | INTEGER          | Between 1 and 120                |
++------------------------+------------------+----------------------------------+
+| skin_type              | VARCHAR(5)       | (I, II, III, IV, V, VI)          |
+|                        |                  | Fitzpatrick Scale                |
++------------------------+------------------+----------------------------------+
+| family_history         | TEXT             |                                  |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+| updated_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+TABLE 3: DOCTORS (DOCTOR CREDENTIALS AND CLINIC INFO)
+================================================================================
+
+Table 4.4.3 Doctors Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| doctor_id              | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| user_id                | UUID             | FK: profiles.user_id             |
+|                        |                  | Unique, NOT NULL                 |
++------------------------+------------------+----------------------------------+
+| license_no             | VARCHAR(100)     | Unique, NOT NULL                 |
++------------------------+------------------+----------------------------------+
+| clinic_name            | VARCHAR(200)     |                                  |
++------------------------+------------------+----------------------------------+
+| lat                    | DOUBLE PRECISION | Between -90 and 90               |
++------------------------+------------------+----------------------------------+
+| lng                    | DOUBLE PRECISION | Between -180 and 180             |
++------------------------+------------------+----------------------------------+
+| whatsapp_no            | VARCHAR(20)      |                                  |
++------------------------+------------------+----------------------------------+
+| specialization         | VARCHAR(100)     |                                  |
++------------------------+------------------+----------------------------------+
+| bio                    | TEXT             |                                  |
++------------------------+------------------+----------------------------------+
+| education              | TEXT             |                                  |
++------------------------+------------------+----------------------------------+
+| certifications         | TEXT             |                                  |
++------------------------+------------------+----------------------------------+
+| languages              | VARCHAR(200)     |                                  |
++------------------------+------------------+----------------------------------+
+| clinic_hours           | TEXT             |                                  |
++------------------------+------------------+----------------------------------+
+| average_rating         | FLOAT            | Default: 0.0                     |
+|                        |                  | Between 0.0 and 5.0              |
++------------------------+------------------+----------------------------------+
+| review_count           | INTEGER          | Default: 0                       |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+| updated_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+TABLE 4: MEDICAL_REPORTS (AI ANALYSIS RESULTS)
+================================================================================
+
+Table 4.4.4 Medical Reports Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| report_id              | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| patient_id             | UUID             | FK: profiles.user_id             |
+|                        |                  | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| image_url              | TEXT             | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| ai_prediction          | JSONB            | Stores cancer type predictions   |
+|                        |                  | with confidence scores           |
++------------------------+------------------+----------------------------------+
+| symptoms               | TEXT             | Symptom wizard data (JSON)       |
++------------------------+------------------+----------------------------------+
+| status                 | VARCHAR(20)      | (safe, urgent, flagged)          |
++------------------------+------------------+----------------------------------+
+| risk_level             | VARCHAR(20)      | (low, medium, high, urgent)      |
++------------------------+------------------+----------------------------------+
+| body_location          | VARCHAR(100)     | Location of lesion               |
++------------------------+------------------+----------------------------------+
+| consultation_notes     | TEXT             | Doctor's notes                   |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+| updated_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+TABLE 5: APPOINTMENTS (APPOINTMENT SCHEDULING SYSTEM)
+================================================================================
+
+Table 4.4.5 Appointments Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| appointment_id         | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| patient_id             | UUID             | FK: profiles.user_id             |
+|                        |                  | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| doctor_id              | UUID             | FK: doctors.doctor_id            |
+|                        |                  | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| report_id              | UUID             | FK: medical_reports.report_id    |
+|                        |                  | Optional (can be NULL)           |
++------------------------+------------------+----------------------------------+
+| scheduled_at           | TIMESTAMP        | NOT NULL                         |
+|                        |                  | Must be in future                |
++------------------------+------------------+----------------------------------+
+| status                 | VARCHAR(20)      | (pending, confirmed,             |
+|                        |                  | completed, cancelled)            |
++------------------------+------------------+----------------------------------+
+| consultation_type      | VARCHAR(20)      | (in_person, video)               |
++------------------------+------------------+----------------------------------+
+| video_room_url         | TEXT             | For video consultations          |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+| updated_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+TABLE 6: REVIEWS (DOCTOR RATINGS AND REVIEWS)
+================================================================================
+
+Table 4.4.6 Reviews Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| review_id              | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| patient_id             | UUID             | FK: profiles.user_id             |
+|                        |                  | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| doctor_id              | UUID             | FK: doctors.doctor_id            |
+|                        |                  | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| appointment_id         | UUID             | FK: appointments.appointment_id  |
+|                        |                  | Optional (can be NULL)           |
++------------------------+------------------+----------------------------------+
+| rating                 | INTEGER          | Between 1 and 5                  |
+|                        |                  | NOT NULL                         |
++------------------------+------------------+----------------------------------+
+| review_text            | TEXT             | Optional review description      |
++------------------------+------------------+----------------------------------+
+| flagged                | BOOLEAN          | Default: FALSE                   |
+|                        |                  | For moderation                   |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+TABLE 7: AUDIT_LOGS (SECURITY AND COMPLIANCE TRAIL)
+================================================================================
+
+Table 4.4.7 Audit Logs Normalize Table
+
++------------------------+------------------+----------------------------------+
+|       Attribute        |    Data Type     |           Constraints            |
++------------------------+------------------+----------------------------------+
+| log_id                 | UUID             | Primary Key                      |
++------------------------+------------------+----------------------------------+
+| user_id                | UUID             | Soft reference (no FK)           |
+|                        |                  | Can be NULL for system events    |
++------------------------+------------------+----------------------------------+
+| action                 | VARCHAR(100)     | NOT NULL                         |
+|                        |                  | (login, upload, analyze, etc)    |
++------------------------+------------------+----------------------------------+
+| resource_type          | VARCHAR(50)      | (user, report, appointment)      |
++------------------------+------------------+----------------------------------+
+| resource_id            | VARCHAR(100)     | ID of affected resource          |
++------------------------+------------------+----------------------------------+
+| metadata               | JSONB            | Additional event details         |
++------------------------+------------------+----------------------------------+
+| created_at             | TIMESTAMP        | Default: NOW()                   |
++------------------------+------------------+----------------------------------+
+
+
+================================================================================
+DATABASE RELATIONSHIP SUMMARY
+================================================================================
+
+PRIMARY KEY RELATIONSHIPS:
+
+1. profiles.user_id
+   ├─> patient_data.user_id (1:1)
+   ├─> doctors.user_id (1:1)
+   ├─> medical_reports.patient_id (1:N)
+   ├─> appointments.patient_id (1:N)
+   └─> reviews.patient_id (1:N)
+
+2. doctors.doctor_id
+   ├─> appointments.doctor_id (1:N)
+   └─> reviews.doctor_id (1:N)
+
+3. medical_reports.report_id
+   └─> appointments.report_id (1:N) - Optional
+
+4. appointments.appointment_id
+   └─> reviews.appointment_id (1:1) - Optional
+
+5. audit_logs.user_id
+   └─> profiles.user_id (Soft reference, no FK constraint)
+
+
+FOREIGN KEY CONSTRAINTS:
+
+- patient_data.user_id → profiles.user_id (ON DELETE CASCADE)
+- doctors.user_id → profiles.user_id (ON DELETE CASCADE)
+- medical_reports.patient_id → profiles.user_id (ON DELETE CASCADE)
+- appointments.patient_id → profiles.user_id (ON DELETE CASCADE)
+- appointments.doctor_id → doctors.doctor_id (ON DELETE CASCADE)
+- appointments.report_id → medical_reports.report_id (ON DELETE SET NULL)
+- reviews.patient_id → profiles.user_id (ON DELETE CASCADE)
+- reviews.doctor_id → doctors.doctor_id (ON DELETE CASCADE)
+- reviews.appointment_id → appointments.appointment_id (ON DELETE SET NULL)
+
+
+NORMALIZATION NOTES:
+
+1. Third Normal Form (3NF) achieved:
+   - No repeating groups
+   - All non-key attributes depend on primary key
+   - No transitive dependencies
+
+2. Single source of truth:
+   - User information in profiles table only
+   - Role-specific data in patient_data and doctors tables
+
+3. Data integrity:
+   - Foreign key constraints ensure referential integrity
+   - CHECK constraints enforce business rules
+   - UNIQUE constraints prevent duplicates
+
+4. Flexible design:
+   - JSONB for complex data (ai_prediction, metadata)
+   - Optional relationships (report_id, appointment_id)
+   - Soft references for audit logs
+
+================================================================================
+END OF DATABASE TABLES DOCUMENTATION
+================================================================================

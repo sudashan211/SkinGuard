@@ -1,0 +1,613 @@
+================================================================================
+CLASS DIAGRAM - SKIN DETECTION MODULE
+================================================================================
+
+This class diagram shows the classes involved in AI-powered skin cancer
+detection and analysis for the SkinGuard system.
+
+Updated for: NSFW Filter + Vision Transformer AI + Risk Assessment + Symptom Wizard
+
+Generate at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+PLANTUML CODE - SKIN DETECTION MODULE CLASS DIAGRAM
+================================================================================
+
+@startuml
+title Class Diagram of Skin Detection Module
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================================================================
+' ENTITY CLASSES
+' ============================================================================
+
+class User {
+    + userId : UUID
+    + email : String
+    + fullName : String
+    + role : String
+}
+
+class MedicalReport {
+    + reportId : UUID
+    + patientId : UUID
+    + imageUrl : String
+    + aiPrediction : JSON
+    + cancerType : String
+    + confidence : Float
+    + riskLevel : String
+    + status : String
+    + bodyLocation : String
+    + createdAt : DateTime
+}
+
+class SymptomResponse {
+    + symptomId : UUID
+    + reportId : UUID
+    + bodyLocation : String
+    + sensations : JSON
+    + visualChanges : JSON
+    + duration : String
+    + painLevel : Integer
+    + itchingLevel : String
+    + bleeding : String
+}
+
+class ImageValidation {
+    + validationId : UUID
+    + imageUrl : String
+    + skinPercentage : Float
+    + nsfwScore : Float
+    + textDetected : Boolean
+    + validationPassed : Boolean
+    + rejectionReason : String
+}
+
+class RiskAssessment {
+    + assessmentId : UUID
+    + reportId : UUID
+    + riskLevel : String
+    + urgencyScore : Integer
+    + timeline : String
+    + justification : String
+    + conservativeBias : Boolean
+}
+
+' ============================================================================
+' CONTROLLER CLASSES
+' ============================================================================
+
+class "<<Controller>>\nImageUploadController" as UploadController {
+    + uploadImage(file, userId): String
+    + capturePhoto(imageData, userId): String
+    + validateFileFormat(file): Boolean
+    + validateFileSize(file): Boolean
+    + storeImage(file): String
+}
+
+class "<<Controller>>\nImageValidationController" as ValidationController {
+    + validateImage(imageUrl): ImageValidation
+    + calculateSkinPercentage(image): Float
+    + detectTextGraphics(image): Boolean
+    + checkNSFW(image): Float
+    + preprocessImage(image): Array
+}
+
+class "<<Controller>>\nAIAnalysisController" as AIController {
+    + analyzeImage(imageUrl, symptoms): MedicalReport
+    + callViTModel(imageData): JSON
+    + parseAIPredictions(output): Object
+    + classifyLesion(predictions): String
+    + getConfidenceScore(predictions): Float
+}
+
+class "<<Controller>>\nRiskAssessmentController" as RiskController {
+    + assessRisk(cancerType, confidence, symptoms): RiskAssessment
+    + calculateRiskLevel(data): String
+    + applyConservativeBias(risk): String
+    + generateJustification(risk): String
+    + assignUrgencyScore(risk): Integer
+}
+
+class "<<Controller>>\nReportController" as ReportController {
+    + getReportById(reportId): MedicalReport
+    + getPatientReports(userId): Array
+    + generatePDF(reportId): File
+    + shareReport(reportId, email): Boolean
+}
+
+' ============================================================================
+' SERVICE CLASSES
+' ============================================================================
+
+class "<<Service>>\nVisionTransformerService" as ViTService {
+    + loadModel(): Model
+    + predict(imageData): Predictions
+    + preprocessForViT(image): Tensor
+    + getCancerTypes(): Array
+}
+
+class "<<Service>>\nNSFWFilterService" as NSFWService {
+    + validateSkinContent(image): Boolean
+    + calculateSkinPixels(image): Integer
+    + checkRGBOrdering(pixel): Boolean
+    + checkBrightness(pixel): Boolean
+    + checkSaturation(pixel): Boolean
+}
+
+class "<<Service>>\nSymptomService" as SymptomService {
+    + collectSymptoms(data): SymptomResponse
+    + validateSymptoms(data): Boolean
+    + analyzeRedFlags(symptoms): Array
+    + calculateSymptomScore(symptoms): Integer
+}
+
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+User "1" -- "*" MedicalReport : creates >
+MedicalReport "1" -- "1" SymptomResponse : includes >
+MedicalReport "1" -- "1" ImageValidation : validated by >
+MedicalReport "1" -- "1" RiskAssessment : has >
+
+UploadController ..> User : authenticates
+UploadController ..> ValidationController : validates
+
+ValidationController ..> ImageValidation : creates
+ValidationController ..> NSFWService : uses
+ValidationController ..> AIController : passes to
+
+AIController ..> MedicalReport : creates
+AIController ..> ViTService : uses
+AIController ..> SymptomService : stores
+AIController ..> RiskController : calculates
+
+RiskController ..> RiskAssessment : generates
+RiskController ..> MedicalReport : updates
+
+ReportController ..> MedicalReport : manages
+
+@enduml
+
+================================================================================
+SIMPLIFIED VERSION - MATCHING YOUR REFERENCE EXACTLY
+================================================================================
+
+Minimal version matching your reference diagram format:
+
+@startuml
+title Class Diagram of Skin Detection Module
+
+skinparam classAttributeIconSize 0
+
+class User {
+    + userId : UUID
+    + email : String
+    + fullName : String
+    + role : String
+}
+
+class MedicalReport {
+    + reportId : UUID
+    + patientId : UUID
+    + imageUrl : String
+    + cancerType : String
+    + confidence : Float
+    + riskLevel : String
+    + createdAt : DateTime
+}
+
+class "<<Controller>>\nAIAnalysisController" as AIController {
+    + uploadImage(image): void
+    + validateImage(image): Boolean
+    + analyzeImage(imageUrl): MedicalReport
+    + assessRisk(report): String
+}
+
+User -- MedicalReport
+MedicalReport -- AIController
+
+@enduml
+
+================================================================================
+DETAILED VERSION - WITH ALL ATTRIBUTES AND METHODS
+================================================================================
+
+Complete version showing all features:
+
+@startuml
+title Class Diagram of Skin Detection Module (Detailed)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================================================================
+' ENTITY CLASSES
+' ============================================================================
+
+class User <<Entity>> {
+    - userId : UUID
+    - email : String
+    - fullName : String
+    - role : ENUM(patient, doctor)
+    --
+    + uploadImage(): MedicalReport
+    + viewReports(): Array
+    + downloadPDF(reportId): File
+}
+
+class MedicalReport <<Entity>> {
+    - reportId : UUID
+    - patientId : UUID (FK)
+    - imageUrl : String
+    - imageThumbnail : String
+    - aiPrediction : JSONB
+    - cancerType : VARCHAR(100)
+    - confidence : FLOAT
+    - allPredictions : JSONB
+    - riskLevel : ENUM(low, medium, high, urgent)
+    - riskJustification : TEXT
+    - status : VARCHAR(20)
+    - bodyLocation : VARCHAR(100)
+    - modelVersion : VARCHAR(50)
+    - createdAt : DATETIME
+    - updatedAt : DATETIME
+    --
+    + generatePDF(): File
+    + shareWithDoctor(email): Boolean
+    + getSummary(): Object
+    + getTopPrediction(): Object
+}
+
+class SymptomResponse <<Entity>> {
+    - symptomId : UUID
+    - reportId : UUID (FK)
+    - bodyLocation : VARCHAR(100)
+    - durationNoticed : VARCHAR(50)
+    - sizeChanges : VARCHAR(50)
+    - painLevel : INTEGER
+    - itchingLevel : VARCHAR(20)
+    - bleedingFrequency : VARCHAR(50)
+    - sensations : JSONB
+    - visualChanges : JSONB
+    - sunExposure : VARCHAR(20)
+    - additionalNotes : TEXT
+    - createdAt : DATETIME
+    --
+    + calculateSymptomScore(): Integer
+    + getRedFlags(): Array
+    + validate(): Boolean
+}
+
+class ImageValidation <<Entity>> {
+    - validationId : UUID
+    - imageUrl : VARCHAR(255)
+    - skinPercentage : FLOAT
+    - nsfwScore : FLOAT
+    - textDetected : BOOLEAN
+    - edgeDensity : FLOAT
+    - contrast : FLOAT
+    - validationPassed : BOOLEAN
+    - rejectionReason : TEXT
+    - createdAt : DATETIME
+    --
+    + logResult(): void
+    + getSummary(): Object
+}
+
+class RiskAssessment <<Entity>> {
+    - assessmentId : UUID
+    - reportId : UUID (FK)
+    - riskLevel : ENUM(low, medium, high, urgent)
+    - urgencyScore : INTEGER
+    - timeline : VARCHAR(100)
+    - recommendedAction : TEXT
+    - justification : TEXT
+    - conservativeBias : BOOLEAN
+    - createdAt : DATETIME
+    --
+    + getTimeline(): String
+    + getPriority(): Integer
+    + needsUrgentCare(): Boolean
+}
+
+' ============================================================================
+' CONTROLLER CLASSES
+' ============================================================================
+
+class ImageUploadController <<Controller>> {
+    --
+    + POST uploadImage(file, userId): String
+    + POST capturePhoto(imageData, userId): String
+    + validateFileFormat(file): Boolean
+    + validateFileSize(file): Boolean
+    + storeImage(file): String
+    + generateThumbnail(image): String
+}
+
+class ImageValidationController <<Controller>> {
+    - minSkinPercentage : Float = 0.25
+    - maxNSFWScore : Float = 0.35
+    --
+    + validateImage(imageUrl): ImageValidation
+    + calculateSkinPercentage(image): Float
+    + detectTextGraphics(image): Boolean
+    + checkNSFW(image): Float
+    + preprocessImage(image): Array
+    + logValidation(result): void
+}
+
+class AIAnalysisController <<Controller>> {
+    --
+    + POST analyzeImage(imageUrl, symptoms): MedicalReport
+    + callViTModel(imageData): JSON
+    + parseAIPredictions(output): Object
+    + classifyLesion(predictions): String
+    + getConfidenceScore(predictions): Float
+    + localizeLesion(image): Coordinates
+    + getAllPredictions(): Array
+}
+
+class RiskAssessmentController <<Controller>> {
+    --
+    + assessRisk(cancerType, confidence, symptoms): RiskAssessment
+    + calculateRiskLevel(data): String
+    + applyConservativeBias(risk): String
+    + generateJustification(risk): String
+    + assignUrgencyScore(risk): Integer
+    + getTimeline(risk): String
+    + getRecommendation(risk): String
+}
+
+class ReportController <<Controller>> {
+    --
+    + GET getReportById(reportId): MedicalReport
+    + GET getPatientReports(userId): Array
+    + POST generatePDF(reportId): File
+    + POST shareReport(reportId, email): Boolean
+    + GET compareReports(id1, id2): Object
+}
+
+class SymptomController <<Controller>> {
+    --
+    + POST submitSymptoms(reportId, data): SymptomResponse
+    + validateSymptoms(data): Boolean
+    + getRedFlags(symptoms): Array
+    + calculateScore(symptoms): Integer
+}
+
+' ============================================================================
+' SERVICE CLASSES
+' ============================================================================
+
+class VisionTransformerService <<Service>> {
+    - modelName : String = "ViT-H-14"
+    - provider : String = "Hugging Face"
+    - accuracy : Float = 0.84
+    - cancerTypes : Array[7]
+    --
+    + loadModel(): Model
+    + predict(imageData): Predictions
+    + preprocessForViT(image): Tensor
+    + getCancerTypes(): Array
+    + getModelVersion(): String
+}
+
+class NSFWFilterService <<Service>> {
+    - skinThreshold : Float = 0.25
+    --
+    + validateSkinContent(image): Boolean
+    + calculateSkinPixels(image): Integer
+    + checkRGBOrdering(pixel): Boolean
+    + checkBrightness(pixel): Boolean
+    + checkSaturation(pixel): Boolean
+    + countValidPixels(image): Integer
+}
+
+class SymptomService <<Service>> {
+    --
+    + collectSymptoms(data): SymptomResponse
+    + validateSymptoms(data): Boolean
+    + analyzeRedFlags(symptoms): Array
+    + calculateSymptomScore(symptoms): Integer
+    + getSeverity(symptoms): String
+}
+
+class ImageProcessingService <<Service>> {
+    --
+    + resize(image, width, height): Image
+    + normalize(image): Array
+    + convertToRGB(image): Image
+    + generateThumbnail(image): Image
+    + extractFeatures(image): Array
+}
+
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+User "1" -- "*" MedicalReport : creates >
+MedicalReport "1" -- "1" SymptomResponse : includes >
+MedicalReport "1" -- "1" ImageValidation : validated by >
+MedicalReport "1" -- "1" RiskAssessment : has >
+
+ImageUploadController ..> User : authenticates
+ImageUploadController ..> ImageProcessingService : uses
+ImageUploadController ..> ImageValidationController : validates
+
+ImageValidationController ..> ImageValidation : creates
+ImageValidationController ..> NSFWFilterService : uses
+ImageValidationController ..> ImageProcessingService : uses
+ImageValidationController ..> AIAnalysisController : passes to
+
+AIAnalysisController ..> MedicalReport : creates
+AIAnalysisController ..> VisionTransformerService : uses
+AIAnalysisController ..> SymptomController : collects
+AIAnalysisController ..> RiskAssessmentController : calculates
+
+RiskAssessmentController ..> RiskAssessment : generates
+RiskAssessmentController ..> MedicalReport : updates
+
+ReportController ..> MedicalReport : manages
+SymptomController ..> SymptomResponse : manages
+SymptomController ..> SymptomService : uses
+
+@enduml
+
+================================================================================
+COMPARISON: OLD vs NEW
+================================================================================
+
+YOUR REFERENCE (Old System):
+┌─────────────────────┐     ┌─────────────────────┐     ┌──────────────────────┐
+│       User          │────→│   SkinDetection     │────→│  <<Controller>>      │
+├─────────────────────┤     ├─────────────────────┤     │ SkinDetection        │
+│ + userId : String   │     │ + imageID : String  │     │ Controller           │
+│ + username : String │     │ + userID : String   │     ├──────────────────────┤
+│ + email : String    │     │ + imagePath : String│     │ + uploadImage(): void│
+│ + password : String │     │ + result : String   │     │ + analyzeImage():    │
+│ + phoneNumber : int │     │ + date : DateTime   │     │   String             │
+└─────────────────────┘     └─────────────────────┘     │ + getResult():       │
+                                                          │   String             │
+                                                          └──────────────────────┘
+
+SKINGUARD (New System):
+┌──────────────┐    ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│     User     │───→│ MedicalReport   │───→│ImageValidation  │    │RiskAssessment  │
+├──────────────┤    ├─────────────────┤    ├──────────────────┤    ├─────────────────┤
+│+ userId:UUID │    │+ reportId:UUID  │    │+ skinPercentage  │    │+ riskLevel     │
+│+ email:String│    │+ imageUrl:String│    │+ nsfwScore       │✨  │+ urgencyScore  │✨
+│+ fullName    │    │+ cancerType     │✨  │+ textDetected    │✨  │+ justification │✨
+│+ role        │    │+ confidence     │✨  │+ validationPassed│✨  │+ timeline      │✨
+└──────────────┘    │+ riskLevel      │✨  └──────────────────┘    └─────────────────┘
+                    │+ aiPrediction   │✨           ↑                        ↑
+                    └─────────────────┘             │                        │
+                             ↓                      │                        │
+                    ┌─────────────────┐    ┌────────────────────────────────┐
+                    │SymptomResponse  │    │      CONTROLLERS               │
+                    ├─────────────────┤    ├────────────────────────────────┤
+                    │+ bodyLocation   │✨  │ ImageUploadController          │
+                    │+ sensations     │✨  │ ImageValidationController  ✨  │
+                    │+ visualChanges  │✨  │ AIAnalysisController      ✨  │
+                    │+ duration       │✨  │ RiskAssessmentController  ✨  │
+                    └─────────────────┘    │ ReportController               │
+                                            └────────────────────────────────┘
+                                                       ↓
+                                            ┌────────────────────────────────┐
+                                            │       SERVICES                 │
+                                            ├────────────────────────────────┤
+                                            │ VisionTransformerService   ✨  │
+                                            │ NSFWFilterService         ✨  │
+                                            │ SymptomService            ✨  │
+                                            │ ImageProcessingService    ✨  │
+                                            └────────────────────────────────┘
+
+KEY IMPROVEMENTS:
+✅ Medical Report instead of simple detection (comprehensive data)
+✅ Image Validation entity (NSFW filter, 25% threshold, poster detection)
+✅ Symptom Response entity (4-step wizard data)
+✅ Risk Assessment entity (stratification with conservative bias)
+✅ 5 specialized controllers (separation of concerns)
+✅ 4 service classes (reusable business logic)
+✅ Vision Transformer AI integration (84% accuracy, 7 cancer types)
+✅ Complete analysis pipeline (Upload → Validate → Analyze → Assess → Report)
+
+================================================================================
+DESCRIPTION FOR THESIS
+================================================================================
+
+Figure 2.7 presents the Class Diagram for the Skin Detection Module,
+illustrating the entity classes, controller classes, service classes, and
+their relationships in the AI-powered skin cancer analysis system. The
+diagram shows five main entity classes: User (patient uploading images),
+MedicalReport (storing AI analysis results including cancer type, confidence
+score, risk level, and all seven cancer type probabilities), SymptomResponse
+(capturing structured symptom data from four-step questionnaire), ImageValidation
+(enforcing content safety through skin percentage calculation, NSFW scoring,
+and text/poster detection), and RiskAssessment (stratifying cases into Low,
+Medium, High, or Urgent categories with conservative medical bias).
+
+The controller layer implements six specialized controllers following the
+single responsibility principle: ImageUploadController handles file upload
+and camera capture with format/size validation, ImageValidationController
+enforces the 25% skin content threshold using RGB analysis and detects
+posters through edge density patterns, AIAnalysisController interfaces with
+Vision Transformer AI model from Hugging Face for seven-class cancer
+classification, RiskAssessmentController applies medical decision rules with
+conservative bias to calculate urgency scores, SymptomController collects
+and validates symptom questionnaire responses, and ReportController manages
+report retrieval, PDF generation, and sharing functionality.
+
+The service layer provides reusable business logic through four service
+classes: VisionTransformerService encapsulates the ViT-H-14 model (84%
+accuracy on HAM10000 dataset) for skin lesion classification into melanoma,
+basal cell carcinoma, squamous cell carcinoma, actinic keratoses, benign
+keratosis, dermatofibroma, and vascular lesions; NSFWFilterService implements
+the four-criteria skin validation algorithm checking RGB channel ordering,
+brightness range, saturation levels, and pixel percentage thresholds to
+prevent poster/document uploads; SymptomService processes symptom wizard
+responses to identify red flags (rapid growth, bleeding, pain) and calculate
+severity scores that influence risk assessment; ImageProcessingService
+handles image transformations including resizing to 224x224 pixels, RGB
+normalization, and thumbnail generation for performance optimization.
+
+The MedicalReport class serves as the central entity with one-to-one
+relationships to SymptomResponse, ImageValidation, and RiskAssessment,
+ensuring every analysis includes validated image content, patient-reported
+symptoms, and risk stratification. The User class has a one-to-many
+relationship with MedicalReport, enabling longitudinal tracking of multiple
+skin lesion images over time for monitoring changes. Controllers depend on
+service classes for cross-cutting concerns (AI inference, validation, image
+processing), following the dependency inversion principle. All entities use
+UUID for primary keys (security against enumeration attacks) and store
+timestamps for audit trails supporting HIPAA/GDPR compliance.
+
+================================================================================
+USAGE IN THESIS
+================================================================================
+
+CHAPTER 2: SYSTEM DESIGN
+Section: 2.2.2.2 Class Diagram of Skin Detection Module
+
+[INSERT CLASS DIAGRAM HERE - USE SIMPLIFIED VERSION FOR CLARITY]
+
+Figure 2.7 shows the Class Diagram for Skin Detection Module. The diagram
+includes entity classes (User, MedicalReport, SymptomResponse, ImageValidation,
+RiskAssessment) and controller classes (ImageUploadController,
+ImageValidationController, AIAnalysisController, RiskAssessmentController)
+that manage the AI analysis workflow. The MedicalReport class serves as the
+central entity with relationships to SymptomResponse (patient symptoms),
+ImageValidation (NSFW filter results), and RiskAssessment (urgency
+stratification). Service classes (VisionTransformerService, NSFWFilterService)
+provide reusable AI and validation functionality.
+
+[Optional: Include detailed description from above]
+
+================================================================================
+WHICH VERSION TO USE?
+================================================================================
+
+FOR THESIS CHAPTER 2 (matching your reference):
+→ Use "SIMPLIFIED VERSION" - Clearest match to your reference
+
+FOR DETAILED TECHNICAL DOCUMENTATION:
+→ Use "DETAILED VERSION" - Shows all attributes, methods, services
+
+FOR HIGH-LEVEL ARCHITECTURE:
+→ Use "MAIN VERSION" - Good balance of detail and clarity
+
+RECOMMENDATION: Use SIMPLIFIED VERSION in thesis main body (Chapter 2),
+place DETAILED VERSION in appendix for complete technical reference.
+
+ALL READY FOR YOUR THESIS! 🎓
+
+================================================================================

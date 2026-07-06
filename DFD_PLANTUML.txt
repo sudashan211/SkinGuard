@@ -1,0 +1,429 @@
+================================================================================
+DATA FLOW DIAGRAM (DFD) - PLANTUML CODE
+================================================================================
+
+NOTE: PlantUML doesn't natively support DFD diagrams. This uses PlantUML's
+component diagram syntax to simulate a DFD layout similar to your reference.
+
+The result won't be perfect, but it's the closest we can get with PlantUML.
+
+For a true DFD matching your reference diagram, use draw.io or Visio instead.
+
+================================================================================
+PLANTUML CODE - DFD SIMULATION
+================================================================================
+
+@startuml
+title Level 1 Data Flow Diagram - SkinGuard System
+
+' Define styling
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor Black
+    FontSize 11
+}
+
+skinparam database {
+    BackgroundColor LightYellow
+    BorderColor Black
+}
+
+skinparam actor {
+    BackgroundColor LightGray
+    BorderColor Black
+}
+
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' External Entities (Actors)
+actor "Patient" as Patient
+actor "Hospital Staff" as Staff
+actor "Vision Transformer AI" as AI
+actor "Google Maps API" as Maps
+actor "Email System" as Email
+
+' System Boundary
+package "Operational Logs" {
+    
+    ' Processes (Components)
+    [P1: Authentication & User Mgmt] as P1
+    [P2: Image Upload & Validation] as P2
+    [P3: AI Analysis & Risk Assessment] as P3
+    [P4: Hospital Search & Navigation] as P4
+    [P5: Appointment Management] as P5
+    [P6: Notification Service] as P6
+    [P7: Audit & Logging] as P7
+    
+    ' Data Stores (Databases)
+    database "D1: User Accounts" as D1
+    database "D2: Patient Profiles" as D2
+    database "D3: Analysis Reports" as D3
+    database "D4: Image Storage" as D4
+    database "D5: Appointments" as D5
+    database "D6: Hospitals" as D6
+    database "D7: Email Queue" as D7
+    database "D8: Audit Logs" as D8
+    
+}
+
+' Data Flows from Patient
+Patient --> P1 : Login Credentials
+Patient --> P2 : Skin Images
+Patient --> P3 : Symptom Responses
+Patient --> P4 : Hospital Search
+Patient --> P5 : Appointment Request
+
+' Data Flows to Patient
+P1 --> Patient : Auth Token
+P2 --> Patient : Validation Result
+P3 --> Patient : AI Results
+P4 --> Patient : Hospital List
+P5 --> Patient : Appt Status
+P6 --> Patient : Email
+
+' Data Flows from Hospital Staff
+Staff --> P1 : Login Credentials
+Staff --> P5 : Appt Decision
+
+' Data Flows to Hospital Staff
+P5 --> Staff : Pending Reports
+P6 --> Staff : Email
+
+' External AI Service
+P3 --> AI : Image Data
+AI --> P3 : Classification
+
+' External Maps Service
+P4 --> Maps : Search Query
+Maps --> P4 : Hospital Data
+
+' External Email Service
+P6 --> Email : Email Request
+Email --> P6 : Delivery Status
+
+' Process to Data Store flows
+P1 --> D1 : Write
+D1 --> P1 : Read
+P2 --> D4 : Write
+P3 --> D2 : Write
+D2 --> P3 : Read
+P3 --> D3 : Write
+P3 --> D4 : Write
+D4 --> P3 : Read
+P4 --> D6 : Write
+D6 --> P4 : Read
+P5 --> D2 : Read
+P5 --> D3 : Read
+P5 --> D5 : Write
+D5 --> P5 : Read
+P5 --> D6 : Read
+P6 --> D7 : Write
+D7 --> P6 : Read
+P7 --> D8 : Write
+
+' Inter-process flows
+P2 --> P3 : Validated Image
+P5 --> P6 : Email Trigger
+
+' All processes to Audit Logging
+P1 --> P7 : Auth logs
+P2 --> P7 : Validation logs
+P3 --> P7 : Analysis logs
+P5 --> P7 : Appt logs
+P6 --> P7 : Email logs
+
+@enduml
+
+================================================================================
+ALTERNATIVE PLANTUML CODE - SIMPLIFIED LAYOUT
+================================================================================
+
+If the above is too cluttered, here's a cleaner version with vertical layout:
+
+@startuml
+title Level 1 Data Flow Diagram - SkinGuard System (Simplified)
+
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor Black
+}
+skinparam database {
+    BackgroundColor LightYellow
+    BorderColor Black
+}
+skinparam actor {
+    BackgroundColor LightGray
+    BorderColor Black
+}
+
+' External Entities
+actor Patient
+actor "Hospital Staff" as Staff
+actor "ViT AI" as AI
+actor "Google Maps" as Maps  
+actor "Email SMTP" as Email
+
+rectangle "Operational Logs" {
+    
+    ' Layer 1: Authentication
+    component "P1: Authentication" as P1
+    database "D1: Users" as D1
+    
+    ' Layer 2: Image Processing
+    component "P2: Image Validation" as P2
+    database "D4: Images" as D4
+    
+    ' Layer 3: AI Analysis
+    component "P3: AI Analysis" as P3
+    database "D2: Profiles" as D2
+    database "D3: Reports" as D3
+    
+    ' Layer 4: Hospital Search
+    component "P4: Hospital Search" as P4
+    database "D6: Hospitals" as D6
+    
+    ' Layer 5: Appointments
+    component "P5: Appointments" as P5
+    database "D5: Bookings" as D5
+    
+    ' Layer 6: Notifications
+    component "P6: Notifications" as P6
+    database "D7: Email Queue" as D7
+    
+    ' Layer 7: Audit
+    component "P7: Audit Log" as P7
+    database "D8: Logs" as D8
+}
+
+' Patient flows
+Patient --> P1 : Login
+Patient --> P2 : Images
+Patient --> P3 : Symptoms
+Patient --> P4 : Search
+Patient --> P5 : Book
+
+P1 --> Patient : Token
+P2 --> Patient : Valid
+P3 --> Patient : Results
+P4 --> Patient : Hospitals
+P5 --> Patient : Status
+P6 --> Patient : Email
+
+' Staff flows
+Staff --> P1 : Login
+Staff --> P5 : Decision
+
+P5 --> Staff : Reports
+P6 --> Staff : Email
+
+' External services
+P3 --> AI : Image
+AI --> P3 : Classification
+P4 --> Maps : Query
+Maps --> P4 : Data
+P6 --> Email : Send
+Email --> P6 : Status
+
+' Internal flows
+P1 --> D1
+D1 --> P1
+P2 --> D4
+P2 --> P3
+P3 --> D2
+D2 --> P3
+P3 --> D3
+P3 --> D4
+D4 --> P3
+P4 --> D6
+D6 --> P4
+P5 --> D2
+P5 --> D3
+P5 --> D5
+D5 --> P5
+P5 --> D6
+P5 --> P6
+P6 --> D7
+D7 --> P6
+P1 --> P7
+P2 --> P7
+P3 --> P7
+P5 --> P7
+P6 --> P7
+P7 --> D8
+
+@enduml
+
+================================================================================
+BETTER ALTERNATIVE: USE GRAPHVIZ (DOT) FORMAT
+================================================================================
+
+PlantUML actually supports Graphviz DOT syntax which is better for DFDs.
+Here's a DOT-based version:
+
+@startuml
+digraph DFD {
+    rankdir=TB;
+    node [shape=rectangle];
+    
+    // External Entities (Box shape)
+    Patient [shape=box, style=filled, fillcolor=lightgray];
+    Staff [label="Hospital Staff", shape=box, style=filled, fillcolor=lightgray];
+    AI [label="ViT AI", shape=box, style=filled, fillcolor=lightgray];
+    Maps [label="Google Maps", shape=box, style=filled, fillcolor=lightgray];
+    Email [label="Email SMTP", shape=box, style=filled, fillcolor=lightgray];
+    
+    // Processes (Ellipse shape - circles/ovals for processes in DFD)
+    P1 [label="P1: Authentication", shape=ellipse, style=filled, fillcolor=lightblue];
+    P2 [label="P2: Image Validation", shape=ellipse, style=filled, fillcolor=lightblue];
+    P3 [label="P3: AI Analysis", shape=ellipse, style=filled, fillcolor=lightblue];
+    P4 [label="P4: Hospital Search", shape=ellipse, style=filled, fillcolor=lightblue];
+    P5 [label="P5: Appointments", shape=ellipse, style=filled, fillcolor=lightblue];
+    P6 [label="P6: Notifications", shape=ellipse, style=filled, fillcolor=lightblue];
+    P7 [label="P7: Audit Log", shape=ellipse, style=filled, fillcolor=lightblue];
+    
+    // Data Stores (Folder/cylinder shape for databases)
+    D1 [label="D1: Users", shape=folder, style=filled, fillcolor=lightyellow];
+    D2 [label="D2: Profiles", shape=folder, style=filled, fillcolor=lightyellow];
+    D3 [label="D3: Reports", shape=folder, style=filled, fillcolor=lightyellow];
+    D4 [label="D4: Images", shape=folder, style=filled, fillcolor=lightyellow];
+    D5 [label="D5: Appointments", shape=folder, style=filled, fillcolor=lightyellow];
+    D6 [label="D6: Hospitals", shape=folder, style=filled, fillcolor=lightyellow];
+    D7 [label="D7: Email Queue", shape=folder, style=filled, fillcolor=lightyellow];
+    D8 [label="D8: Audit Logs", shape=folder, style=filled, fillcolor=lightyellow];
+    
+    // Patient data flows
+    Patient -> P1 [label="Login"];
+    Patient -> P2 [label="Images"];
+    Patient -> P3 [label="Symptoms"];
+    Patient -> P4 [label="Search"];
+    Patient -> P5 [label="Request"];
+    
+    P1 -> Patient [label="Token"];
+    P2 -> Patient [label="Valid"];
+    P3 -> Patient [label="Results"];
+    P4 -> Patient [label="Hospitals"];
+    P5 -> Patient [label="Status"];
+    P6 -> Patient [label="Email"];
+    
+    // Staff data flows
+    Staff -> P1 [label="Login"];
+    Staff -> P5 [label="Decision"];
+    P5 -> Staff [label="Reports"];
+    P6 -> Staff [label="Email"];
+    
+    // External service flows
+    P3 -> AI [label="Image"];
+    AI -> P3 [label="Class"];
+    P4 -> Maps [label="Query"];
+    Maps -> P4 [label="Data"];
+    P6 -> Email [label="Request"];
+    Email -> P6 [label="Status"];
+    
+    // Process to Data Store flows (bidirectional shown as two arrows)
+    P1 -> D1 [label="Write"];
+    D1 -> P1 [label="Read"];
+    
+    P2 -> D4 [label="Store"];
+    
+    P2 -> P3 [label="Validated"];
+    
+    P3 -> D2 [label="Write"];
+    D2 -> P3 [label="Read"];
+    P3 -> D3 [label="Store"];
+    P3 -> D4 [label="Write"];
+    D4 -> P3 [label="Read"];
+    
+    P4 -> D6 [label="Cache"];
+    D6 -> P4 [label="Read"];
+    
+    P5 -> D2 [label="Read"];
+    P5 -> D3 [label="Attach"];
+    P5 -> D5 [label="Write"];
+    D5 -> P5 [label="Read"];
+    P5 -> D6 [label="Read"];
+    
+    P5 -> P6 [label="Trigger"];
+    
+    P6 -> D7 [label="Queue"];
+    D7 -> P6 [label="Read"];
+    
+    // Audit logging flows
+    P1 -> P7 [label="Auth"];
+    P2 -> P7 [label="Valid"];
+    P3 -> P7 [label="Analysis"];
+    P5 -> P7 [label="Appt"];
+    P6 -> P7 [label="Email"];
+    P7 -> D8 [label="Store"];
+}
+@enduml
+
+================================================================================
+HOW TO USE THESE CODES
+================================================================================
+
+METHOD 1: ONLINE PLANTUML
+1. Go to: http://www.plantuml.com/plantuml/uml/
+2. Copy ONE of the codes above (choose which looks best)
+3. Paste into the text box
+4. Click "Submit"
+5. Download as PNG or SVG
+
+METHOD 2: VS CODE
+1. Install "PlantUML" extension
+2. Create file: dfd.puml
+3. Paste code
+4. Press Alt+D to preview
+5. Export to PNG/SVG
+
+================================================================================
+RECOMMENDATION
+================================================================================
+
+⚠️ IMPORTANT: PlantUML DFD results won't match your reference diagram exactly!
+
+The PlantUML codes above will produce diagrams but:
+- ❌ Layout is auto-generated (can't manually position like your reference)
+- ❌ Data stores won't have the exact open-ended rectangle style
+- ❌ Boundary box may not appear exactly as "Operational Logs"
+- ❌ Arrow routing may cross and look messy
+
+FOR BEST RESULTS (to match your reference):
+✅ Use draw.io (diagrams.net) - FREE and web-based
+✅ Use Microsoft Visio - Professional tool
+✅ Use Lucidchart - Web-based
+✅ Use PowerPoint - Manual drawing
+
+USE MY DETAILED TEXTUAL DESCRIPTION FROM:
+- DFD_LEVEL1_DETAILED.txt
+- Lists all components, data flows, and layout suggestions
+- Follow the step-by-step drawing instructions
+
+================================================================================
+TRY ALL THREE PLANTUML VERSIONS
+================================================================================
+
+I've provided 3 different PlantUML approaches:
+
+1. COMPONENT DIAGRAM STYLE (First code)
+   - Uses component and database shapes
+   - Most similar to UML notation
+
+2. SIMPLIFIED VERTICAL LAYOUT (Second code)
+   - Cleaner, organized by layers
+   - Easier to read but less detailed
+
+3. GRAPHVIZ DOT SYNTAX (Third code)
+   - Uses ellipses for processes
+   - Folders for data stores
+   - Better control over shapes
+
+TRY ALL THREE and see which output you like best!
+
+But honestly, for a thesis-quality DFD matching your reference diagram,
+I strongly recommend using draw.io with my detailed instructions. 🎓
+
+================================================================================

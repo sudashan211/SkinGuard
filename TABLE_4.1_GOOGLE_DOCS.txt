@@ -1,0 +1,95 @@
+===============================================
+TABLE 4.1: FUNCTIONAL REQUIREMENTS
+FOR GOOGLE DOCS - MANUAL TABLE CREATION
+===============================================
+
+HOW TO CREATE TABLE IN GOOGLE DOCS:
+1. Open Google Docs
+2. Go to: Insert → Table → Select 3 columns × 29 rows
+3. Copy each row below and paste into corresponding table cells
+4. Format header row (Row 1): Bold, Blue background, White text
+
+===============================================
+HEADER ROW (Row 1):
+===============================================
+
+ID | Use Case | Functional Requirements
+
+===============================================
+DATA ROWS (Copy one row at a time):
+===============================================
+
+UC001 | User Registration | Allows patients to create an account by providing name, email, phone number, and password. System validates email format and password strength (minimum 8 characters).
+
+UC002 | User Login | Enables patients to log into the system using registered email and password. System validates credentials against database.
+
+UC003 | Password Reset | Allows users to reset forgotten passwords via email link with secure JWT token that expires in 15 minutes.
+
+UC004 | Hospital/Staff Login | Enables hospital staff and dermatologists to access the facility dashboard using authenticated credentials.
+
+UC005 | Logout | Allows users and hospital staff to securely log out, clearing session tokens and protecting account security.
+
+UC006 | Create Health Profile | Patients can create health profiles with medical history, current medications, known allergies, and previous skin conditions.
+
+UC007 | Update Health Profile | Allows patients to modify existing health information, add new medications, or update allergy information.
+
+UC008 | View Health Profile | Displays complete health profile including medical history, risk factors, and previous analysis results.
+
+UC009 | Upload Skin Image | Patients can upload clear photos of skin lesions from device gallery for AI analysis.
+
+UC010 | Capture Skin Image | Allows real-time image capture using device camera with guidelines for proper lighting and distance.
+
+UC011 | Validate Image Content | System automatically checks images for inappropriate content (NSFW filter) and verifies minimum 25% skin content before analysis.
+
+UC012 | Reject Non-Skin Images | System rejects posters, text documents, or images without sufficient skin content with clear error messages.
+
+UC013 | Complete Symptom Questionnaire | Patients answer guided questions about symptoms: duration, pain level, itching, bleeding, size changes, and location.
+
+UC014 | AI Lesion Analysis | Vision Transformer model analyzes validated images, detects lesion location, classifies into 7 cancer types with confidence scores.
+
+UC015 | Display AI Results | Shows analysis results with cancer type classification, confidence percentage, risk level (low/medium/high/urgent), and recommended actions.
+
+UC016 | Generate Risk Assessment | AI system assigns risk levels based on cancer type and confidence: Melanoma/High confidence = Urgent, others classified accordingly.
+
+UC017 | Save Analysis Report | System stores complete analysis including image, AI predictions, symptom responses, and risk assessment in patient history.
+
+UC018 | View Analysis History | Patients can access all previous skin analyses with dates, results, and risk levels in chronological order.
+
+UC019 | Search Nearby Hospitals | Uses patient's GPS location or manual address to find dermatology hospitals and general hospitals within 50km radius via Google Maps API.
+
+UC020 | Filter Hospital Results | Displays up to 180 hospitals sorted by rating (4.5+ first) then distance, showing ratings, distance, and operating hours.
+
+UC021 | View Hospital Details | Shows comprehensive facility information: specialties, contact details, address, operating hours, and patient reviews.
+
+UC022 | Get Navigation Directions | Provides turn-by-turn directions from patient's location to selected hospital using Google Maps integration.
+
+UC023 | Book Appointment | Patients select hospital, preferred date/time, attach analysis report, and submit appointment request with urgency level.
+
+UC024 | View Reports by Urgency | Hospital staff see incoming patient reports organized by risk level (Urgent → High → Medium → Low) for clinical prioritization.
+
+UC025 | Review Patient Report | Staff can view AI analysis results, skin images, symptom questionnaire, but patient identity remains hidden until appointment confirmed.
+
+UC026 | Access Patient History | After confirming appointment, staff can access patient's complete medical history, previous analyses, and health profile for consultation preparation.
+
+UC027 | Confirm Appointment | Hospital staff accept appointment requests, select available time slot, and system sends confirmation email to patient automatically.
+
+UC028 | Reject Appointment | Staff can decline appointments with reason (fully booked, requires different specialist, etc.) and system notifies patient via email.
+
+===============================================
+TOTAL: 28 Use Cases
+===============================================
+
+FORMATTING TIPS FOR GOOGLE DOCS:
+- Column 1 (ID): Width 10%, Center-aligned, Bold
+- Column 2 (Use Case): Width 25%, Left-aligned, Bold
+- Column 3 (Functional Requirements): Width 65%, Justified
+
+Header Row Formatting:
+- Background: Blue (#4285F4)
+- Text: White, Bold, Center-aligned
+- Border: All borders visible
+
+Data Rows:
+- Alternating colors (optional): White and Light Blue (#E8F0FE)
+- Text: Black, Regular font
+- Border: All borders visible

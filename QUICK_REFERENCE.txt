@@ -1,0 +1,141 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    SKINGUARD QUICK REFERENCE CARD                            ║
+║                         Keep This Visible!                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ START SERVERS                                                                │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Terminal 1 - Backend:                                                      │
+│  ┌────────────────────────────────────────────────────────────────────┐    │
+│  │ cd backend                                                          │    │
+│  │ uvicorn app.main:app --host 0.0.0.0 --port 8001                    │    │
+│  └────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  Terminal 2 - Frontend:                                                     │
+│  ┌────────────────────────────────────────────────────────────────────┐    │
+│  │ cd frontend                                                         │    │
+│  │ npm run dev                                                         │    │
+│  └────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ URLS                                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Frontend:    http://localhost:3000                                         │
+│  Backend API: http://localhost:8001/docs                                    │
+│  Database:    localhost:5432                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PORTS (MEMORIZE THIS!)                                                      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Frontend:  3000                                                            │
+│  Backend:   8001  ⚠️  NOT 8000!                                             │
+│  Database:  5432                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ LOGIN CREDENTIALS                                                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Admin:   admin@skinguard.com          / Admin123                           │
+│  Patient: sudashanrao0702@gmail.com    / Password123                        │
+│  Doctor:  doctor@skinguard.com         / Doctor123                          │
+│  Doctor:  kesava@gmaill.com            / Kesava55                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DATABASE CONNECTION                                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Host:     localhost                                                        │
+│  Port:     5432                                                             │
+│  Database: skinguard                                                        │
+│  User:     postgres                                                         │
+│  Password: 12345                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ENVIRONMENT FILES                                                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  backend/.env:                                                              │
+│    DATABASE_URL=postgresql://postgres:12345@localhost:5432/skinguard        │
+│    USE_REAL_AI=true                                                         │
+│    API_PORT=8001                                                            │
+│                                                                              │
+│  frontend/.env:                                                             │
+│    VITE_API_URL=http://localhost:8001  ⚠️  NOT 8000!                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ COMMON ISSUES - QUICK FIXES                                                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ❌ Port already in use:                                                    │
+│     netstat -ano | findstr :8001                                            │
+│     taskkill /PID <PID> /F                                                  │
+│                                                                              │
+│  ❌ Frontend shows "Connection Refused":                                    │
+│     1. Check backend is running: http://localhost:8001/docs                 │
+│     2. Hard refresh browser: Ctrl+Shift+R                                   │
+│     3. Restart frontend                                                     │
+│                                                                              │
+│  ❌ Admin dashboard shows port 8000 errors:                                 │
+│     1. Hard refresh browser: Ctrl+Shift+R or Ctrl+F5                        │
+│     2. Clear browser cache                                                  │
+│     3. Restart frontend                                                     │
+│                                                                              │
+│  ❌ Database connection error:                                              │
+│     1. Check PostgreSQL is running (pgAdmin or Task Manager)                │
+│     2. Verify credentials: postgres/12345                                   │
+│     3. Check database 'skinguard' exists                                    │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ VERIFICATION CHECKLIST                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  ☐ PostgreSQL is running                                                    │
+│  ☐ Backend started on port 8001                                             │
+│  ☐ Frontend started on port 3000                                            │
+│  ☐ http://localhost:8001/docs shows Swagger UI                              │
+│  ☐ http://localhost:3000 shows login page                                   │
+│  ☐ Can login successfully                                                   │
+│  ☐ Admin dashboard loads without errors                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ DOCUMENTATION FILES                                                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  📄 START_HERE.md           - Quick reference (read this first!)            │
+│  📄 SERVER_STARTUP.md       - Complete startup guide                        │
+│  📄 STARTUP_CHECKLIST.md    - Step-by-step checklist                        │
+│  📄 TROUBLESHOOTING.md      - Solutions to common problems                  │
+│  📄 SYSTEM_ARCHITECTURE.md  - System diagrams and architecture              │
+│  📄 DOCUMENTATION_INDEX.md  - Index of all documentation                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ EMERGENCY COMMANDS                                                           │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Kill all Node processes:                                                   │
+│    taskkill /F /IM node.exe                                                 │
+│                                                                              │
+│  Kill all Python processes:                                                 │
+│    taskkill /F /IM python.exe                                               │
+│                                                                              │
+│  Check all ports:                                                           │
+│    netstat -ano | findstr :3000                                             │
+│    netstat -ano | findstr :8001                                             │
+│    netstat -ano | findstr :5432                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ⚠️  CRITICAL REMINDER: Backend MUST run on port 8001 (NOT 8000!)          ║
+║  ⚠️  Always hard refresh browser (Ctrl+Shift+R) after code changes!        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Last Updated: April 3, 2026
+Version: PostgreSQL Production Mode
+Status: All systems operational ✅

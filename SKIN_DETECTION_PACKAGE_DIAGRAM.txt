@@ -1,0 +1,541 @@
+================================================================================
+PACKAGE DIAGRAM - SKIN DETECTION MODULE (P002)
+================================================================================
+
+This package diagram shows the AI Analysis and Skin Cancer Detection module
+for the SkinGuard system, following the MVC pattern.
+
+Updated for: Image Validation (NSFW Filter) + Vision Transformer AI + Risk Assessment
+
+Generate at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+PLANTUML CODE - SKIN DETECTION MODULE (P002)
+================================================================================
+
+@startuml
+title Package Diagram: Skin Detection Module (P002)
+
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+package "Skin Detection Module" {
+    
+    package "View" {
+        component "+ Image Upload Page" as UploadView
+        component "+ Image Capture Page" as CaptureView
+        component "+ Symptom Wizard Page" as SymptomView
+        component "+ Analysis Results Page" as ResultsView
+        component "+ Report History Page" as HistoryView
+    }
+    
+    package "Controller" {
+        component "+ Image Upload Controller" as UploadController
+        component "+ Image Validation Controller" as ValidationController
+        component "+ AI Analysis Controller" as AIController
+        component "+ Risk Assessment Controller" as RiskController
+        component "+ Report Management Controller" as ReportController
+    }
+    
+    package "Model" {
+        component "+ Medical Report" as ReportModel
+        component "+ Symptom Response" as SymptomModel
+        component "+ Image Validation" as ValidationModel
+        component "+ Risk Assessment" as RiskModel
+        component "+ Patient" as PatientModel
+    }
+}
+
+' Dependencies
+UploadView ..> UploadController : uses
+CaptureView ..> UploadController : uses
+SymptomView ..> AIController : uses
+ResultsView ..> ReportController : uses
+HistoryView ..> ReportController : uses
+
+UploadController ..> ValidationController : validates
+ValidationController ..> ValidationModel : creates
+ValidationController ..> AIController : passes to
+
+AIController ..> ReportModel : creates
+AIController ..> SymptomModel : stores
+AIController ..> RiskController : calculates
+
+RiskController ..> RiskModel : generates
+RiskController ..> ReportModel : updates
+
+ReportController ..> ReportModel : manages
+ReportController ..> PatientModel : associates
+
+note right of "Skin Detection Module"
+  AI Analysis Features:
+  - Image validation (NSFW filter)
+  - 25% skin content threshold
+  - Poster/text detection
+  - Vision Transformer AI (ViT)
+  - 7 cancer type classification
+  - 84% accuracy
+  - Risk stratification (Low/Medium/High/Urgent)
+  - Conservative bias (medical safety)
+end note
+
+@enduml
+
+================================================================================
+SIMPLIFIED VERSION - MATCHING YOUR REFERENCE EXACTLY
+================================================================================
+
+Clean minimal version perfect for thesis:
+
+@startuml
+title Package Diagram: Skin Detection Module (P002)
+
+skinparam packageStyle rectangle
+
+package "Skin Detection Module" <<Rectangle>> {
+    
+    package "View" <<Rectangle>> {
+        component "+ Image Upload Page"
+        component "+ Symptom Wizard Page"
+        component "+ Analysis Results Page"
+    }
+    
+    package "Controller" <<Rectangle>> {
+        component "+ Image Validation Controller"
+        component "+ AI Analysis Controller"
+        component "+ Risk Assessment Controller"
+    }
+    
+    package "Model" <<Rectangle>> {
+        component "+ Medical Report"
+        component "+ Image Validation"
+        component "+ Risk Assessment"
+    }
+}
+
+@enduml
+
+================================================================================
+DETAILED VERSION - WITH EXTERNAL AI SERVICE
+================================================================================
+
+Shows the Vision Transformer AI integration:
+
+@startuml
+title Package Diagram: Skin Detection Module with AI Integration (P002)
+
+skinparam packageStyle rectangle
+
+package "Skin Detection Module" {
+    
+    package "View Layer (React)" {
+        component "Image Input" as InputView {
+            + Upload Image Page
+            + Capture Photo Page
+            + Image Preview Component
+        }
+        
+        component "Symptom Collection" as SymptomView {
+            + Symptom Wizard (4 steps)
+            + Body Location Selector
+            + Duration Input
+        }
+        
+        component "Results Display" as ResultsView {
+            + Risk Level Banner
+            + AI Classification Display
+            + 7 Cancer Types Probabilities
+            + Recommended Actions
+            + Medical Disclaimer
+        }
+        
+        component "Report Management" as HistoryView {
+            + Report History List
+            + Report Details View
+            + PDF Export
+            + Share with Doctor
+        }
+    }
+    
+    package "Controller Layer (FastAPI)" {
+        component "Upload Controller" as UploadCtrl {
+            + POST /upload-image
+            + POST /capture-photo
+            + validateFileFormat()
+            + validateFileSize()
+        }
+        
+        component "Validation Controller" as ValidCtrl {
+            + validateSkinContent()
+            + detectTextGraphics()
+            + checkNSFW()
+            + calculateSkinPercentage()
+        }
+        
+        component "AI Analysis Controller" as AICtrl {
+            + POST /analyze
+            + preprocessImage()
+            + callViTModel()
+            + parseAIPredictions()
+            + storeSymptoms()
+        }
+        
+        component "Risk Controller" as RiskCtrl {
+            + calculateRiskLevel()
+            + applyConservativeBias()
+            + generateJustification()
+            + assignUrgencyScore()
+        }
+        
+        component "Report Controller" as ReportCtrl {
+            + GET /reports
+            + GET /reports/:id
+            + POST /reports/generate-pdf
+            + PUT /reports/:id/share
+        }
+    }
+    
+    package "Model Layer (Database)" {
+        component "medical_reports" as ReportDB {
+            - id: UUID
+            - patient_id: UUID
+            - image_url: TEXT
+            - ai_prediction: JSONB
+            - risk_level: VARCHAR(20)
+        }
+        
+        component "symptom_responses" as SymptomDB {
+            - report_id: UUID
+            - body_location: VARCHAR(100)
+            - sensations: JSONB
+            - visual_changes: JSONB
+            - duration: VARCHAR(50)
+        }
+        
+        component "image_validation" as ValidationDB {
+            - id: UUID
+            - image_url: VARCHAR(255)
+            - skin_percentage: FLOAT
+            - nsfw_score: FLOAT
+            - validation_passed: BOOLEAN
+        }
+        
+        component "risk_assessment" as RiskDB {
+            - id: UUID
+            - report_id: UUID
+            - risk_level: ENUM
+            - urgency_score: INTEGER
+            - justification: TEXT
+        }
+    }
+    
+    package "External Services" {
+        component "Vision Transformer AI" as ViTAI {
+            + Model: ViT-H-14
+            + Provider: Hugging Face
+            + Accuracy: 84%
+            + Classes: 7 cancer types
+        }
+        
+        component "Image Storage" as Storage {
+            + Store original images
+            + Store thumbnails
+            + Generate URLs
+        }
+    }
+}
+
+' View to Controller
+InputView --> UploadCtrl
+SymptomView --> AICtrl
+ResultsView --> ReportCtrl
+HistoryView --> ReportCtrl
+
+' Controller flow
+UploadCtrl --> ValidCtrl : validates
+ValidCtrl --> AICtrl : if valid
+AICtrl --> RiskCtrl : after analysis
+RiskCtrl --> ReportCtrl : saves report
+
+' Controller to External Services
+AICtrl --> ViTAI : requests classification
+UploadCtrl --> Storage : stores image
+
+' Controller to Model
+ValidCtrl --> ValidationDB
+AICtrl --> ReportDB
+AICtrl --> SymptomDB
+RiskCtrl --> RiskDB
+ReportCtrl --> ReportDB
+
+@enduml
+
+================================================================================
+EXPANDED VERSION - SHOWING COMPLETE AI WORKFLOW
+================================================================================
+
+Shows the complete analysis pipeline:
+
+@startuml
+title Package Diagram: AI Analysis Workflow (P002)
+
+skinparam packageStyle rectangle
+
+package "Skin Detection & AI Analysis Module" {
+    
+    package "Input Stage" {
+        [Image Upload/Capture]
+        [Symptom Questionnaire]
+    }
+    
+    package "Validation Stage" {
+        [File Format Validator]
+        [NSFW Filter (25% threshold)]
+        [Text/Poster Detector]
+        [Image Preprocessor]
+    }
+    
+    package "AI Analysis Stage" {
+        [Vision Transformer Client]
+        [Symptom Processor]
+        [Prediction Parser]
+    }
+    
+    package "Risk Assessment Stage" {
+        [Risk Calculator]
+        [Conservative Bias Applier]
+        [Urgency Scorer]
+        [Justification Generator]
+    }
+    
+    package "Output Stage" {
+        [Report Generator]
+        [Results Formatter]
+        [PDF Exporter]
+        [Email Notifier]
+    }
+    
+    package "Data Storage" {
+        database "Medical Reports DB"
+        database "Image Storage"
+        database "Validation Logs"
+    }
+    
+    package "External AI" {
+        cloud "Vision Transformer\n(Hugging Face)\n7 Cancer Types\n84% Accuracy"
+    }
+}
+
+' Workflow
+[Image Upload/Capture] --> [File Format Validator]
+[Symptom Questionnaire] --> [Symptom Processor]
+
+[File Format Validator] --> [NSFW Filter (25% threshold)]
+[NSFW Filter (25% threshold)] --> [Text/Poster Detector]
+[Text/Poster Detector] --> [Image Preprocessor]
+
+[Image Preprocessor] --> [Vision Transformer Client]
+[Vision Transformer Client] --> "Vision Transformer\n(Hugging Face)\n7 Cancer Types\n84% Accuracy"
+"Vision Transformer\n(Hugging Face)\n7 Cancer Types\n84% Accuracy" --> [Prediction Parser]
+
+[Prediction Parser] --> [Risk Calculator]
+[Symptom Processor] --> [Risk Calculator]
+[Risk Calculator] --> [Conservative Bias Applier]
+[Conservative Bias Applier] --> [Urgency Scorer]
+[Urgency Scorer] --> [Justification Generator]
+
+[Justification Generator] --> [Report Generator]
+[Report Generator] --> [Results Formatter]
+[Results Formatter] --> [PDF Exporter]
+[Results Formatter] --> [Email Notifier]
+
+[Report Generator] --> "Medical Reports DB"
+[Image Preprocessor] --> "Image Storage"
+[NSFW Filter (25% threshold)] --> "Validation Logs"
+
+@enduml
+
+================================================================================
+COMPARISON: OLD vs NEW
+================================================================================
+
+YOUR REFERENCE (Old System):
+┌──────────────────────────────────┐
+│   Skin Detection Module          │
+├──────────────────────────────────┤
+│ View:                            │
+│ - Upload Image Page              │
+│ - Detection Result Page          │
+│                                  │
+│ Controller:                      │
+│ - Skin Detection Controller      │
+│                                  │
+│ Model:                           │
+│ - Skin Detection                 │
+│ - User                           │
+└──────────────────────────────────┘
+
+SKINGUARD (New System):
+┌──────────────────────────────────┐
+│ Skin Detection & AI Analysis     │
+├──────────────────────────────────┤
+│ View:                            │
+│ - Image Upload Page              │
+│ - Image Capture Page             │✨ NEW
+│ - Symptom Wizard Page (4 steps) │✨ NEW
+│ - Analysis Results Page          │
+│ - Report History Page            │✨ NEW
+│                                  │
+│ Controller:                      │
+│ - Image Upload Controller        │
+│ - Image Validation Controller    │✨ NEW (NSFW)
+│ - AI Analysis Controller         │✨ NEW
+│ - Risk Assessment Controller     │✨ NEW
+│ - Report Management Controller   │✨ NEW
+│                                  │
+│ Model:                           │
+│ - Medical Report                 │
+│ - Symptom Response               │✨ NEW
+│ - Image Validation               │✨ NEW
+│ - Risk Assessment                │✨ NEW
+│ - Patient                        │
+└──────────────────────────────────┘
+
+KEY IMPROVEMENTS:
+✅ NSFW Filter - 25% skin threshold, poster detection
+✅ Symptom Wizard - 4-step questionnaire (body location, sensations, visual changes, duration)
+✅ Vision Transformer AI - Hugging Face ViT-H-14, 84% accuracy
+✅ 7 Cancer Types - Melanoma, Basal Cell, Squamous Cell, Actinic Keratosis, Benign Keratosis, Dermatofibroma, Vascular Lesion
+✅ Risk Stratification - Low/Medium/High/Urgent with conservative bias
+✅ Image Capture - Camera integration for real-time photo
+✅ Report History - View all past analyses
+✅ PDF Export - Downloadable reports
+✅ Share with Doctor - Attach to appointments
+
+================================================================================
+DESCRIPTION FOR THESIS
+================================================================================
+
+This package diagram describes the skin cancer detection and AI analysis
+functionality. In the package diagram, the Model includes Medical Report,
+Symptom Response, Image Validation, and Risk Assessment classes. View
+consists of the image upload page, image capture page, symptom wizard page
+(4-step questionnaire), analysis results page, and report history page. For
+controllers, the Image Upload Controller, Image Validation Controller (NSFW
+filter with 25% skin threshold and poster detection), AI Analysis Controller
+(Vision Transformer integration), Risk Assessment Controller (stratification
+with conservative bias), and Report Management Controller are included.
+
+The Skin Detection Module implements a multi-stage AI analysis pipeline
+following the MVC pattern. The View layer provides user interfaces for image
+input (upload or camera capture), a four-step symptom wizard collecting body
+location, sensations (itching, pain, burning), visual changes (color, size,
+shape), and duration, and a comprehensive results display showing risk level
+banner, AI classification with confidence scores for all seven cancer types,
+lesion localization, and recommended consultation timelines.
+
+The Controller layer orchestrates the analysis workflow through five
+specialized controllers: Image Upload Controller validates file format and
+size (max 10MB, JPEG/PNG), Image Validation Controller enforces content
+safety through NSFW filtering (checking skin percentage ≥25%, detecting text
+or graphics indicative of posters or documents, and screening explicit
+content), AI Analysis Controller interfaces with the Vision Transformer AI
+model from Hugging Face (ViT-H-14 architecture, 84% accuracy on HAM10000
+dataset, classifying into seven cancer types), Risk Assessment Controller
+applies medical decision rules (URGENT for melanoma or confidence ≥85%, HIGH
+for basal cell carcinoma or actinic keratoses, MEDIUM for confidence 60-85%,
+LOW otherwise) with conservative bias favoring false positives over false
+negatives for patient safety, and Report Management Controller handles report
+storage, retrieval, PDF generation, and sharing with hospital staff.
+
+The Model layer persists data through four database tables: medical_reports
+(storing AI predictions, confidence scores, risk levels, body locations),
+symptom_responses (structured symptom data from wizard), image_validation
+(validation metrics including skin percentage, NSFW scores, rejection
+reasons), and risk_assessment (urgency scores, justification text, timeline
+recommendations). External integration with Vision Transformer AI via Hugging
+Face API enables real-time skin lesion classification, while image storage
+services preserve both original uploads and thumbnails for performance
+optimization. The system logs all validation attempts to audit_logs for
+quality monitoring and continuous improvement of the NSFW filter thresholds.
+
+================================================================================
+USAGE IN THESIS
+================================================================================
+
+CHAPTER 2: SYSTEM DESIGN
+Section: 2.2.2.1 P002: Package <Skin Detection Module>
+
+This package diagram describes the skin cancer detection and AI analysis
+functionality. In the package diagram, the Model includes Medical Report,
+Symptom Response, Image Validation, and Risk Assessment classes. View
+consists of the image upload page, image capture page, symptom wizard page,
+analysis results page, and report history page. For controllers, the Image
+Upload Controller, Image Validation Controller (NSFW filter), AI Analysis
+Controller (Vision Transformer integration), Risk Assessment Controller,
+and Report Management Controller are included.
+
+[INSERT PACKAGE DIAGRAM HERE - USE SIMPLIFIED VERSION FOR CLARITY]
+
+[Optional: Add expanded description from "DESCRIPTION FOR THESIS" above]
+
+The Skin Detection Module represents the core innovation of the SkinGuard
+system, implementing a comprehensive AI-powered skin cancer screening workflow
+that combines image validation (NSFW filter with 25% skin content threshold),
+symptom collection (4-step questionnaire), Vision Transformer AI
+classification (84% accuracy across 7 cancer types), and risk stratification
+(Low/Medium/High/Urgent with conservative medical bias). This multi-layered
+approach ensures both accuracy and safety, preventing misuse while providing
+actionable medical guidance to patients.
+
+================================================================================
+WHICH VERSION TO USE?
+================================================================================
+
+FOR THESIS CHAPTER 2 (matching your reference):
+→ Use "SIMPLIFIED VERSION" - Clearest match to your reference
+
+FOR TECHNICAL DOCUMENTATION:
+→ Use "DETAILED VERSION" - Shows AI integration and database
+
+FOR WORKFLOW DIAGRAM:
+→ Use "EXPANDED VERSION" - Shows complete analysis pipeline
+
+FOR PRESENTATION/POSTER:
+→ Use "EXPANDED VERSION" - Visual pipeline is impressive
+
+RECOMMENDATION: Use SIMPLIFIED VERSION in thesis main body (Chapter 2),
+include EXPANDED VERSION in appendix to show technical sophistication.
+
+================================================================================
+KEY FEATURES TO EMPHASIZE
+================================================================================
+
+1. **NSFW FILTER (25% threshold)** - Your unique contribution!
+   - Prevents poster/document uploads
+   - Ensures genuine skin lesion images
+   - Validates skin-like pixel percentage
+
+2. **VISION TRANSFORMER AI (ViT-H-14)**
+   - State-of-the-art deep learning
+   - 84% accuracy on HAM10000 dataset
+   - 7 cancer type classification
+
+3. **SYMPTOM WIZARD (4 steps)**
+   - Structured data collection
+   - Enhances AI context
+   - Supports risk assessment
+
+4. **RISK STRATIFICATION**
+   - Low/Medium/High/Urgent levels
+   - Conservative bias for safety
+   - Urgency scoring (0-100)
+
+5. **COMPLETE WORKFLOW**
+   - Upload/Capture → Validate → Analyze → Assess → Report
+   - PDF export for medical records
+   - Share with hospitals via appointments
+
+ALL READY FOR YOUR THESIS! 🎓
+
+================================================================================

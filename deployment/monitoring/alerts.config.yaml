@@ -1,0 +1,325 @@
+# Alert Configuration for SkinGuard Platform
+# Defines alerting rules for critical errors and performance issues
+
+# Alert Channels
+channels:
+  email:
+    enabled: true
+    recipients:
+      - admin@skinguard.com
+      - devops@skinguard.com
+    smtp_host: ${SMTP_HOST}
+    smtp_port: 587
+    smtp_user: ${SMTP_USER}
+    smtp_password: ${SMTP_PASSWORD}
+    from_address: alerts@skinguard.com
+  
+  slack:
+    enabled: true
+    webhook_url: ${SLACK_WEBHOOK_URL}
+    channel: "#skinguard-alerts"
+    username: "SkinGuard Monitor"
+    icon_emoji: ":warning:"
+  
+  pagerduty:
+    enabled: false
+    integration_key: ${PAGERDUTY_INTEGRATION_KEY}
+    severity_mapping:
+      critical: "critical"
+      high: "error"
+      medium: "warning"
+      low: "info"
+  
+  sms:
+    enabled: false
+    provider: "twilio"
+    phone_numbers:
+      - "+1234567890"
+    account_sid: ${TWILIO_ACCOUNT_SID}
+    auth_token: ${TWILIO_AUTH_TOKEN}
+    from_number: ${TWILIO_FROM_NUMBER}
+
+# Alert Rules
+rules:
+  # Critical Errors
+  - name: "High Error Rate"
+    description: "Error rate exceeds threshold"
+    severity: critical
+    condition:
+      metric: error_rate
+      operator: ">"
+      threshold: 0.05  # 5% error rate
+      window: 5m  # 5 minute window
+    channels: [email, slack, pagerduty]
+    cooldown: 15m  # Don't re-alert for 15 minutes
+    
+  - name: "Database Connection Failure"
+    description: "Unable to connect to database"
+    severity: critical
+    condition:
+      metric: database_connection_errors
+      operator: ">"
+      threshold: 0
+      window: 1m
+    channels: [email, slack, pagerduty, sms]
+    cooldown: 5m
+  
+  - name: "AI Model Loading Failure"
+    description: "AI models failed to load"
+    severity: critical
+    condition:
+      metric: model_loading_errors
+      operator: ">"
+      threshold: 0
+      window: 1m
+    channels: [email, slack, pagerduty]
+    cooldown: 10m
+  
+  # Performance Issues
+  - name: "Slow API Response Time"
+    description: "API response time exceeds 5 seconds"
+    severity: high
+    condition:
+      metric: api_response_time_p95
+      operator: ">"
+      threshold: 5000  # 5 seconds in milliseconds
+      window: 5m
+    channels: [email, slack]
+    cooldown: 15m
+  
+  - name: "Slow AI Processing"
+    description: "AI analysis taking longer than expected"
+    severity: medium
+    condition:
+      metric: ai_processing_time_p95
+      operator: ">"
+      threshold: 10000  # 10 seconds
+      window: 10m
+    channels: [slack]
+    cooldown: 30m
+  
+  - name: "High Memory Usage"
+    description: "Memory usage exceeds 85%"
+    severity: high
+    condition:
+      metric: memory_usage_percent
+      operator: ">"
+      threshold: 85
+      window: 5m
+    channels: [email, slack]
+    cooldown: 15m
+  
+  - name: "High CPU Usage"
+    description: "CPU usage exceeds 90%"
+    severity: high
+    condition:
+      metric: cpu_usage_percent
+      operator: ">"
+      threshold: 90
+      window: 5m
+    channels: [email, slack]
+    cooldown: 15m
+  
+  # Security Issues
+  - name: "High NSFW Rejection Rate"
+    description: "Unusual number of NSFW content rejections"
+    severity: medium
+    condition:
+      metric: nsfw_rejection_rate
+      operator: ">"
+      threshold: 0.20  # 20% rejection rate
+      window: 10m
+    channels: [email, slack]
+    cooldown: 30m
+  
+  - name: "Failed Authentication Attempts"
+    description: "Multiple failed login attempts detected"
+    severity: high
+    condition:
+      metric: failed_auth_attempts
+      operator: ">"
+      threshold: 10
+      window: 5m
+    channels: [email, slack]
+    cooldown: 10m
+  
+  - name: "Suspicious Activity Detected"
+    description: "Potential security threat detected"
+    severity: critical
+    condition:
+      metric: suspicious_activity_count
+      operator: ">"
+      threshold: 0
+      window: 1m
+    channels: [email, slack, pagerduty]
+    cooldown: 5m
+  
+  # Business Metrics
+  - name: "Urgent Case Unreviewed"
+    description: "Urgent medical case not reviewed within 24 hours"
+    severity: critical
+    condition:
+      metric: urgent_cases_unreviewed_24h
+      operator: ">"
+      threshold: 0
+      window: 1h
+    channels: [email, slack, pagerduty, sms]
+    cooldown: 6h
+  
+  - name: "Low Doctor Availability"
+    description: "Number of verified doctors below threshold"
+    severity: medium
+    condition:
+      metric: verified_doctors_count
+      operator: "<"
+      threshold: 5
+      window: 1h
+    channels: [email]
+    cooldown: 24h
+  
+  - name: "High Queue Length"
+    description: "Too many pending reports in queue"
+    severity: medium
+    condition:
+      metric: pending_reports_count
+      operator: ">"
+      threshold: 100
+      window: 10m
+    channels: [slack]
+    cooldown: 30m
+  
+  # Infrastructure
+  - name: "Disk Space Low"
+    description: "Disk space below 15%"
+    severity: high
+    condition:
+      metric: disk_space_percent
+      operator: "<"
+      threshold: 15
+      window: 5m
+    channels: [email, slack]
+    cooldown: 1h
+  
+  - name: "Service Unavailable"
+    description: "Health check endpoint failing"
+    severity: critical
+    condition:
+      metric: health_check_failures
+      operator: ">"
+      threshold: 3
+      window: 5m
+    channels: [email, slack, pagerduty, sms]
+    cooldown: 5m
+  
+  - name: "External Service Failure"
+    description: "External service (Maps, Email, Video) unavailable"
+    severity: high
+    condition:
+      metric: external_service_errors
+      operator: ">"
+      threshold: 5
+      window: 5m
+    channels: [email, slack]
+    cooldown: 15m
+
+# Alert Templates
+templates:
+  email:
+    subject: "[{{ severity | upper }}] SkinGuard Alert: {{ rule_name }}"
+    body: |
+      Alert: {{ rule_name }}
+      Severity: {{ severity }}
+      Description: {{ description }}
+      
+      Condition: {{ metric }} {{ operator }} {{ threshold }}
+      Current Value: {{ current_value }}
+      Time Window: {{ window }}
+      
+      Timestamp: {{ timestamp }}
+      Environment: {{ environment }}
+      
+      Details:
+      {{ details }}
+      
+      ---
+      SkinGuard Monitoring System
+  
+  slack:
+    message: |
+      :warning: *{{ severity | upper }} Alert*
+      
+      *{{ rule_name }}*
+      {{ description }}
+      
+      • Metric: `{{ metric }}`
+      • Threshold: `{{ operator }} {{ threshold }}`
+      • Current: `{{ current_value }}`
+      • Window: `{{ window }}`
+      
+      _{{ timestamp }} | {{ environment }}_
+  
+  sms:
+    message: "SkinGuard {{ severity | upper }}: {{ rule_name }}. {{ description }}. Check dashboard."
+
+# Escalation Policy
+escalation:
+  enabled: true
+  levels:
+    - level: 1
+      wait: 15m  # Wait 15 minutes before escalating
+      channels: [email, slack]
+    
+    - level: 2
+      wait: 30m  # Wait 30 more minutes
+      channels: [email, slack, pagerduty]
+    
+    - level: 3
+      wait: 1h  # Wait 1 more hour
+      channels: [email, slack, pagerduty, sms]
+
+# Maintenance Windows
+maintenance_windows:
+  # Suppress alerts during maintenance
+  enabled: true
+  windows:
+    - name: "Weekly Maintenance"
+      schedule: "0 2 * * 0"  # Every Sunday at 2 AM
+      duration: 2h
+      suppress_all: true
+    
+    - name: "Deployment Window"
+      schedule: "manual"  # Manually triggered
+      duration: 1h
+      suppress_all: false
+      suppress_rules: ["Slow API Response Time", "High CPU Usage"]
+
+# Health Check Configuration
+health_checks:
+  enabled: true
+  interval: 60s  # Check every 60 seconds
+  timeout: 10s
+  
+  endpoints:
+    - name: "API Health"
+      url: "${API_BASE_URL}/health"
+      method: GET
+      expected_status: 200
+      alert_on_failure: true
+    
+    - name: "Database Health"
+      url: "${API_BASE_URL}/health/db"
+      method: GET
+      expected_status: 200
+      alert_on_failure: true
+    
+    - name: "AI Models Health"
+      url: "${API_BASE_URL}/health/ai"
+      method: GET
+      expected_status: 200
+      alert_on_failure: true
+    
+    - name: "Storage Health"
+      url: "${API_BASE_URL}/health/storage"
+      method: GET
+      expected_status: 200
+      alert_on_failure: true

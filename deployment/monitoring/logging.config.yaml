@@ -1,0 +1,189 @@
+# Logging Configuration for SkinGuard Platform
+# Supports structured logging with JSON format for log aggregation
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  json:
+    class: pythonjsonlogger.jsonlogger.JsonFormatter
+    format: '%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(lineno)d'
+  
+  standard:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  
+  detailed:
+    format: '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(funcName)s() - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: standard
+    stream: ext://sys.stdout
+  
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: detailed
+    filename: /var/log/skinguard/app.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+  
+  error_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed
+    filename: /var/log/skinguard/error.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+  
+  json_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: /var/log/skinguard/app.json
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+  
+  syslog:
+    class: logging.handlers.SysLogHandler
+    level: INFO
+    formatter: json
+    address: /dev/log  # Unix socket for syslog
+  
+  # CloudWatch handler (requires watchtower package)
+  cloudwatch:
+    class: watchtower.CloudWatchLogHandler
+    level: INFO
+    formatter: json
+    log_group: /aws/skinguard/production
+    stream_name: '{machine_name}/{program_name}/{logger_name}'
+    send_interval: 10
+    create_log_group: true
+
+loggers:
+  # Root logger
+  root:
+    level: INFO
+    handlers: [console, file, error_file, json_file]
+  
+  # Application loggers
+  app:
+    level: INFO
+    handlers: [console, file, json_file]
+    propagate: false
+  
+  app.api:
+    level: INFO
+    handlers: [console, file, json_file]
+    propagate: false
+  
+  app.ai:
+    level: INFO
+    handlers: [console, file, json_file]
+    propagate: false
+  
+  app.security:
+    level: WARNING
+    handlers: [console, error_file, json_file]
+    propagate: false
+  
+  # Third-party loggers
+  uvicorn:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+  
+  uvicorn.access:
+    level: INFO
+    handlers: [file, json_file]
+    propagate: false
+  
+  uvicorn.error:
+    level: ERROR
+    handlers: [console, error_file]
+    propagate: false
+  
+  sqlalchemy:
+    level: WARNING
+    handlers: [file]
+    propagate: false
+  
+  sentry_sdk:
+    level: ERROR
+    handlers: [console, error_file]
+    propagate: false
+
+# Production configuration (use CloudWatch)
+production:
+  version: 1
+  disable_existing_loggers: false
+  
+  formatters:
+    json:
+      class: pythonjsonlogger.jsonlogger.JsonFormatter
+      format: '%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(lineno)d'
+  
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: WARNING
+      formatter: json
+      stream: ext://sys.stdout
+    
+    cloudwatch:
+      class: watchtower.CloudWatchLogHandler
+      level: INFO
+      formatter: json
+      log_group: /aws/skinguard/production
+      stream_name: '{machine_name}/{program_name}/{logger_name}'
+      send_interval: 10
+      create_log_group: true
+  
+  loggers:
+    root:
+      level: INFO
+      handlers: [console, cloudwatch]
+    
+    app:
+      level: INFO
+      handlers: [cloudwatch]
+      propagate: false
+    
+    app.security:
+      level: WARNING
+      handlers: [console, cloudwatch]
+      propagate: false
+
+# Development configuration
+development:
+  version: 1
+  disable_existing_loggers: false
+  
+  formatters:
+    standard:
+      format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+  
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: standard
+      stream: ext://sys.stdout
+  
+  loggers:
+    root:
+      level: DEBUG
+      handlers: [console]
+    
+    app:
+      level: DEBUG
+      handlers: [console]
+      propagate: false

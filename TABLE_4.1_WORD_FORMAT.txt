@@ -1,0 +1,179 @@
+Table 4.1    Functional Requirements of SkinGuard Web Application with AI-Powered Analysis
+
+ID	Use Case	Functional Requirements
+
+UC001	Patient Login	This use case enables patients to access the system by authenticating with their email and password credentials.
+
+UC002	Hospital Staff Login	This use case enables hospital/clinic staff to log into the system to access the hospital dashboard.
+
+UC003	Forgot Password	If a user forgets their password, this use case enables them to request a password reset link via email.
+
+UC004	Register Patient Account	With this use case, users can register for a patient account by providing email, password, and full name.This use case allows doctors to access complete patient medical history including demographics, skin type, family history, and all past 
+
+UC005	Manage Health Profile	This use case allows patients to create and update their health profile including age, skin type, and family history.
+
+UC006	Upload Skin Lesion Image	This use case allows patients to upload skin lesion photographs into the system for AI analysis.
+
+UC007	Complete Symptom Wizard	This use case guides patients through a 3-step process to record symptoms including body location, sensations, and visual changes.
+
+UC008	Validate Skin Content	This automated use case verifies that uploaded images contain skin lesions and rejects non-skin images such as posters or text documents.
+
+UC009	Classify Cancer Type	This automated use case uses Vision Transformer AI to classify lesions into 7 cancer types with 84% accuracy.
+
+UC010	Assess Risk Level	This automated use case categorizes analysis results into 4 risk levels: low, medium, high, or urgent based on cancer probability.
+
+UC011	View Analysis Results	This use case displays AI predictions, risk assessment, and recommendations to patients after image analysis.
+
+UC012	View Report History	This use case allows patients to access all their past medical reports with filters and download options.
+
+UC013	Find Nearby Hospitals	This use case allows patients to search for dermatology hospitals and clinics near their location using Google Maps integration.
+
+UC014	View Hospital Details	This use case displays detailed information about selected hospitals including ratings, distance, and operating hours.
+
+UC015	Book Appointment	This use case enables patients to request appointments with hospitals by selecting a medical report and preferred date.
+
+UC016	Manage Appointments	This use case allows patients to view and manage all their appointments including pending, confirmed, and completed consultations.
+
+UC017	Manage Facility Profile	This use case allows hospital staff to update facility information including name, description, operating hours, and contact details.
+
+UC018	View Pending Reports	This use case displays medical reports awaiting review, organized by patient with urgent cases highlighted.
+
+UC019	Review Urgent Cases	This use case filters and displays only high-priority reports with urgent or high risk levels for immediate doctor attention.
+
+UC020	View Appointment Requests	This use case displays all appointment requests with status breakdown for hospital staff to review.
+
+UC021	Confirm Appointment	This use case allows hospital staff to accept patient appointment requests and unlock access to patient medical history.
+
+UC022	Reject Appointment	This use case enables hospital staff to decline appointment requests with optional cancellation reason.
+
+UC023	View Patient Health Profile	reports (only accessible after appointment confirmation).
+
+UC024	Mark Appointment Complete	This use case allows doctors to mark consultations as completed and add optional consultation notes for patients.
+
+UC025	Send Confirmation Email	This automated use case sends email notifications to patients when their appointments are confirmed by hospitals.
+
+UC026	Send Cancellation Email	This automated use case sends email notifications when appointments are cancelled by either patient or hospital.
+
+UC027	Search Hospitals via Google Maps	This automated use case queries Google Maps Places API to find dermatology hospitals within specified radius.
+
+UC028	Generate Navigation Link	This automated use case creates direct navigation links to open selected hospitals in Google Maps application.
+
+
+===== HOW TO USE IN MICROSOFT WORD =====
+
+STEP 1: CREATE TABLE
+1. Open Microsoft Word
+2. Go to: Insert → Table
+3. Choose: 3 columns, 29 rows (including header)
+4. Click OK
+
+STEP 2: COPY HEADER
+Column 1: ID
+Column 2: Use Case
+Column 3: Functional Requirements
+
+STEP 3: COPY DATA
+- Copy each row from above (UC001, UC002, etc.)
+- Paste into corresponding Word table cells
+- Each line with UC### is one complete row
+
+STEP 4: FORMAT TABLE
+Header Row:
+- Font: Arial 11pt Bold
+- Background: Blue (#4472C4) or Gray
+- Text Color: White
+- Alignment: Centered
+
+Data Rows:
+- Font: Arial 10pt Regular
+- Column 1 (ID): Centered, width 2cm
+- Column 2 (Use Case): Left-aligned, Bold, width 5cm
+- Column 3 (Requirements): Justified, width 10cm
+- Row Height: Auto or minimum 1.5cm
+- Borders: All borders visible (0.5pt)
+
+STEP 5: APPLY STYLE (OPTIONAL)
+- Select entire table
+- Go to: Table Design → Table Styles
+- Choose: "Grid Table 4 - Accent 1" or similar
+- Adjust to match your document theme
+
+STEP 6: ADD CAPTION
+- Right-click table
+- Insert Caption
+- Type: "Table 4.1: Functional Requirements of SkinGuard Web Application with AI-Powered Analysis"
+- Position: Above table
+
+STEP 7: SET HEADER TO REPEAT
+- Click table
+- Go to: Layout → Data → Repeat Header Rows
+- This makes header appear on every page
+
+===== QUICK COPY VERSION (TAB-SEPARATED) =====
+
+ID	Use Case	Functional Requirements
+UC001	Patient Login	This use case enables patients to access the system by authenticating with their email and password credentials.
+UC002	Hospital Staff Login	This use case enables hospital/clinic staff to log into the system to access the hospital dashboard.
+UC003	Forgot Password	If a user forgets their password, this use case enables them to request a password reset link via email.
+UC004	Register Patient Account	With this use case, users can register for a patient account by providing email, password, and full name.
+UC005	Manage Health Profile	This use case allows patients to create and update their health profile including age, skin type, and family history.
+UC006	Upload Skin Lesion Image	This use case allows patients to upload skin lesion photographs into the system for AI analysis.
+UC007	Complete Symptom Wizard	This use case guides patients through a 3-step process to record symptoms including body location, sensations, and visual changes.
+UC008	Validate Skin Content	This automated use case verifies that uploaded images contain skin lesions and rejects non-skin images such as posters or text documents.
+UC009	Classify Cancer Type	This automated use case uses Vision Transformer AI to classify lesions into 7 cancer types with 84% accuracy.
+UC010	Assess Risk Level	This automated use case categorizes analysis results into 4 risk levels: low, medium, high, or urgent based on cancer probability.
+UC011	View Analysis Results	This use case displays AI predictions, risk assessment, and recommendations to patients after image analysis.
+UC012	View Report History	This use case allows patients to access all their past medical reports with filters and download options.
+UC013	Find Nearby Hospitals	This use case allows patients to search for dermatology hospitals and clinics near their location using Google Maps integration.
+UC014	View Hospital Details	This use case displays detailed information about selected hospitals including ratings, distance, and operating hours.
+UC015	Book Appointment	This use case enables patients to request appointments with hospitals by selecting a medical report and preferred date.
+UC016	Manage Appointments	This use case allows patients to view and manage all their appointments including pending, confirmed, and completed consultations.
+UC017	Manage Facility Profile	This use case allows hospital staff to update facility information including name, description, operating hours, and contact details.
+UC018	View Pending Reports	This use case displays medical reports awaiting review, organized by patient with urgent cases highlighted.
+UC019	Review Urgent Cases	This use case filters and displays only high-priority reports with urgent or high risk levels for immediate doctor attention.
+UC020	View Appointment Requests	This use case displays all appointment requests with status breakdown for hospital staff to review.
+UC021	Confirm Appointment	This use case allows hospital staff to accept patient appointment requests and unlock access to patient medical history.
+UC022	Reject Appointment	This use case enables hospital staff to decline appointment requests with optional cancellation reason.
+UC023	View Patient Health Profile	This use case allows doctors to access complete patient medical history including demographics, skin type, family history, and all past reports (only accessible after appointment confirmation).
+UC024	Mark Appointment Complete	This use case allows doctors to mark consultations as completed and add optional consultation notes for patients.
+UC025	Send Confirmation Email	This automated use case sends email notifications to patients when their appointments are confirmed by hospitals.
+UC026	Send Cancellation Email	This automated use case sends email notifications when appointments are cancelled by either patient or hospital.
+UC027	Search Hospitals via Google Maps	This automated use case queries Google Maps Places API to find dermatology hospitals within specified radius.
+UC028	Generate Navigation Link	This automated use case creates direct navigation links to open selected hospitals in Google Maps application.
+
+===== FAST METHOD: CONVERT TEXT TO TABLE =====
+
+1. Copy the "QUICK COPY VERSION" section above (including header)
+2. Paste into Word
+3. Select all the pasted text
+4. Go to: Insert → Table → Convert Text to Table
+5. In the dialog:
+   - "Separate text at": Choose "Tabs"
+   - Click OK
+6. Word will automatically create the table
+7. Apply formatting as described in STEP 4 above
+
+===== NOTES =====
+
+Key Changes from Old Table:
+- Removed: Admin role, Query management (UC006, UC009 from old table)
+- Added: 19 new use cases including AI analysis, hospital finder, appointments
+- Updated: "Doctor" → "Hospital Staff" (facility-based system)
+- Enhanced: AI features (7 cancer types, 4 risk levels, skin validation)
+
+Total Use Cases: 28 (vs 9 in old table)
+
+Actor Breakdown:
+- Patient: 12 use cases
+- Hospital Staff: 8 use cases
+- AI System: 5 automated use cases
+- Google Maps API: 2 automated use cases
+- Email System: 2 automated use cases
+
+Technology Stack:
+- Frontend: React
+- Backend: FastAPI (Python)
+- Database: PostgreSQL
+- AI Model: Vision Transformer (84% accuracy)
+- External APIs: Google Maps, Email (SMTP)
+

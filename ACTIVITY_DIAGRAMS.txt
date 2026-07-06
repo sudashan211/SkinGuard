@@ -1,0 +1,585 @@
+================================================================================
+ACTIVITY DIAGRAMS FOR SKINGUARD SYSTEM
+================================================================================
+
+RECOMMENDED: Create 5 key activity diagrams (not all 28 use cases)
+
+1. Patient Login (UC002) - Updated from your old "Admin Login"
+2. Complete AI Analysis Workflow (UC009→UC014→UC015) - CORE FEATURE
+3. Book Appointment (UC023) - Patient journey
+4. Hospital Staff Review & Confirm (UC024→UC027) - Staff workflow
+5. Image Validation with NSFW Filter (UC011→UC012) - Security feature
+
+Each diagram below is provided in PlantUML format.
+Generate images at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+DIAGRAM 1: PATIENT LOGIN (UC002)
+================================================================================
+Replaces your old "Admin Login" diagram
+
+@startuml
+title Activity Diagram: Patient Login (AD001)
+|User|
+start
+:Enter email\nand password;
+|System|
+:Display Login Page;
+|User|
+:Click Login Button;
+|System|
+:Validate email format;
+if (Valid format?) then (no)
+  :Display Error Message\n"Invalid email format";
+  |User|
+  stop
+else (yes)
+  :Retrieve user record\nfrom database;
+  if (User exists?) then (no)
+    :Display Error Message\n"Account not found";
+    |User|
+    stop
+  else (yes)
+    :Verify password\nagainst hash;
+    if (Password correct?) then (no)
+      :Increment failed attempts;
+      if (Failed attempts >= 5?) then (yes)
+        :Lock account\nfor 15 minutes;
+        :Display Error\n"Account locked";
+        |User|
+        stop
+      else (no)
+        :Display Error\n"Invalid password";
+        |User|
+        stop
+      endif
+    else (yes)
+      :Generate JWT\naccess token (30 min);
+      :Generate refresh token\n(7 days);
+      :Store tokens in\nbrowser storage;
+      :Log login event;
+      :Display Success Message;
+      :Redirect to\nPatient Dashboard;
+      |User|
+      stop
+    endif
+  endif
+endif
+@enduml
+
+================================================================================
+DIAGRAM 2: COMPLETE AI ANALYSIS WORKFLOW (AD002)
+================================================================================
+Most Important - Shows core system feature: Upload → Validate → Analyze → Display
+
+@startuml
+title Activity Diagram: Complete AI Analysis Workflow (AD002)
+|Patient|
+start
+:Click "New Analysis";
+|System|
+:Display Upload Interface\nwith guidelines;
+|Patient|
+if (Upload or Capture?) then (Upload)
+  :Select image\nfrom device;
+else (Capture)
+  :Activate camera;
+  :Position over lesion;
+  :Capture photo;
+endif
+:Confirm image;
+|System|
+:Validate file format\nand size;
+if (Valid file?) then (no)
+  :Display Error\n"Invalid format or size";
+  |Patient|
+  stop
+else (yes)
+  :Upload image to server;
+  
+  partition "NSFW & Skin Validation (UC011/UC012)" {
+    :Preprocess image\n(224x224, normalize);
+    :Calculate skin percentage\n(4 criteria: RGB, brightness, saturation);
+    if (Skin percentage >= 25%?) then (no)
+      :Display Error\n"Not a skin lesion image\nUpload actual skin photo";
+      |Patient|
+      stop
+    else (yes)
+      :Detect text/graphics\n(edge density, contrast);
+      if (Text/graphics detected?) then (yes)
+        :Display Error\n"Poster/document detected\nUpload skin photo";
+        |Patient|
+        stop
+      else (no)
+        :Check NSFW score;
+        if (NSFW score > 0.35?) then (yes)
+          :Display Error\n"Inappropriate content";
+          |Patient|
+          stop
+        else (no)
+          :Image validation passed;
+        endif
+      endif
+    endif
+  }
+  
+  :Display Symptom\nQuestionnaire (UC013);
+  |Patient|
+  :Answer 8 questions:\n- Duration\n- Size changes\n- Pain level\n- Itching\n- Bleeding\n- Location\n- Sun exposure\n- Additional notes;
+  :Submit questionnaire;
+  |System|
+  :Validate all required\nquestions answered;
+  if (Complete?) then (no)
+    :Highlight missing\nquestions;
+    |Patient|
+    stop
+  else (yes)
+    :Store responses\nin database;
+    :Display "Analyzing..."\nprogress indicator;
+    
+    partition "AI Analysis (UC014)" {
+      :Load Vision Transformer\nmodel from Hugging Face;
+      :Preprocess image for ViT;
+      :Perform neural network\nforward pass;
+      :Generate probabilities\nfor 7 cancer types;
+      :Identify highest\nprobability as prediction;
+      :Convert to confidence\npercentage;
+      :Perform lesion\nlocalization;
+    }
+    
+    partition "Risk Assessment (UC016)" {
+      if (Cancer type = Melanoma\nOR Confidence >= 85%?) then (yes)
+        :Assign risk = URGENT;
+        :Set color = Red;
+      else (no)
+        if (Type = Basal Cell\nOR Actinic Keratoses?) then (yes)
+          :Assign risk = HIGH;
+          :Set color = Orange;
+        else (no)
+          if (Confidence 60-85%\nOR Symptoms concerning?) then (yes)
+            :Assign risk = MEDIUM;
+            :Set color = Yellow;
+          else (no)
+            :Assign risk = LOW;
+            :Set color = Green;
+          endif
+        endif
+      endif
+      :Generate risk\njustification text;
+      :Calculate urgency\nscore (0-100);
+    }
+    
+    :Save complete analysis\nreport in database (UC017);
+    
+    partition "Display Results (UC015)" {
+      :Display risk level\nbanner with color;
+      :Show cancer type\nand confidence %;
+      :Show all 7 classes\nwith probabilities;
+      :Display image with\nlesion bounding box;
+      :Show symptom summary;
+      :Provide recommended\nactions based on risk;
+      :Display medical\ndisclaimer (84% accuracy);
+      :Show action buttons:\n- Find Hospitals\n- Save Report\n- Download PDF;
+    }
+    |Patient|
+    :Review results;
+    if (Next action?) then (Find Hospitals)
+      :Proceed to UC019\n(Search Hospitals);
+    else (Save for later)
+      :View in history later\n(UC018);
+    else (Download)
+      :Download PDF report;
+    endif
+    stop
+  endif
+endif
+@enduml
+
+================================================================================
+DIAGRAM 3: BOOK APPOINTMENT (AD003)
+================================================================================
+Shows patient journey from hospital selection to appointment submission
+
+@startuml
+title Activity Diagram: Book Appointment (AD003)
+|Patient|
+start
+:Search nearby hospitals\n(UC019);
+|System|
+:Use GPS or manual address;
+:Call Google Places API\n(50km radius);
+:Retrieve up to 180 hospitals;
+:Sort by rating (4.5+ first)\nthen distance;
+:Display map view\nand list view;
+|Patient|
+:Browse hospital results;
+:Select hospital;
+:Click "Book Appointment";
+|System|
+:Display booking form;
+:Pre-fill hospital info;
+:Show "Select Analysis Report"\ndropdown;
+|Patient|
+:Select report from history;
+|System|
+:Display report summary:\n- Cancer type\n- Risk level\n- Analysis date;
+:Auto-suggest urgency\nbased on risk;
+|Patient|
+:Select preferred date\n(calendar picker);
+:Select preferred time slot\n(Morning/Afternoon/Evening);
+if (Additional notes?) then (yes)
+  :Enter symptoms/concerns\n(max 300 chars);
+endif
+:Check "Confirm info correct";
+:Click "Submit Request";
+|System|
+:Validate all required fields;
+if (Valid form?) then (no)
+  :Highlight missing fields;
+  :Display error message;
+  |Patient|
+  stop
+else (yes)
+  if (Date in past?) then (yes)
+    :Display Error\n"Select future date";
+    |Patient|
+    stop
+  else (no)
+    :Create appointment record:\n- Status: Pending\n- Link patient, hospital, report\n- Store preferences;
+    :Send email notification\nto hospital staff;
+    :Display Success Message\n"Request submitted!\nHospital will confirm\nwithin 24-48 hours";
+    :Redirect to\n"My Appointments" page;
+    |Patient|
+    :View appointment status:\n"Pending";
+    if (Risk = Urgent?) then (yes)
+      note right
+        System suggests calling
+        hospital directly for
+        urgent cases
+      end note
+    endif
+    stop
+  endif
+endif
+@enduml
+
+================================================================================
+DIAGRAM 4: HOSPITAL STAFF REVIEW & CONFIRM APPOINTMENT (AD004)
+================================================================================
+Shows staff workflow from viewing reports to confirming appointments
+
+@startuml
+title Activity Diagram: Hospital Staff Review & Confirm (AD004)
+|Hospital Staff|
+start
+:Login to hospital\ndashboard (UC004);
+|System|
+:Load pending appointments\nfor this hospital;
+:Organize by urgency:\n🔴 Urgent (top)\n🟠 High\n🟡 Medium\n🟢 Low (bottom);
+:Display dashboard with\nreport cards (UC024);
+note right
+  Patient identity HIDDEN
+  Only anonymized report data shown
+end note
+|Hospital Staff|
+:Select report to review;
+|System|
+:Display report review page\n(UC025);
+:Show sections:\n- Risk level banner\n- AI classification\n- Lesion images\n- Symptom responses\n- Appointment request details;
+:Display privacy notice:\n"Patient identity protected\nuntil confirmation";
+|Hospital Staff|
+:Review AI analysis results;
+:Examine skin lesion image;
+:Read symptom responses;
+:Check appointment preferences;
+if (Decision?) then (Confirm)
+  :Click "Confirm Appointment";
+  |System|
+  :Display confirmation form;
+  :Show hospital calendar;
+  |Hospital Staff|
+  :Select available date/time;
+  :Select consultation type;
+  :Estimate duration;
+  if (Add instructions?) then (yes)
+    :Enter special instructions\nfor patient;
+  endif
+  :Click "Confirm and\nNotify Patient";
+  |System|
+  :Update appointment status:\nPending → Confirmed;
+  :REVEAL patient identity\nto staff:\n- Name\n- Contact info;
+  :Grant access to patient\nmedical history (UC026);
+  :Add to hospital calendar;
+  :Send confirmation email\nto patient (UC027):\n- Hospital details\n- Date/Time\n- What to bring\n- Directions\n- Calendar invite;
+  :Display Success\n"Appointment confirmed!";
+  :Move to "Confirmed\nAppointments" list;
+  |Hospital Staff|
+  :Can now view patient\nfull medical history;
+  stop
+  
+else (Reject)
+  :Click "Reject Request";
+  |System|
+  :Display rejection form;
+  |Hospital Staff|
+  :Select rejection reason:\n- Fully booked\n- Requires specialist\n- Other;
+  if (Add message?) then (yes)
+    :Enter personalized\nexplanation;
+  endif
+  |System|
+  :Find 3 alternative\nhospitals nearby;
+  |Hospital Staff|
+  :Select recommended\nalternatives;
+  :Click "Confirm Rejection";
+  |System|
+  :Update appointment status:\nPending → Rejected;
+  note right
+    Patient identity NEVER revealed
+    for rejected appointments
+  end note
+  :Send rejection email\nwith alternatives (UC028);
+  :Remove from pending queue;
+  :Display Success\n"Rejection sent";
+  |Hospital Staff|
+  stop
+  
+else (Request More Info)
+  :Click "Request More\nInformation";
+  |System|
+  :Display message form;
+  |Hospital Staff|
+  :Enter questions\nfor patient;
+  :Submit request;
+  |System|
+  :Send anonymous email\nto patient;
+  :Wait for patient response;
+  note right
+    Staff can review again
+    after patient responds
+  end note
+  |Hospital Staff|
+  stop
+endif
+@enduml
+
+================================================================================
+DIAGRAM 5: IMAGE VALIDATION WITH NSFW FILTER (AD005)
+================================================================================
+Shows security feature - validates skin content and rejects inappropriate images
+
+@startuml
+title Activity Diagram: Image Validation with NSFW Filter (AD005)
+|System|
+start
+:Receive uploaded/captured\nimage from patient;
+:Convert image to RGB format;
+:Preprocess to 224x224 pixels;
+:Normalize pixel values\nto [0, 1] range;
+
+partition "Skin Content Validation" {
+  :Calculate skin percentage\nusing 4 criteria;
+  
+  fork
+    :Check RGB channel\nordering (R > G > B);
+  fork again
+    :Check RGB value ranges:\nR: 20-95%\nG: 15-85%\nB: 10-75%;
+  fork again
+    :Check brightness\nrange (20-90%);
+  fork again
+    :Check saturation\nrange (10-70%);
+  end fork
+  
+  :Count pixels passing\n≥3 criteria as "skin-like";
+  :Calculate total\nskin percentage;
+  
+  if (Skin percentage >= 25%?) then (no)
+    :Log rejection:\n"Insufficient skin content";
+    :Display Error to patient:\n"Not a skin lesion image.\nUpload clear skin photo.";
+    stop
+  endif
+}
+
+partition "Text/Graphics Detection" {
+  :Convert to grayscale;
+  :Calculate horizontal and\nvertical gradients;
+  :Measure edge density;
+  :Calculate contrast (std dev);
+  :Check for pure color blocks\n(low channel variance);
+  
+  if (Edge density > 15%\nOR\nHigh contrast + low variance?) then (yes)
+    :Text/graphics detected\n(poster, document);
+    :Log rejection:\n"Text/graphics detected";
+    :Display Error to patient:\n"Poster/document detected.\nUpload actual skin photo.";
+    stop
+  endif
+}
+
+partition "NSFW Content Check" {
+  :Calculate NSFW score\nusing heuristic:\n- Skin tone percentage\n- Color variance\n- Brightness patterns;
+  
+  if (NSFW score > 0.35?) then (yes)
+    :Log rejection:\n"NSFW content detected";
+    :Display Error to patient:\n"Inappropriate content.\nUpload valid medical image.";
+    stop
+  endif
+}
+
+:All validation checks passed;
+:Log success:\n"Validation passed - X% skin";
+:Allow image to proceed\nto AI analysis (UC014);
+stop
+@enduml
+
+
+================================================================================
+HOW TO GENERATE DIAGRAMS
+================================================================================
+
+METHOD 1: ONLINE PLANTUML (EASIEST)
+1. Go to: http://www.plantuml.com/plantuml/uml/
+2. Copy the PlantUML code for one diagram (from @startuml to @enduml)
+3. Paste into the text box
+4. Click "Submit"
+5. Download as PNG or SVG
+
+METHOD 2: VS CODE EXTENSION
+1. Install "PlantUML" extension in VS Code
+2. Create new file: diagram1.puml
+3. Paste PlantUML code
+4. Press Alt+D to preview
+5. Right-click preview → Export to PNG/SVG
+
+METHOD 3: COMMAND LINE (if you have Java + PlantUML installed)
+1. Save each diagram as separate .puml file
+2. Run: java -jar plantuml.jar diagram1.puml
+3. Generates diagram1.png
+
+================================================================================
+RECOMMENDED APPROACH FOR YOUR THESIS
+================================================================================
+
+INCLUDE THESE 5 ACTIVITY DIAGRAMS:
+
+1. ✅ Patient Login (AD001) - Replaces your old "Admin Login"
+   - Shows authentication flow with validation
+   - Demonstrates security (account locking after 5 attempts)
+
+2. ✅ Complete AI Analysis Workflow (AD002) - MOST IMPORTANT
+   - Shows entire core feature end-to-end
+   - Includes NSFW validation, AI analysis, risk assessment
+   - Demonstrates system's main value proposition
+
+3. ✅ Book Appointment (AD003)
+   - Shows patient journey from hospital search to booking
+   - Demonstrates Google Maps integration
+   - Shows privacy protection (patient identity hidden initially)
+
+4. ✅ Hospital Staff Review & Confirm (AD004)
+   - Shows staff workflow and decision-making
+   - Demonstrates urgency-based triage
+   - Shows privacy reveal after confirmation
+
+5. ✅ Image Validation with NSFW Filter (AD005)
+   - Shows security feature (your poster detection fix!)
+   - Demonstrates 25% skin content threshold
+   - Shows multi-criteria validation
+
+================================================================================
+WHY NOT ALL 28 USE CASES?
+================================================================================
+
+REASONS:
+1. Too Many Diagrams = Redundant and overwhelming
+   - Reviewers lose focus on key features
+   - Thesis becomes unnecessarily long
+
+2. Similar Workflows Don't Need Separate Diagrams
+   - User Login vs Staff Login are very similar
+   - Create vs Update vs View Profile are straightforward CRUD
+
+3. Academic Standards Recommend 5-8 Key Diagrams
+   - Focus on complex workflows
+   - Show decision points and parallel activities
+   - Demonstrate unique system features
+
+4. Use Case Descriptions Already Cover Details
+   - All 28 use cases have detailed written descriptions
+   - Activity diagrams should complement, not duplicate
+
+================================================================================
+THESIS ORGANIZATION SUGGESTION
+================================================================================
+
+CHAPTER 4: SYSTEM DESIGN
+├── 4.1 Use Case Diagram (1 diagram showing all 28 use cases)
+├── 4.2 Use Case Descriptions (all 28 use cases in tables)
+│   ├── Table 4.1: Functional Requirements (28 use cases)
+│   ├── Table 4.2: Actor Description (5 actors)
+│   └── Tables 4.3-4.30: Detailed Use Case Descriptions (28 tables)
+├── 4.3 Activity Diagrams (5 key workflows)
+│   ├── Figure 4.1: Patient Login (AD001)
+│   ├── Figure 4.2: Complete AI Analysis Workflow (AD002) ⭐ KEY
+│   ├── Figure 4.3: Book Appointment (AD003)
+│   ├── Figure 4.4: Hospital Staff Review & Confirm (AD004)
+│   └── Figure 4.5: Image Validation with NSFW Filter (AD005)
+├── 4.4 Sequence Diagrams (optional, 2-3 key interactions)
+│   ├── Patient-System-AI interaction
+│   └── Patient-System-Hospital-Email interaction
+├── 4.5 Class Diagram (database schema)
+└── 4.6 System Architecture Diagram (high-level)
+
+================================================================================
+COMPARISON: OLD vs NEW ACTIVITY DIAGRAM
+================================================================================
+
+OLD DIAGRAM (Your "Login Admin"):
+❌ Shows "Admin" actor (removed in new system)
+❌ Shows "Admin Dashboard" (no longer exists)
+❌ References UC003 "Admin Password Forgot" (removed)
+❌ Simple flow without modern features
+✅ Basic structure is good (swimlanes, decision points)
+
+NEW DIAGRAM (Patient Login - AD001):
+✅ Shows "Patient" actor (correct for new system)
+✅ Shows "Patient Dashboard" (actual destination)
+✅ Includes account locking (5 failed attempts)
+✅ JWT token generation (modern auth)
+✅ References UC003 "Password Reset" (correct UC)
+✅ More detailed security features
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. ✅ GENERATE IMAGES:
+   - Copy each PlantUML code to http://www.plantuml.com/plantuml/uml/
+   - Download as PNG (for Word/Google Docs)
+   - Save as: AD001.png, AD002.png, AD003.png, AD004.png, AD005.png
+
+2. ✅ INSERT IN THESIS:
+   - Place diagrams in Chapter 4 (System Design)
+   - Add figure captions:
+     * Figure 4.1: Activity Diagram of Patient Login
+     * Figure 4.2: Activity Diagram of Complete AI Analysis Workflow
+     * Figure 4.3: Activity Diagram of Book Appointment
+     * Figure 4.4: Activity Diagram of Hospital Staff Review & Confirm
+     * Figure 4.5: Activity Diagram of Image Validation with NSFW Filter
+
+3. ✅ WRITE EXPLANATORY TEXT:
+   - Brief paragraph before each diagram explaining what it shows
+   - Reference the diagram in text: "As shown in Figure 4.2..."
+   - Highlight key decision points and parallel activities
+
+================================================================================
+FILES CREATED
+================================================================================
+
+✅ ACTIVITY_DIAGRAMS.txt - This file with all 5 PlantUML diagrams
+
+Previous files:
+✅ USE_CASE_DESCRIPTIONS_ALL.txt - All 28 detailed use case descriptions
+✅ TABLE_4.1_GOOGLE_DOCS.txt - Functional Requirements Table
+✅ TABLE_4.2_GOOGLE_DOCS.txt - Actor Description Table
+✅ use_case_diagram.puml - Use Case Diagram (35 use cases)
+
+ALL READY FOR YOUR THESIS! 🎓

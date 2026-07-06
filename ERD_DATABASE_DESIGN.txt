@@ -1,0 +1,574 @@
+================================================================================
+ERD (ENTITY RELATIONSHIP DIAGRAM) - SKINGUARD DATABASE DESIGN
+================================================================================
+
+This ERD matches the reference diagram format with:
+- Black arrows for relationships
+- PK (Primary Key) and FK (Foreign Key) clearly marked
+- Cardinality notation (1:1, 1:*, *:1)
+- Tables as rectangles with column lists
+- Column names with data types
+- Relationship labels
+- Clean layout to minimize arrow crossings
+
+================================================================================
+PLANTUML CODE - ERD DIAGRAM (REFERENCE FORMAT STYLE)
+================================================================================
+
+@startuml
+'title SkinGuard Database Design - Entity Relationship Diagram
+
+hide circle
+hide methods
+hide stereotypes
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    BorderThickness 1
+    FontSize 10
+}
+
+' ============================================================================
+' CENTRAL TABLE: profiles (User accounts)
+' ============================================================================
+
+class profiles {
+    PK  user_id : UUID
+    --
+        email : VARCHAR(255) NOT NULL
+        full_name : VARCHAR(100)
+        role : VARCHAR(20) NOT NULL
+        verified : BOOLEAN
+        avatar_url : TEXT
+        language_preference : VARCHAR(10)
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' USER EXTENSION TABLES
+' ============================================================================
+
+class patient_data {
+    PK  id : UUID
+    --
+    FK  user_id : UUID
+        age : INTEGER
+        skin_type : VARCHAR(5)
+        family_history : TEXT
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+class doctors {
+    PK  doctor_id : UUID
+    --
+    FK  user_id : UUID
+        license_no : VARCHAR(100) NOT NULL
+        clinic_name : VARCHAR(200)
+        lat : DOUBLE PRECISION
+        lng : DOUBLE PRECISION
+        whatsapp_no : VARCHAR(20)
+        specialization : VARCHAR(100)
+        bio : TEXT
+        education : TEXT
+        certifications : TEXT
+        languages : VARCHAR(200)
+        clinic_hours : TEXT
+        average_rating : FLOAT
+        review_count : INTEGER
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' MEDICAL DATA TABLES
+' ============================================================================
+
+class medical_reports {
+    PK  report_id : UUID
+    --
+    FK  patient_id : UUID
+        image_url : TEXT NOT NULL
+        ai_prediction : JSON
+        symptoms : TEXT
+        status : VARCHAR(20)
+        risk_level : VARCHAR(20)
+        body_location : VARCHAR(100)
+        consultation_notes : TEXT
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' APPOINTMENT SYSTEM
+' ============================================================================
+
+class appointments {
+    PK  appointment_id : UUID
+    --
+    FK  patient_id : UUID
+    FK  doctor_id : UUID
+    FK  report_id : UUID
+        scheduled_at : DATETIME NOT NULL
+        status : VARCHAR(20)
+        consultation_type : VARCHAR(20)
+        video_room_url : TEXT
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' REVIEW SYSTEM
+' ============================================================================
+
+class reviews {
+    PK  review_id : UUID
+    --
+    FK  patient_id : UUID
+    FK  doctor_id : UUID
+    FK  appointment_id : UUID
+        rating : INTEGER
+        review_text : TEXT
+        flagged : BOOLEAN
+        created_at : DATETIME
+}
+
+' ============================================================================
+' AUDIT AND LOGGING
+' ============================================================================
+
+class audit_logs {
+    PK  log_id : UUID
+    --
+        user_id : UUID
+        action : VARCHAR(100) NOT NULL
+        resource_type : VARCHAR(50)
+        resource_id : VARCHAR(100)
+        metadata : JSON
+        created_at : DATETIME
+}
+
+' ============================================================================
+' RELATIONSHIPS WITH CARDINALITY
+' ============================================================================
+
+' profiles to patient_data (1:1)
+profiles "1" -down-> "1" patient_data : Has
+
+' profiles to doctors (1:1)  
+profiles "1" -down-> "1" doctors : Registers
+
+' profiles to medical_reports (1:*)
+profiles "1" -right-> "*" medical_reports : Creates
+
+' profiles to appointments (1:*) - as patient
+profiles "1" -down-> "*" appointments : Books
+
+' doctors to appointments (1:*)
+doctors "1" -right-> "*" appointments : Receives
+
+' medical_reports to appointments (1:*)
+medical_reports "1" -down-> "*" appointments : Attached
+
+' profiles to reviews (1:*) - as patient
+profiles "1" -down-> "*" reviews : Writes
+
+' doctors to reviews (1:*)
+doctors "1" -down-> "*" reviews : Receives
+
+' appointments to reviews (1:1)
+appointments "1" -down-> "0..1" reviews : Generates
+
+@enduml
+
+================================================================================
+ALTERNATIVE VERSION - WITH LAYOUT POSITIONING
+================================================================================
+
+This version uses explicit layout control for better positioning
+to match the reference diagram style more closely.
+
+@startuml
+
+hide circle
+hide methods
+hide stereotypes
+
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 70
+skinparam ranksep 90
+
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    BorderThickness 1
+    FontSize 10
+}
+
+' ============================================================================
+' TOP CENTER: Main User Table
+' ============================================================================
+
+class profiles {
+    PK  user_id : UUID
+        email : VARCHAR(255) NOT NULL
+        full_name : VARCHAR(100)
+        role : VARCHAR(20) NOT NULL
+        verified : BOOLEAN
+        avatar_url : TEXT
+        language_preference : VARCHAR(10)
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' LEFT SIDE: Patient Data
+' ============================================================================
+
+class patient_data {
+    PK  id : UUID
+    FK  user_id : UUID
+        age : INTEGER
+        skin_type : VARCHAR(5)
+        family_history : TEXT
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' RIGHT SIDE: Doctor Data
+' ============================================================================
+
+class doctors {
+    PK  doctor_id : UUID
+    FK  user_id : UUID
+        license_no : VARCHAR(100) NOT NULL
+        clinic_name : VARCHAR(200)
+        lat : DOUBLE PRECISION
+        lng : DOUBLE PRECISION
+        whatsapp_no : VARCHAR(20)
+        specialization : VARCHAR(100)
+        bio : TEXT
+        education : TEXT
+        certifications : TEXT
+        languages : VARCHAR(200)
+        clinic_hours : TEXT
+        average_rating : FLOAT
+        review_count : INTEGER
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' BOTTOM LEFT: Medical Reports
+' ============================================================================
+
+class medical_reports {
+    PK  report_id : UUID
+    FK  patient_id : UUID
+        image_url : TEXT NOT NULL
+        ai_prediction : JSON
+        symptoms : TEXT
+        status : VARCHAR(20)
+        risk_level : VARCHAR(20)
+        body_location : VARCHAR(100)
+        consultation_notes : TEXT
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' CENTER BOTTOM: Appointments
+' ============================================================================
+
+class appointments {
+    PK  appointment_id : UUID
+    FK  patient_id : UUID
+    FK  doctor_id : UUID
+    FK  report_id : UUID
+        scheduled_at : DATETIME NOT NULL
+        status : VARCHAR(20)
+        consultation_type : VARCHAR(20)
+        video_room_url : TEXT
+        created_at : DATETIME
+        updated_at : DATETIME
+}
+
+' ============================================================================
+' BOTTOM RIGHT: Reviews
+' ============================================================================
+
+class reviews {
+    PK  review_id : UUID
+    FK  patient_id : UUID
+    FK  doctor_id : UUID
+    FK  appointment_id : UUID
+        rating : INTEGER
+        review_text : TEXT
+        flagged : BOOLEAN
+        created_at : DATETIME
+}
+
+' ============================================================================
+' FAR LEFT: Audit Logs
+' ============================================================================
+
+class audit_logs {
+    PK  log_id : UUID
+        user_id : UUID
+        action : VARCHAR(100) NOT NULL
+        resource_type : VARCHAR(50)
+        resource_id : VARCHAR(100)
+        metadata : JSON
+        created_at : DATETIME
+}
+
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+profiles "1" --> "1" patient_data : Has
+profiles "1" --> "1" doctors : Registers
+profiles "1" --> "*" medical_reports : Creates
+profiles "1" --> "*" appointments : Books
+doctors "1" --> "*" appointments : Receives
+medical_reports "1" --> "*" appointments : Attached
+profiles "1" --> "*" reviews : Writes
+doctors "1" --> "*" reviews : Receives
+appointments "1" --> "0..1" reviews : Generates
+
+' Layout hints
+patient_data -[hidden]right- profiles
+profiles -[hidden]right- doctors
+patient_data -[hidden]down- medical_reports
+medical_reports -[hidden]right- appointments
+appointments -[hidden]right- reviews
+
+@enduml
+
+================================================================================
+SIMPLIFIED VERSION - MINIMAL STYLE
+================================================================================
+
+This version is compact and clean, similar to the reference diagram style.
+
+@startuml
+
+hide circle
+hide methods
+hide stereotypes
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    FontSize 9
+}
+
+class profiles {
+    PK  user_id : UUID
+    FK  
+        email : VARCHAR(255)
+        full_name : VARCHAR(100)
+        role : VARCHAR(20)
+        verified : BOOLEAN
+        created_at : DATETIME
+}
+
+class patient_data {
+    PK  id : UUID
+    FK  user_id : UUID
+        age : INTEGER
+        skin_type : VARCHAR(5)
+        family_history : TEXT
+}
+
+class doctors {
+    PK  doctor_id : UUID
+    FK  user_id : UUID
+        license_no : VARCHAR(100)
+        clinic_name : VARCHAR(200)
+        lat : DOUBLE
+        lng : DOUBLE
+        whatsapp_no : VARCHAR(20)
+        average_rating : FLOAT
+        review_count : INTEGER
+}
+
+class medical_reports {
+    PK  report_id : UUID
+    FK  patient_id : UUID
+        image_url : TEXT
+        ai_prediction : JSON
+        status : VARCHAR(20)
+        risk_level : VARCHAR(20)
+        body_location : VARCHAR(100)
+}
+
+class appointments {
+    PK  appointment_id : UUID
+    FK  patient_id : UUID
+    FK  doctor_id : UUID
+    FK  report_id : UUID
+        scheduled_at : DATETIME
+        status : VARCHAR(20)
+        consultation_type : VARCHAR(20)
+}
+
+class reviews {
+    PK  review_id : UUID
+    FK  patient_id : UUID
+    FK  doctor_id : UUID
+    FK  appointment_id : UUID
+        rating : INTEGER
+        review_text : TEXT
+}
+
+class audit_logs {
+    PK  log_id : UUID
+        user_id : UUID
+        action : VARCHAR(100)
+        resource_type : VARCHAR(50)
+        created_at : DATETIME
+}
+
+profiles "1" --> "1" patient_data
+profiles "1" --> "1" doctors
+profiles "1" --> "*" medical_reports
+profiles "1" --> "*" appointments
+doctors "1" --> "*" appointments
+medical_reports "1" --> "*" appointments
+profiles "1" --> "*" reviews
+doctors "1" --> "*" reviews
+appointments "1" --> "0..1" reviews
+
+@enduml
+
+================================================================================
+DATABASE RELATIONSHIP DETAILS
+================================================================================
+
+TABLE RELATIONSHIPS:
+
+1. **profiles** (Core user table)
+   - Primary entity for all users (patients, doctors, admins)
+   - 1:1 with patient_data (each patient has one profile)
+   - 1:1 with doctors (each doctor has one profile)
+   - 1:N with medical_reports (patient can have many reports)
+   - 1:N with appointments (patient can have many appointments)
+   - 1:N with reviews (patient can write many reviews)
+
+2. **patient_data** (Patient health profile)
+   - Extends profiles table for patient-specific data
+   - Stores age, skin type (Fitzpatrick scale), family history
+   - 1:1 relationship with profiles (user_id foreign key)
+
+3. **doctors** (Doctor profile and credentials)
+   - Extends profiles table for doctor-specific data
+   - Stores license, clinic info, location, WhatsApp contact
+   - 1:1 relationship with profiles (user_id foreign key)
+   - 1:N with appointments (doctor can have many appointments)
+   - 1:N with reviews (doctor can receive many reviews)
+
+4. **medical_reports** (AI analysis results)
+   - Stores uploaded images and AI predictions
+   - Stores symptoms from symptom wizard (4 steps)
+   - Tracks risk level (low/medium/high/urgent)
+   - N:1 relationship with profiles (patient_id foreign key)
+   - 1:N with appointments (report can be attached to appointments)
+
+5. **appointments** (Appointment scheduling)
+   - Links patients with doctors
+   - Optional link to medical_reports
+   - Supports in-person and video consultations
+   - N:1 relationship with profiles (patient_id foreign key)
+   - N:1 relationship with doctors (doctor_id foreign key)
+   - N:1 optional relationship with medical_reports (report_id foreign key)
+   - 1:1 optional with reviews (can be reviewed after completion)
+
+6. **reviews** (Doctor ratings and reviews)
+   - Patients rate doctors after appointments
+   - 1-5 star rating with optional text review
+   - N:1 relationship with profiles (patient_id foreign key)
+   - N:1 relationship with doctors (doctor_id foreign key)
+   - N:1 optional relationship with appointments (appointment_id foreign key)
+
+7. **audit_logs** (Security and compliance trail)
+   - Tracks all system actions for security
+   - Records user actions, timestamps, metadata
+   - Soft relationship with profiles (user_id, no foreign key constraint)
+
+CARDINALITY NOTATION:
+- ||--|| : One to One (mandatory both sides)
+- ||--o| : One to Zero or One (optional on one side)
+- ||--o{ : One to Many (optional many side)
+- }o--o{ : Many to Many (optional both sides)
+
+KEY DESIGN DECISIONS:
+
+1. **Single profiles table for all users**
+   - Role field differentiates patient/doctor/admin
+   - Reduces duplication and simplifies authentication
+   - Extended by patient_data and doctors tables
+
+2. **Optional report_id in appointments**
+   - Appointments can be booked without existing reports
+   - Allows patients to book consultations proactively
+   - ON DELETE SET NULL preserves appointment history
+
+3. **Optional appointment_id in reviews**
+   - Patients can review doctors even without formal appointments
+   - ON DELETE SET NULL preserves review history
+
+4. **JSONB for flexible data**
+   - ai_prediction: Stores complex AI output with probabilities
+   - metadata in audit_logs: Flexible logging structure
+
+5. **Soft reference in audit_logs**
+   - No foreign key constraint on user_id
+   - Allows logging of system actions and unauthenticated events
+
+================================================================================
+HOW TO USE THIS ERD
+================================================================================
+
+METHOD 1: ONLINE PLANTUML
+1. Go to: http://www.plantuml.com/plantuml/uml/
+2. Copy ONE of the three PlantUML codes above
+3. Paste into the text box
+4. Click "Submit"
+5. Download as PNG or SVG
+
+METHOD 2: VS CODE
+1. Install "PlantUML" extension
+2. Create file: erd_database.puml
+3. Paste one of the codes
+4. Press Alt+D to preview
+5. Export to PNG/SVG
+
+METHOD 3: DRAW.IO (For thesis-quality diagram)
+If PlantUML layout doesn't match your reference exactly:
+1. Go to: https://app.diagrams.net/
+2. Create new diagram
+3. Manually draw tables as rectangles
+4. Add column lists inside rectangles
+5. Draw relationship lines with cardinality labels
+6. Use the entity lists above as reference
+
+RECOMMENDED CODE TO USE:
+- Use "ALTERNATIVE PLANTUML CODE" for best results
+- Has explicit positioning hints to avoid arrow crossings
+- Most similar to your reference diagram layout
+
+================================================================================

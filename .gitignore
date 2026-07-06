@@ -1,0 +1,9 @@
+﻿.env
+*.zip
+HAM10000_images_part_1/
+HAM10000_images_part_2/
+dataverse_files/
+node_modules/
+__pycache__/
+.hypothesis/
+backend/.env

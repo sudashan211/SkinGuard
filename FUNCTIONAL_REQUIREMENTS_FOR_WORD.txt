@@ -1,0 +1,267 @@
+===============================================================================
+TABLE 4.1: FUNCTIONAL REQUIREMENTS OF SKINGUARD WEB APPLICATION
+===============================================================================
+
+SECTION 1: AUTHENTICATION & ACCOUNT MANAGEMENT
+-------------------------------------------------------------------------------
+
+UC001	Patient Login	Patient	
+This use case enables patients to access the system by authenticating with their email and password. The system validates credentials against the database and creates an authenticated session with JWT token.
+
+UC002	Hospital/Clinic Staff Login	Hospital Staff	
+This use case enables hospital/clinic staff (doctors/dermatologists) to access the system by authenticating with their credentials. Upon successful login, staff can access the hospital dashboard to review reports and manage appointments.
+
+UC003	Register Patient Account	Patient	
+This use case allows new users to create a patient account by providing email, password, full name, and role selection. The system validates email uniqueness, encrypts password using bcrypt, and stores user data in the database.
+
+UC004	Forgot Password	Patient/Hospital	
+If a user forgets their password, this use case enables them to request a password reset link via email. The system generates a secure JWT token, sends it via email, and allows the user to set a new password.
+
+UC005	Logout	Patient/Hospital	
+This use case allows users to terminate their authenticated session and clear JWT tokens from local storage.
+
+
+SECTION 2: PATIENT HEALTH PROFILE MANAGEMENT
+-------------------------------------------------------------------------------
+
+UC006	Create Health Profile	Patient	
+This use case allows patients to create their initial health profile by providing age (1-120 years), Fitzpatrick skin type (I-VI), and family history of skin conditions. The system validates input and stores data in the patient_data table.
+
+UC007	Update Health Profile	Patient	
+This use case enables patients to modify their existing health profile information. The system validates changes and updates the patient_data table with new information and timestamp.
+
+UC008	View Health Profile	Patient	
+This use case allows patients to view their current health profile including age, skin type, family history, and profile creation/update dates.
+
+
+SECTION 3: IMAGE UPLOAD & AI ANALYSIS
+-------------------------------------------------------------------------------
+
+UC009	Upload Skin Lesion Image	Patient	
+This use case allows patients to upload a photograph of their skin lesion. The system validates file type (JPEG/PNG), file size (max 10MB), and stores the image securely. The upload triggers the AI analysis pipeline automatically.
+
+UC010	Complete Symptom Wizard	Patient	
+This use case guides patients through a 3-step wizard to record symptoms:
+• Step 1: Select body location (arm, leg, face, torso, etc.)
+• Step 2: Select sensations (itching, pain, burning, numbness, tingling, none)
+• Step 3: Select visual changes (color, size, shape, border, texture, bleeding, none)
+• Optional: Enter symptom duration
+The system stores symptom data as JSONB in medical_reports table.
+
+UC011	Validate Image Quality	AI System	
+This automated use case checks uploaded images for minimum quality standards: resolution ≥300x300 pixels, blur score within acceptable range, brightness within acceptable range. If validation fails, the system rejects the image with specific error message.
+
+UC012	Validate Skin Content	AI System	
+This automated use case verifies that uploaded images contain skin lesions (not posters, text, or other objects). The system calculates skin-like pixel percentage using color analysis, detects text/graphics patterns using edge detection, and requires ≥25% skin content. If validation fails, system returns user-friendly error message.
+
+UC013	Detect Lesion Hotspots	AI System	
+This automated use case identifies and localizes skin lesions within the validated image using Swin Transformer object detection model. The system generates bounding boxes with confidence scores for detected lesions.
+
+UC014	Classify Cancer Type	AI System	
+This automated use case classifies the detected lesion into one of 7 cancer types using Vision Transformer (ViT) model: (1) Melanoma, (2) Basal Cell Carcinoma, (3) Actinic Keratoses, (4) Benign Keratosis-Like Lesions, (5) Dermatofibroma, (6) Vascular Lesions, (7) Melanocytic Nevi. The model provides probability scores for each type with 84% accuracy on HAM10000 dataset.
+
+UC015	Assess Risk Level	AI System	
+This automated use case categorizes the analysis into risk levels based on cancer probability: Low (<20% malignancy), Medium (20-50%), High (50-80%), Urgent (>80%). Risk level determines report priority for hospital staff.
+
+UC016	Generate Medical Report	AI System	
+This automated use case creates a structured medical report containing AI predictions with probabilities, risk level classification, lesion hotspot locations, symptom data, image with annotations, quality metrics, processing timestamps, and medical disclaimer. Report is stored in medical_reports table with unique ID.
+
+UC017	View Analysis Results	Patient	
+This use case displays the AI analysis results to the patient, including top prediction with confidence percentage, all 7 predictions with probability bars, risk level with color coding, disclaimer about AI screening vs clinical diagnosis, and recommendation to consult dermatologist.
+
+UC018	View Medical Report History	Patient	
+This use case allows patients to access all their past skin analysis reports. The system displays reports sorted by date (newest first) with filters for risk level. Patients can view full details or download reports as PDF.
+
+
+SECTION 4: HOSPITAL FINDER & APPOINTMENTS
+-------------------------------------------------------------------------------
+
+UC019	Find Nearby Hospitals	Patient	
+This use case enables patients to search for dermatology hospitals and clinics near their location. The system uses patient's GPS location or manual address input, searches via Google Maps Places API within 50km radius, implements 3-tier search strategy (dermatology specialists, dermatology clinics, general hospitals), returns up to 180 results, and sorts results by rating and distance.
+
+UC020	View Hospital Details	Patient	
+This use case displays detailed information about a selected hospital including hospital name and address, Google Maps rating and review count, distance from patient location, operating hours, and direct link to Google Maps for navigation.
+
+UC021	Calculate Distance	Google Maps API	
+This automated use case calculates the distance between patient location and each hospital using Haversine formula (GPS coordinates). Results are displayed in kilometers.
+
+UC022	Book Appointment	Patient	
+This use case allows patients to request appointments with hospitals for consultation. The patient selects a medical report to share, chooses preferred date and time, and adds optional notes. The system creates appointment record with status "pending" and sends notification to hospital. Patient identity remains hidden until hospital confirms.
+
+UC023	Manage Patient Appointments	Patient	
+This use case enables patients to view and manage all their appointments. Patients can view appointment list filtered by status (pending/confirmed/completed/cancelled), view details (hospital, date, time, status), cancel pending or confirmed appointments, and view consultation notes for completed appointments.
+
+
+SECTION 5: HOSPITAL DASHBOARD - REPORT REVIEW
+-------------------------------------------------------------------------------
+
+UC024	Manage Facility Profile	Hospital Staff	
+This use case allows hospital/clinic staff to update their facility information including hospital/clinic name, facility description, operating hours, contact information (phone, email, address), and specialties and services offered. The system validates input and updates the doctor_profile table.
+
+UC025	View Pending Reports	Hospital Staff	
+This use case displays all medical reports awaiting review, organized by patient. Reports are grouped by patient_id with collapsible sections, showing patient count and report count per patient, displaying "HAS URGENT CASES" badge for patients with urgent reports. All sections are collapsed by default. Privacy Protection: Patient names shown as "Unknown Patient" for reports without confirmed appointments.
+
+UC026	View Report Details	Hospital Staff	
+This use case displays full details of a selected medical report including patient name (if appointment confirmed), skin lesion image with hotspots, AI predictions with probabilities, risk level classification, symptom data (location, sensations, visual changes, duration), analysis timestamp, and quality metrics.
+
+UC027	Review Urgent Cases	Hospital Staff	
+This use case filters and displays only high-priority reports with risk level "urgent" or "high". Reports are sorted by risk level (urgent first) then date (newest first), enabling doctors to prioritize critical cases. Displays total count of urgent cases.
+
+
+SECTION 6: HOSPITAL DASHBOARD - APPOINTMENT MANAGEMENT
+-------------------------------------------------------------------------------
+
+UC028	View Appointment Requests	Hospital Staff	
+This use case displays all appointment requests with status breakdown: pending (awaiting confirmation), confirmed (scheduled consultations), and completed (past consultations). Shows patient name (hidden if pending), date, time, and report preview. Sorted by date (upcoming first).
+
+UC029	Confirm Appointment	Hospital Staff	
+This use case allows hospital staff to accept patient appointment requests. Staff can review appointment details and patient report, then click "Confirm" to accept. The system updates appointment status to "confirmed", unlocks patient identity and full medical history, sends confirmation email to patient, and enables doctor to view patient health profile.
+
+UC030	Reject/Cancel Appointment	Hospital Staff	
+This use case enables hospital staff to decline or cancel appointments. Staff can provide optional reason for cancellation. System updates appointment status to "cancelled" and sends cancellation email to patient via Email System.
+
+UC031	View Patient Health Profile	Hospital Staff	
+This use case allows doctors to access complete patient medical history (only after appointment confirmation) including patient demographics (name, age, email), Fitzpatrick skin type, family history of skin conditions, all past medical reports (last 10 analyses), and report details (date, location, risk level, AI predictions). Privacy Protection: Only accessible for patients with confirmed appointments.
+
+UC032	Mark Appointment Complete	Hospital Staff	
+This use case allows doctors to mark consultations as completed. Doctors can add optional consultation notes. System updates appointment status to "completed". Notes are visible to patient in their appointment history. Report moves from "pending" to "reviewed" status.
+
+
+SECTION 7: EXTERNAL SYSTEM INTEGRATIONS
+-------------------------------------------------------------------------------
+
+UC033	Search Hospitals via Google Maps	Google Maps API	
+This automated use case queries Google Maps Places API to find hospitals. Accepts patient location (latitude, longitude) and radius, searches for dermatology-related businesses, returns hospital data (name, address, rating, coordinates, place_id), supports pagination (up to 60 results per search), and filters results by rating and distance.
+
+UC034	Generate Navigation Link	Google Maps API	
+This automated use case creates direct navigation links by accepting hospital coordinates, generating deep link URL to Google Maps, opening in Google Maps app (mobile) or website (desktop), and providing turn-by-turn directions from patient location.
+
+UC035	Send Appointment Confirmation Email	Email System	
+This automated use case sends email notifications when appointments are confirmed. Recipient is patient email address with subject "Appointment Confirmed with [Hospital Name]" and content including hospital name, date, time, location, and preparation instructions. Triggered by hospital staff confirming appointment.
+
+UC036	Send Appointment Cancellation Email	Email System	
+This automated use case sends email notifications when appointments are cancelled. Recipient is patient email address with subject "Appointment Cancelled - [Hospital Name]" and content including cancellation reason (if provided), next steps, and rebooking instructions. Triggered by hospital or patient cancelling appointment.
+
+UC037	Send Password Reset Email	Email System	
+This automated use case sends secure password reset links. Triggered by "Forgot Password" action, contains time-limited JWT token (valid 1 hour), includes reset link to password change form, and verifies email ownership before allowing password reset.
+
+
+===============================================================================
+SUMMARY STATISTICS
+===============================================================================
+
+Total Use Cases: 37
+
+By Actor:
+- Patient: 13 use cases
+- Hospital/Clinic Staff: 9 use cases
+- AI System: 8 use cases (automated)
+- Google Maps API: 3 use cases (automated)
+- Email System: 3 use cases (automated)
+- Shared (Patient & Hospital): 1 use case (Login)
+
+Key Features:
+- 7 cancer type classification (Vision Transformer, 84% accuracy)
+- 4-level risk assessment (Low/Medium/High/Urgent)
+- 3-step symptom wizard (body location, sensations, visual changes)
+- Skin validation (≥25% threshold, rejects posters/text)
+- Google Maps integration (up to 180 hospital results)
+- Privacy-first design (patient identity hidden until appointment confirmed)
+- Smart triage (urgent cases prioritized automatically)
+- Email notifications (appointment confirmations/cancellations)
+
+Technology Stack:
+- Frontend: React (JavaScript)
+- Backend: FastAPI (Python)
+- Database: PostgreSQL
+- AI Model: Vision Transformer (Anwarkh1/Skin_Cancer-Image_Classification)
+- External APIs: Google Maps Places API, Email Service (SMTP)
+
+===============================================================================
+END OF TABLE 4.1
+===============================================================================
+
+
+===============================================================================
+HOW TO USE THIS IN MICROSOFT WORD
+===============================================================================
+
+METHOD 1: SIMPLE COPY-PASTE (BASIC FORMATTING)
+-------------------------------------------------------------------------------
+1. Select all text from this file (Ctrl+A)
+2. Copy (Ctrl+C)
+3. Open Microsoft Word
+4. Paste (Ctrl+V)
+5. Word will preserve the spacing and structure
+
+
+METHOD 2: CONVERT TO WORD TABLE (PROFESSIONAL)
+-------------------------------------------------------------------------------
+1. Copy the content section by section (e.g., "SECTION 1")
+2. In Word, select the pasted text
+3. Go to: Insert → Table → Convert Text to Table
+4. Set "Separate text at: Tabs"
+5. Click OK
+6. Format the table:
+   - Header row: Bold, shaded background
+   - Adjust column widths (ID: 10%, Use Case: 25%, Actor: 15%, Requirements: 50%)
+   - Add borders
+
+
+METHOD 3: CREATE TABLE MANUALLY (MOST CONTROL)
+-------------------------------------------------------------------------------
+1. In Word, go to: Insert → Table → Insert Table
+2. Create table with 4 columns: ID | Use Case Name | Actor | Functional Requirements
+3. Copy each section's data row by row
+4. Format:
+   - Header: Bold, centered, shaded (blue/gray)
+   - ID column: Centered
+   - Use Case Name: Bold
+   - Actor: Italics
+   - Functional Requirements: Justified text, single spacing
+
+
+RECOMMENDED TABLE STYLING FOR WORD
+-------------------------------------------------------------------------------
+
+Table Style: Grid Table 4 - Accent 1 (built-in Word style)
+
+Column Widths:
+- ID: 1.5 cm
+- Use Case Name: 5 cm
+- Actor: 3 cm
+- Functional Requirements: 10.5 cm (adjust to fit page)
+
+Font:
+- Header: Arial 11pt, Bold, White text on Blue background
+- Content: Arial 10pt, Regular
+- ID: Centered
+- Use Case Name: Left-aligned, Bold
+- Actor: Left-aligned, Italics
+- Requirements: Justified
+
+Borders: All borders visible (0.5pt black)
+
+Row Height: Auto (or minimum 1.5cm for readability)
+
+
+SECTION HEADERS (Between use case groups)
+-------------------------------------------------------------------------------
+Style: Heading 3
+Font: Arial 12pt, Bold, Blue color
+Spacing: 12pt before, 6pt after
+Example: "SECTION 1: AUTHENTICATION & ACCOUNT MANAGEMENT"
+
+
+TIPS FOR FORMATTING
+-------------------------------------------------------------------------------
+1. Use "Table Styles" in Word for quick professional formatting
+2. Set header row to repeat on each page (Table Tools → Layout → Repeat Header Rows)
+3. Keep related use cases together (avoid page breaks mid-section)
+4. Add page numbers and table caption: "Table 4.1: Functional Requirements"
+5. Use bullet points (•) for multi-step requirements
+6. Keep text concise - break long requirements into numbered lists
+7. Add a note below table referencing the use case diagram: "Refer to Figure 4.1 for Use Case Diagram"
+
+
+===============================================================================

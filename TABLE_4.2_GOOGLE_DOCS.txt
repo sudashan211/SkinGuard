@@ -1,0 +1,83 @@
+===============================================
+TABLE 4.2: ACTOR DESCRIPTION
+FOR GOOGLE DOCS - MANUAL TABLE CREATION
+===============================================
+
+HOW TO CREATE TABLE IN GOOGLE DOCS:
+1. Open Google Docs
+2. Go to: Insert → Table → Select 2 columns × 6 rows
+3. Copy each row below and paste into corresponding table cells
+4. Format header row (Row 1): Bold, Blue background, White text
+
+===============================================
+HEADER ROW (Row 1):
+===============================================
+
+Actor | Role
+
+===============================================
+DATA ROWS (Copy one row at a time):
+===============================================
+
+Patient | Registered users who can upload skin lesion images, complete symptom questionnaires, view AI analysis results, manage their health profile, search for nearby hospitals, and book appointments with dermatology clinics for consultation.
+
+Hospital/Clinic Staff | Dermatologists and medical staff who can review patient reports organized by urgency, access patient medical history (after appointment confirmation), confirm or reject appointment requests, and manage their facility profile information.
+
+Vision Transformer AI System (ViT) | An advanced deep learning model that validates uploaded images for skin content, detects and localizes skin lesions, classifies them into 7 cancer types (Melanoma, Basal Cell Carcinoma, Actinic Keratoses, Benign Keratosis, Dermatofibroma, Vascular Lesions, Melanocytic Nevi) with 84% accuracy, and assesses risk levels (low, medium, high, urgent) for clinical prioritization.
+
+Google Maps API | External mapping service that uses the patient's GPS location or manual address input to search for dermatology hospitals and general hospitals within a 50km radius, displays hospital ratings and distances, calculates navigation routes, and provides up to 180 nearby medical facilities sorted by rating and proximity.
+
+Email System (SMTP) | Automated notification service that sends appointment confirmation emails when hospitals accept patient requests, appointment cancellation notifications with reasons, password reset links with secure JWT tokens for account recovery, and other system notifications to patients and hospital staff.
+
+===============================================
+TOTAL: 5 Actors
+===============================================
+
+FORMATTING TIPS FOR GOOGLE DOCS:
+- Column 1 (Actor): Width 30%, Left-aligned, Bold
+- Column 2 (Role): Width 70%, Justified
+
+Header Row Formatting:
+- Background: Blue (#4285F4)
+- Text: White, Bold, Center-aligned
+- Border: All borders visible
+
+Data Rows:
+- Background: White
+- Text: Black, Regular font
+- Border: All borders visible
+- Row height: Adjust to fit content (text wrapping enabled)
+
+===============================================
+SHORTENED VERSION (If space limited):
+===============================================
+
+If you need shorter descriptions, use these instead:
+
+Patient | Users who upload skin images, view AI analysis, manage health profiles, find hospitals, and book appointments.
+
+Hospital/Clinic Staff | Medical professionals who review reports, confirm appointments, access patient history, and manage facility profiles.
+
+Vision Transformer AI (ViT) | Deep learning model that validates skin images, classifies 7 cancer types with 84% accuracy, and assesses risk levels.
+
+Google Maps API | Mapping service that searches nearby hospitals within 50km radius and provides navigation with ratings and distance.
+
+Email System (SMTP) | Notification service that sends appointment confirmations, cancellations, and password reset emails automatically.
+
+===============================================
+KEY CHANGES FROM OLD TABLE:
+===============================================
+
+REMOVED:
+- Admin (no admin role in current system)
+- "User" term (now specifically "Patient")
+
+ADDED:
+- Hospital/Clinic Staff (new actor - facility-based system)
+- Email System/SMTP (automated notifications)
+
+UPDATED:
+- "Pre-Trained Skin Cancer Module" → "Vision Transformer AI System"
+- Added specific details: 7 cancer types, 84% accuracy, 4 risk levels
+- Enhanced Google Maps details: 50km radius, 180 results, sorting
+- Privacy protection features in actor descriptions

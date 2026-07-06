@@ -1,0 +1,107 @@
+================================================================================
+UPDATED PARAGRAPH FOR TABLE DESCRIPTIONS
+================================================================================
+
+Original paragraph (Friend's thesis):
+------------------------------------
+Table 3.2 to Table 3.8 are detailed description of each table, which contains 
+the attribute, data type and description for table User, Admin, Diagnosis 
+Result, Hospital, Appointment Request, Query, Notification, Password Reset 
+Request and Skin Lesion Upload respectively.
+
+
+Updated paragraph (SkinGuard):
+------------------------------------
+Table 4.4.1 to Table 4.4.7 are detailed descriptions of each database table, 
+which contain the attribute, data type, and constraints for tables Profiles, 
+Patient Data, Doctors, Medical Reports, Appointments, Reviews, and Audit Logs 
+respectively.
+
+
+Alternative version (more descriptive):
+------------------------------------
+Table 4.4.1 to Table 4.4.7 present the normalized database schema for the 
+SkinGuard system. Each table description contains the attribute names, data 
+types, and constraint specifications for the seven core tables: Profiles (user 
+accounts), Patient Data (health information), Doctors (hospital staff 
+credentials), Medical Reports (AI analysis results), Appointments (scheduling 
+system), Reviews (doctor ratings), and Audit Logs (security trail) respectively.
+
+
+Short version (concise):
+------------------------------------
+Tables 4.4.1 to 4.4.7 describe the seven database tables with their attributes, 
+data types, and constraints: Profiles, Patient Data, Doctors, Medical Reports, 
+Appointments, Reviews, and Audit Logs.
+
+
+================================================================================
+KEY CHANGES FROM FRIEND'S SYSTEM TO YOURS
+================================================================================
+
+FRIEND'S TABLES (9 tables):
+1. User
+2. Admin
+3. Skin Lesion Upload
+4. Diagnosis Result
+5. Hospital
+6. Appointment Request
+7. Query
+8. Notification
+9. Password Reset Request
+
+YOUR TABLES (7 tables):
+1. Profiles (unified user accounts - replaces User + Admin)
+2. Patient Data (extends profiles for patient-specific data)
+3. Doctors (extends profiles for hospital staff - replaces Hospital)
+4. Medical Reports (combined image upload + AI results - replaces Skin Lesion Upload + Diagnosis Result)
+5. Appointments (replaces Appointment Request)
+6. Reviews (doctor ratings - NEW feature)
+7. Audit Logs (security compliance - replaces Query/Notification concept)
+
+REMOVED TABLES:
+❌ Query (support system not in scope)
+❌ Notification (handled by appointment status updates)
+❌ Password Reset Request (handled by authentication service)
+
+YOUR DATABASE IS MORE NORMALIZED AND EFFICIENT! ✅
+
+================================================================================
+RECOMMENDED VERSION TO USE
+================================================================================
+
+Use this one (balanced detail):
+
+Table 4.4.1 to Table 4.4.7 are detailed descriptions of each database table, 
+which contain the attribute, data type, and constraints for tables Profiles, 
+Patient Data, Doctors, Medical Reports, Appointments, Reviews, and Audit Logs 
+respectively.
+
+WHY THIS VERSION:
+✅ Matches your friend's sentence structure (easy adaptation)
+✅ Uses correct table numbers (4.4.1 to 4.4.7 for 7 tables)
+✅ Changed "description" to "constraints" (matches your table format)
+✅ Lists all 7 table names clearly
+✅ Professional and academic tone
+
+================================================================================
+PLACEMENT IN THESIS
+================================================================================
+
+This paragraph should appear BEFORE your table definitions section, probably 
+right after the ERD diagram and ERD description table.
+
+TYPICAL STRUCTURE:
+- Section 4.4: Database Design
+- Figure 4.X: Entity Relationship Diagram (ERD)
+- Table 4.X: ERD Table Descriptions (entity name + brief description)
+- [INSERT THIS PARAGRAPH HERE] ← Introduces the detailed tables
+- Table 4.4.1: Profiles Normalize Table (attribute, data type, constraints)
+- Table 4.4.2: Patient Data Normalize Table
+- Table 4.4.3: Doctors Normalize Table
+- Table 4.4.4: Medical Reports Normalize Table
+- Table 4.4.5: Appointments Normalize Table
+- Table 4.4.6: Reviews Normalize Table
+- Table 4.4.7: Audit Logs Normalize Table
+
+================================================================================

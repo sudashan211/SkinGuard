@@ -1,0 +1,955 @@
+================================================================================
+PACKAGE DIAGRAM - SKINGUARD SYSTEM
+================================================================================
+
+This package diagram shows the high-level architecture of the SkinGuard system,
+organized into packages representing different layers and functional modules.
+
+Based on your actual system architecture:
+- Frontend (React)
+- Backend (FastAPI)
+- Database (PostgreSQL)
+- External Services (AI, Maps, Email)
+
+Generate at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+PLANTUML CODE - COMPLETE PACKAGE DIAGRAM
+================================================================================
+
+@startuml
+title Complete Package Diagram - SkinGuard System
+
+skinparam packageStyle rectangle
+skinparam package {
+    BackgroundColor LightBlue
+    BorderColor Black
+    FontSize 11
+}
+
+skinparam component {
+    BackgroundColor White
+    BorderColor Black
+    FontSize 10
+}
+
+' ============================================================================
+' TOP LAYER: PRESENTATION LAYER (FRONTEND)
+' ============================================================================
+
+package "Presentation Layer (Frontend)" {
+    
+    package "User Interface" {
+        component "Authentication Pages" as AuthUI
+        component "Patient Dashboard" as PatientUI
+        component "Hospital Staff Dashboard" as StaffUI
+    }
+    
+    package "Core Features" {
+        component "Image Upload & Capture" as UploadUI
+        component "Symptom Wizard" as SymptomUI
+        component "Analysis Results Display" as ResultsUI
+    }
+    
+    package "Hospital Features" {
+        component "Hospital Search & Map" as SearchUI
+        component "Appointment Booking" as BookingUI
+        component "Report Review Interface" as ReviewUI
+    }
+    
+    package "State Management" {
+        component "Redux Store" as Redux
+        component "API Client (Axios)" as APIClient
+    }
+}
+
+' ============================================================================
+' MIDDLE LAYER: APPLICATION LAYER (BACKEND)
+' ============================================================================
+
+package "Application Layer (Backend)" {
+    
+    package "API Endpoints" {
+        component "Authentication API" as AuthAPI
+        component "Patient API" as PatientAPI
+        component "Analysis API" as AnalysisAPI
+        component "Appointment API" as AppointmentAPI
+        component "Hospital API" as HospitalAPI
+    }
+    
+    package "Business Logic" {
+        component "User Management" as UserMgmt
+        component "Image Validation (NSFW)" as ImageVal
+        component "AI Analysis Service" as AIService
+        component "Risk Assessment" as RiskCalc
+        component "Appointment Manager" as ApptMgr
+    }
+    
+    package "External Integration" {
+        component "Vision Transformer Client" as ViTClient
+        component "Google Maps Client" as MapsClient
+        component "Email Service (SMTP)" as EmailSvc
+    }
+    
+    package "Security & Logging" {
+        component "JWT Authentication" as JWT
+        component "Privacy Protection" as Privacy
+        component "Audit Logger" as AuditLog
+    }
+}
+
+' ============================================================================
+' BOTTOM LAYER: DATA LAYER (DATABASE)
+' ============================================================================
+
+package "Data Layer (PostgreSQL)" {
+    
+    package "User Data" {
+        component "profiles" as ProfileDB
+        component "patient_data" as PatientDB
+        component "doctors" as DoctorDB
+    }
+    
+    package "Analysis Data" {
+        component "medical_reports" as ReportDB
+        component "symptom_responses" as SymptomDB
+        component "image_storage" as ImageDB
+    }
+    
+    package "Appointment Data" {
+        component "appointments" as ApptDB
+        component "hospitals" as HospitalDB
+        component "reviews" as ReviewDB
+    }
+    
+    package "System Data" {
+        component "audit_logs" as LogDB
+        component "email_queue" as EmailDB
+    }
+}
+
+' ============================================================================
+' EXTERNAL SERVICES LAYER
+' ============================================================================
+
+package "External Services" {
+    component "Vision Transformer AI\n(Hugging Face)" as ViTAI
+    component "Google Maps API\n(Places & Directions)" as GoogleMaps
+    component "SMTP Server\n(Email Delivery)" as SMTP
+}
+
+' ============================================================================
+' RELATIONSHIPS BETWEEN LAYERS
+' ============================================================================
+
+' Frontend to Backend API connections
+AuthUI --> AuthAPI
+PatientUI --> PatientAPI
+UploadUI --> AnalysisAPI
+SymptomUI --> AnalysisAPI
+ResultsUI --> AnalysisAPI
+SearchUI --> HospitalAPI
+BookingUI --> AppointmentAPI
+ReviewUI --> AppointmentAPI
+StaffUI --> AppointmentAPI
+
+Redux --> APIClient
+APIClient --> AuthAPI
+APIClient --> AnalysisAPI
+APIClient --> AppointmentAPI
+
+' Backend API to Business Logic
+AuthAPI --> UserMgmt
+AuthAPI --> JWT
+PatientAPI --> UserMgmt
+AnalysisAPI --> ImageVal
+AnalysisAPI --> AIService
+AnalysisAPI --> RiskCalc
+AppointmentAPI --> ApptMgr
+AppointmentAPI --> Privacy
+HospitalAPI --> MapsClient
+
+' Business Logic to External Services
+AIService --> ViTClient
+MapsClient --> GoogleMaps
+EmailSvc --> SMTP
+ViTClient --> ViTAI
+
+' Business Logic to Database
+UserMgmt --> ProfileDB
+UserMgmt --> PatientDB
+UserMgmt --> DoctorDB
+ImageVal --> ImageDB
+AIService --> ReportDB
+AIService --> ImageDB
+RiskCalc --> ReportDB
+ApptMgr --> ApptDB
+ApptMgr --> HospitalDB
+ApptMgr --> ReportDB
+EmailSvc --> EmailDB
+AuditLog --> LogDB
+Privacy --> LogDB
+
+' Cross-cutting concerns
+JWT ..> AuthAPI : secures
+Privacy ..> ApptMgr : enforces
+AuditLog ..> UserMgmt : logs
+AuditLog ..> ApptMgr : logs
+
+' Notes
+note top of "Presentation Layer (Frontend)"
+  Technology: React + Redux
+  Port: 3000
+  Communication: REST API (Axios)
+end note
+
+note top of "Application Layer (Backend)"
+  Technology: FastAPI (Python)
+  Port: 8001
+  Authentication: JWT tokens
+end note
+
+note top of "Data Layer (PostgreSQL)"
+  Database: PostgreSQL
+  ORM: SQLAlchemy
+  Schema: 8 tables with foreign keys
+end note
+
+note top of "External Services"
+  - ViT AI: 84% accuracy, 7 cancer types
+  - Google Maps: 50km radius, 180 results
+  - SMTP: Confirmation/rejection emails
+end note
+
+@enduml
+
+================================================================================
+ALTERNATIVE VERSION - SIMPLIFIED PACKAGE DIAGRAM
+================================================================================
+
+For a cleaner view with fewer packages:
+
+@startuml
+title Package Diagram - SkinGuard System (Simplified)
+
+skinparam packageStyle rectangle
+
+package "Frontend (React)" {
+    [User Interface]
+    [Image Upload]
+    [Symptom Wizard]
+    [Hospital Search]
+    [Appointment Booking]
+}
+
+package "Backend (FastAPI)" {
+    [Authentication]
+    [Image Validation]
+    [AI Analysis]
+    [Risk Assessment]
+    [Appointment Manager]
+    [Email Service]
+}
+
+package "Database (PostgreSQL)" {
+    [User Accounts]
+    [Medical Reports]
+    [Appointments]
+    [Audit Logs]
+}
+
+package "External Services" {
+    [Vision Transformer AI]
+    [Google Maps API]
+    [SMTP Server]
+}
+
+[User Interface] --> [Authentication]
+[Image Upload] --> [Image Validation]
+[Symptom Wizard] --> [AI Analysis]
+[Hospital Search] --> [Google Maps API]
+[Appointment Booking] --> [Appointment Manager]
+
+[Authentication] --> [User Accounts]
+[Image Validation] --> [Medical Reports]
+[AI Analysis] --> [Vision Transformer AI]
+[AI Analysis] --> [Medical Reports]
+[Risk Assessment] --> [Medical Reports]
+[Appointment Manager] --> [Appointments]
+[Appointment Manager] --> [Email Service]
+[Email Service] --> [SMTP Server]
+[Email Service] --> [Audit Logs]
+
+@enduml
+
+================================================================================
+ALTERNATIVE VERSION - LAYERED ARCHITECTURE STYLE
+================================================================================
+
+For showing clear architectural layers:
+
+@startuml
+title Package Diagram - SkinGuard Layered Architecture
+
+skinparam packageStyle rectangle
+
+rectangle "Client Layer" {
+    package "Web Browser" {
+        [React Application]
+        [Redux State Store]
+    }
+}
+
+rectangle "Application Layer" {
+    package "API Gateway" {
+        [REST API Endpoints]
+        [JWT Authentication]
+    }
+    
+    package "Business Services" {
+        [User Service]
+        [Analysis Service]
+        [Appointment Service]
+        [Notification Service]
+    }
+    
+    package "Core Functions" {
+        [NSFW Filter (25% threshold)]
+        [AI Classification (ViT)]
+        [Risk Stratification]
+        [Privacy Protection]
+    }
+}
+
+rectangle "Data Layer" {
+    package "Database" {
+        [User Data Store]
+        [Medical Reports Store]
+        [Appointment Store]
+        [Audit Log Store]
+    }
+}
+
+rectangle "External Integration Layer" {
+    package "Third-Party Services" {
+        [Hugging Face (ViT AI)]
+        [Google Maps API]
+        [SMTP Email Server]
+    }
+}
+
+[React Application] --> [REST API Endpoints] : HTTPS/JSON
+[REST API Endpoints] --> [Business Services]
+[Business Services] --> [Core Functions]
+[Core Functions] --> [Database]
+[Business Services] --> [Third-Party Services]
+
+@enduml
+
+================================================================================
+PACKAGE DESCRIPTIONS FOR THESIS
+================================================================================
+
+Use these descriptions in your thesis after presenting the package diagram:
+
+PRESENTATION LAYER (FRONTEND):
+The Presentation Layer consists of the React-based user interface organized
+into three main packages: User Interface (authentication pages, dashboards),
+Core Features (image upload, symptom wizard, results display), and Hospital
+Features (search, booking, review interface). The State Management package
+handles Redux store and API client communication with the backend.
+
+APPLICATION LAYER (BACKEND):
+The Application Layer implements business logic through FastAPI, organized
+into five packages: API Endpoints (RESTful routes), Business Logic (user
+management, image validation with NSFW filter, AI analysis, risk assessment),
+External Integration (Vision Transformer client, Google Maps client, email
+service), and Security & Logging (JWT authentication, privacy protection,
+audit logging). This layer enforces the 25% skin content threshold, performs
+AI classification with 84% accuracy, and manages appointment workflows with
+privacy-by-design principles.
+
+DATA LAYER (DATABASE):
+The Data Layer uses PostgreSQL with eight normalized tables organized into
+four packages: User Data (profiles, patient_data, doctors), Analysis Data
+(medical_reports, symptom_responses, image_storage), Appointment Data
+(appointments, hospitals, reviews), and System Data (audit_logs, email_queue).
+This structure ensures data integrity through foreign key constraints and
+supports HIPAA/GDPR compliance through comprehensive audit trails.
+
+EXTERNAL SERVICES LAYER:
+The External Services Layer integrates three critical third-party systems:
+Vision Transformer AI from Hugging Face (skin cancer classification into
+seven types with confidence scores), Google Maps API (hospital search within
+50km radius, up to 180 results sorted by rating and distance), and SMTP
+Server (email delivery for appointment confirmations, rejections, and
+reminders). These services are abstracted through client components in the
+Application Layer to ensure loose coupling and testability.
+
+ARCHITECTURAL PATTERNS:
+The package diagram demonstrates a three-tier architecture pattern with clear
+separation of concerns. The Frontend communicates with Backend exclusively
+through REST API endpoints using JWT tokens for authentication. The Backend
+encapsulates business logic and coordinates between Database and External
+Services. Cross-cutting concerns (authentication, privacy, audit logging)
+are implemented as separate packages that interact with multiple layers,
+ensuring consistent enforcement of security and compliance requirements
+throughout the system.
+
+================================================================================
+USAGE IN THESIS
+================================================================================
+
+CHAPTER 2 or 3: SYSTEM ARCHITECTURE
+Section: 2.1 Complete Package Diagram
+
+Figure 2.1 illustrates the complete package diagram of the SkinGuard system,
+showing the architectural organization into four main layers: Presentation
+Layer (React frontend), Application Layer (FastAPI backend), Data Layer
+(PostgreSQL database), and External Services Layer (AI, Maps, Email). Each
+layer is further decomposed into packages representing specific functional
+modules and their dependencies.
+
+[INSERT PACKAGE DIAGRAM HERE]
+
+[INSERT PACKAGE DESCRIPTIONS FROM ABOVE]
+
+The package structure ensures:
+- Separation of Concerns: Clear boundaries between UI, business logic, and data
+- Modularity: Each package has well-defined responsibilities
+- Scalability: Independent packages can be scaled horizontally
+- Maintainability: Changes to one package have minimal impact on others
+- Testability: Packages can be tested in isolation with mock dependencies
+
+This architecture supports the system's key requirements: real-time AI
+analysis (Application Layer → External Services), privacy protection
+(Privacy package enforces anonymization), and regulatory compliance
+(Audit Logger tracks all data access for HIPAA/GDPR).
+
+================================================================================
+KEY DIFFERENCES FROM YOUR REFERENCE DIAGRAM
+================================================================================
+
+YOUR REFERENCE (Old system):
+- User Model (Login, Session, User Profile)
+- User Registration Module (Registration form, Controller, Model)
+- User Account Module (Wallet, User info)
+- User Detection Module (Upload image, Detection, Model)
+
+SKINGUARD (Your new system):
+✅ THREE-TIER ARCHITECTURE: Frontend, Backend, Database (more professional)
+✅ EXTERNAL SERVICES: AI, Maps, Email (modern microservices approach)
+✅ SECURITY LAYER: JWT, Privacy, Audit (compliance-focused)
+✅ APPOINTMENT SYSTEM: Full booking workflow with hospital integration
+✅ ADVANCED AI: NSFW filter + ViT classification (not just simple detection)
+✅ PRIVACY-BY-DESIGN: Anonymous review → Reveal on confirmation
+✅ SCALABLE: Each layer can be deployed independently
+
+YOUR SYSTEM IS MORE SOPHISTICATED! 🎓
+
+================================================================================
+FILES CREATED
+================================================================================
+
+✅ PACKAGE_DIAGRAM.txt - This file with 3 PlantUML versions
+
+Choose the version that best fits your thesis style:
+1. COMPLETE VERSION - Most detailed, shows all packages
+2. SIMPLIFIED VERSION - Cleaner, fewer packages
+3. LAYERED VERSION - Shows architectural layers clearly
+
+ALL READY FOR YOUR THESIS! 🎓
+
+
+
+================================================================================
+PACKAGE DIAGRAM - USER REGISTRATION MODULE (P001)
+================================================================================
+
+This is a detailed package diagram for the User Registration Module following
+the MVC (Model-View-Controller) pattern, matching your reference diagram format.
+
+For SkinGuard system: Patient and Hospital Staff registration (no Admin)
+
+================================================================================
+PLANTUML CODE - USER REGISTRATION MODULE
+================================================================================
+
+@startuml
+title Package Diagram: User Registration Module (P001)
+
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+package "User Registration Module" {
+    
+    package "View" {
+        component "+ Patient Registration Page" as PatientRegView
+        component "+ Patient Login Page" as PatientLoginView
+        component "+ Hospital Staff Registration Page" as StaffRegView
+        component "+ Hospital Staff Login Page" as StaffLoginView
+        component "+ Forgot Password Page" as ForgotPwdView
+        component "+ Email Verification Page" as VerifyEmailView
+    }
+    
+    package "Controller" {
+        component "+ Patient Auth Controller" as PatientController
+        component "+ Hospital Staff Auth Controller" as StaffController
+        component "+ Password Reset Controller" as PasswordController
+        component "+ Email Verification Controller" as EmailController
+    }
+    
+    package "Model" {
+        component "+ User Profile Model" as UserModel
+        component "+ Patient Data Model" as PatientModel
+        component "+ Hospital Staff Model" as StaffModel
+        component "+ JWT Token Model" as TokenModel
+    }
+}
+
+' Dependencies
+PatientRegView ..> PatientController : uses
+PatientLoginView ..> PatientController : uses
+StaffRegView ..> StaffController : uses
+StaffLoginView ..> StaffController : uses
+ForgotPwdView ..> PasswordController : uses
+VerifyEmailView ..> EmailController : uses
+
+PatientController ..> UserModel : manages
+PatientController ..> PatientModel : creates
+PatientController ..> TokenModel : generates
+StaffController ..> UserModel : manages
+StaffController ..> StaffModel : creates
+StaffController ..> TokenModel : generates
+PasswordController ..> UserModel : updates
+EmailController ..> UserModel : verifies
+
+note right of "User Registration Module"
+  Handles authentication for:
+  - Patients (skin cancer screening)
+  - Hospital/Clinic Staff (report review)
+  
+  Features:
+  - Email + Password registration
+  - JWT token authentication
+  - Email verification
+  - Password reset via email
+  - Role-based access control
+end note
+
+@enduml
+
+================================================================================
+ALTERNATIVE VERSION - WITH DATABASE CONNECTION
+================================================================================
+
+Shows the database layer connection:
+
+@startuml
+title Package Diagram: User Registration Module with Database (P001)
+
+skinparam packageStyle rectangle
+
+package "User Registration Module" {
+    
+    package "View (Frontend - React)" {
+        [Patient Registration Page]
+        [Patient Login Page]
+        [Hospital Staff Registration Page]
+        [Hospital Staff Login Page]
+        [Forgot Password Page]
+        [Email Verification Page]
+    }
+    
+    package "Controller (Backend - FastAPI)" {
+        [Patient Auth Controller]
+        [Hospital Staff Auth Controller]
+        [Password Reset Controller]
+        [Email Verification Controller]
+        [JWT Token Generator]
+    }
+    
+    package "Model (Database - PostgreSQL)" {
+        [profiles table]
+        [patient_data table]
+        [doctors table]
+        [audit_logs table]
+    }
+    
+    package "External Services" {
+        [SMTP Email Server]
+    }
+}
+
+' View to Controller
+[Patient Registration Page] --> [Patient Auth Controller]
+[Patient Login Page] --> [Patient Auth Controller]
+[Hospital Staff Registration Page] --> [Hospital Staff Auth Controller]
+[Hospital Staff Login Page] --> [Hospital Staff Auth Controller]
+[Forgot Password Page] --> [Password Reset Controller]
+[Email Verification Page] --> [Email Verification Controller]
+
+' Controller to Model
+[Patient Auth Controller] --> [profiles table]
+[Patient Auth Controller] --> [patient_data table]
+[Patient Auth Controller] --> [JWT Token Generator]
+[Hospital Staff Auth Controller] --> [profiles table]
+[Hospital Staff Auth Controller] --> [doctors table]
+[Hospital Staff Auth Controller] --> [JWT Token Generator]
+[Password Reset Controller] --> [profiles table]
+[Email Verification Controller] --> [profiles table]
+
+' Controller to External Services
+[Email Verification Controller] --> [SMTP Email Server]
+[Password Reset Controller] --> [SMTP Email Server]
+
+' All controllers log to audit
+[Patient Auth Controller] --> [audit_logs table]
+[Hospital Staff Auth Controller] --> [audit_logs table]
+[Password Reset Controller] --> [audit_logs table]
+
+@enduml
+
+================================================================================
+SIMPLIFIED VERSION - MATCHING YOUR REFERENCE EXACTLY
+================================================================================
+
+Minimal version matching your reference diagram format exactly:
+
+@startuml
+title Package Diagram: User Registration Module (P001)
+
+skinparam packageStyle rectangle
+
+package "User Registration Module" <<Rectangle>> {
+    
+    package "View" <<Rectangle>> {
+        component "+ Patient Login Page"
+        component "+ Patient Register Page"
+        component "+ Hospital Staff Login Page"
+        component "+ Hospital Staff Register Page"
+        component "+ Forgot Password Page"
+    }
+    
+    package "Controller" <<Rectangle>> {
+        component "+ Patient Controller"
+        component "+ Hospital Staff Controller"
+        component "+ Password Controller"
+    }
+    
+    package "Model" <<Rectangle>> {
+        component "+ User"
+        component "+ Patient"
+        component "+ Hospital Staff"
+    }
+}
+
+@enduml
+
+================================================================================
+EXPANDED VERSION - SHOWING ALL REGISTRATION FEATURES
+================================================================================
+
+Complete version showing all authentication features:
+
+@startuml
+title Package Diagram: User Registration & Authentication Module (P001)
+
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+package "User Registration & Authentication Module" {
+    
+    package "View Layer (React Components)" {
+        component "Registration Forms" as RegForms {
+            + Patient Registration Form
+            + Hospital Staff Registration Form
+            + Email/Password Validation
+            + Terms & Conditions Display
+        }
+        
+        component "Login Forms" as LoginForms {
+            + Patient Login Form
+            + Hospital Staff Login Form
+            + Remember Me Option
+            + Show/Hide Password
+        }
+        
+        component "Password Management" as PwdForms {
+            + Forgot Password Form
+            + Reset Password Form
+            + Change Password Form
+        }
+        
+        component "Email Verification" as EmailForms {
+            + Verification Pending Page
+            + Verification Success Page
+            + Resend Verification Email
+        }
+    }
+    
+    package "Controller Layer (FastAPI Endpoints)" {
+        component "Authentication Controller" as AuthCtrl {
+            + POST /auth/register
+            + POST /auth/login
+            + POST /auth/logout
+            + POST /auth/refresh-token
+            + GET /auth/verify-email
+        }
+        
+        component "Password Controller" as PwdCtrl {
+            + POST /auth/forgot-password
+            + POST /auth/reset-password
+            + PUT /auth/change-password
+        }
+        
+        component "Profile Controller" as ProfileCtrl {
+            + GET /users/profile
+            + PUT /users/profile
+            + POST /patients/profile
+            + POST /staff/profile
+        }
+    }
+    
+    package "Business Logic Layer" {
+        component "User Service" as UserSvc {
+            + register_patient()
+            + register_staff()
+            + login_user()
+            + verify_email()
+            + generate_jwt_token()
+        }
+        
+        component "Password Service" as PwdSvc {
+            + hash_password()
+            + verify_password()
+            + generate_reset_token()
+            + validate_token_expiry()
+        }
+        
+        component "Email Service" as EmailSvc {
+            + send_verification_email()
+            + send_password_reset_email()
+            + send_welcome_email()
+        }
+    }
+    
+    package "Model Layer (Database Tables)" {
+        component "profiles" as ProfileModel {
+            - id: UUID
+            - email: VARCHAR(255)
+            - password_hash: VARCHAR(255)
+            - role: ENUM
+            - verified: BOOLEAN
+        }
+        
+        component "patient_data" as PatientModel {
+            - id: UUID
+            - user_id: UUID (FK)
+            - age: INTEGER
+            - skin_type: VARCHAR(5)
+        }
+        
+        component "doctors" as StaffModel {
+            - id: UUID
+            - user_id: UUID (FK)
+            - license_no: VARCHAR(100)
+            - clinic_name: VARCHAR(200)
+        }
+        
+        component "audit_logs" as AuditModel {
+            - id: UUID
+            - user_id: UUID
+            - action: VARCHAR(100)
+            - timestamp: DATETIME
+        }
+    }
+    
+    package "Security Layer" {
+        component "JWT Handler" as JWT {
+            + generate_access_token()
+            + generate_refresh_token()
+            + verify_token()
+            + decode_token()
+        }
+        
+        component "Password Hasher" as Hasher {
+            + hash_password(bcrypt)
+            + verify_password()
+        }
+        
+        component "Input Validator" as Validator {
+            + validate_email_format()
+            + validate_password_strength()
+            + sanitize_input()
+        }
+    }
+}
+
+' View to Controller connections
+RegForms --> AuthCtrl
+LoginForms --> AuthCtrl
+PwdForms --> PwdCtrl
+EmailForms --> AuthCtrl
+
+' Controller to Business Logic
+AuthCtrl --> UserSvc
+AuthCtrl --> EmailSvc
+PwdCtrl --> PwdSvc
+PwdCtrl --> EmailSvc
+ProfileCtrl --> UserSvc
+
+' Business Logic to Model
+UserSvc --> ProfileModel
+UserSvc --> PatientModel
+UserSvc --> StaffModel
+UserSvc --> AuditModel
+PwdSvc --> ProfileModel
+EmailSvc --> AuditModel
+
+' Business Logic to Security
+UserSvc --> JWT
+UserSvc --> Hasher
+UserSvc --> Validator
+PwdSvc --> Hasher
+AuthCtrl --> JWT
+
+@enduml
+
+================================================================================
+DESCRIPTION FOR THESIS (MATCHING YOUR REFERENCE)
+================================================================================
+
+This package diagram describes the registration, login, and password reset
+functions for patients and hospital staff. In the package diagram, the Model
+includes User Profile, Patient Data, and Hospital Staff classes. View consists
+of the patient registration page, patient login page, hospital staff
+registration page, hospital staff login page, forgot password page, and email
+verification page. For controllers, the Patient Authentication Controller,
+Hospital Staff Authentication Controller, Password Reset Controller, and Email
+Verification Controller are included.
+
+The User Registration Module implements the MVC (Model-View-Controller)
+architectural pattern to separate concerns and improve maintainability. The
+View layer handles user interface components built with React, including
+registration forms with email/password validation, login forms with JWT token
+handling, password recovery workflow, and email verification pages. The
+Controller layer provides RESTful API endpoints through FastAPI for user
+registration (POST /auth/register), authentication (POST /auth/login), token
+refresh (POST /auth/refresh-token), password reset, and email verification.
+The Model layer manages data persistence through PostgreSQL tables (profiles,
+patient_data, doctors, audit_logs) and enforces business rules such as
+password strength requirements (minimum 8 characters, uppercase, lowercase,
+digit), unique email addresses, and email verification before full system
+access.
+
+The module integrates with external SMTP services for sending verification
+emails and password reset tokens, implements JWT (JSON Web Tokens) for
+stateless authentication with 30-minute access tokens and 7-day refresh
+tokens, uses bcrypt for secure password hashing, and logs all authentication
+events to audit_logs table for HIPAA/GDPR compliance. Role-based access
+control is enforced through the profiles.role field, differentiating between
+'patient' (can upload images, book appointments) and 'doctor' (can review
+reports, confirm appointments) roles, with no admin role in the current system.
+
+================================================================================
+COMPARISON: OLD vs NEW
+================================================================================
+
+YOUR REFERENCE (Old System):
+┌────────────────────────────────┐
+│  User Registration Module      │
+├────────────────────────────────┤
+│ View:                          │
+│ - User Login Page              │
+│ - User Register Page           │
+│ - Admin Login Page             │
+│ - Forgot Password Page         │
+│                                │
+│ Controller:                    │
+│ - User Controller              │
+│ - Admin Controller             │
+│                                │
+│ Model:                         │
+│ - User                         │
+│ - Admin                        │
+└────────────────────────────────┘
+
+SKINGUARD (New System):
+┌────────────────────────────────┐
+│  User Registration Module      │
+├────────────────────────────────┤
+│ View:                          │
+│ - Patient Login Page           │
+│ - Patient Register Page        │
+│ - Hospital Staff Login Page    │
+│ - Hospital Staff Register Page │
+│ - Forgot Password Page         │
+│ - Email Verification Page      │✨ NEW
+│                                │
+│ Controller:                    │
+│ - Patient Controller           │
+│ - Hospital Staff Controller    │
+│ - Password Controller          │✨ NEW
+│ - Email Verification Controller│✨ NEW
+│                                │
+│ Model:                         │
+│ - User Profile (all users)     │
+│ - Patient Data                 │
+│ - Hospital Staff               │
+│ - JWT Token                    │✨ NEW
+└────────────────────────────────┘
+
+KEY IMPROVEMENTS:
+✅ Replaced "User/Admin" with "Patient/Hospital Staff" (role-specific)
+✅ Added Email Verification (security requirement)
+✅ Added JWT Token handling (modern authentication)
+✅ Separated Password Controller (better organization)
+✅ Integrated with external SMTP (email functionality)
+✅ Added audit logging (HIPAA/GDPR compliance)
+✅ No Admin role (system is patient and staff focused)
+
+================================================================================
+USAGE IN THESIS
+================================================================================
+
+CHAPTER 2: SYSTEM DESIGN
+Section: 2.2.1.1 P001: Package <User Registration Module>
+
+This package diagram describes the registration, login, and password reset
+functions for patients and hospital staff. In the package diagram, the Model
+includes User Profile, Patient Data, and Hospital Staff classes. View consists
+of the patient registration page, patient login page, hospital staff
+registration page, hospital staff login page, forgot password page, and email
+verification page. For controllers, the Patient Authentication Controller,
+Hospital Staff Authentication Controller, Password Reset Controller, and Email
+Verification Controller are included.
+
+[INSERT PACKAGE DIAGRAM HERE - USE SIMPLIFIED VERSION FOR CLARITY]
+
+[Optional: Add expanded description from "DESCRIPTION FOR THESIS" section above]
+
+The User Registration Module follows the MVC pattern to ensure separation of
+concerns and maintainability, with Views handling user interfaces in React,
+Controllers managing business logic through FastAPI endpoints, and Models
+representing database entities in PostgreSQL. Security features include JWT
+authentication, bcrypt password hashing, email verification, and comprehensive
+audit logging for regulatory compliance.
+
+================================================================================
+WHICH VERSION TO USE?
+================================================================================
+
+FOR THESIS CHAPTER 2 (matching your reference):
+→ Use "SIMPLIFIED VERSION" - Clearest and most similar to your reference
+
+FOR DETAILED DOCUMENTATION:
+→ Use "EXPANDED VERSION" - Shows all components and relationships
+
+FOR TECHNICAL PRESENTATION:
+→ Use "ALTERNATIVE VERSION WITH DATABASE" - Shows full stack
+
+RECOMMENDATION: Use SIMPLIFIED VERSION in main thesis, include EXPANDED
+VERSION in appendix for technical details.
+
+================================================================================

@@ -1,0 +1,277 @@
+{
+  "common": {
+    "appName": "SkinGuard",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "role": "Role",
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "admin": "Admin",
+    "loginButton": "Log In",
+    "signupButton": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "forgotPassword": "Forgot password?"
+  },
+  "landing": {
+    "hero": {
+      "title": "AI-Powered Skin Cancer Screening",
+      "subtitle": "Get instant AI analysis of skin lesions and connect with verified dermatologists",
+      "cta": "Get Started"
+    },
+    "features": {
+      "aiScreening": {
+        "title": "AI Screening",
+        "description": "Advanced AI analyzes your skin lesions with 94% accuracy"
+      },
+      "findDoctors": {
+        "title": "Find Doctors",
+        "description": "Connect with verified dermatologists near you"
+      },
+      "secureHistory": {
+        "title": "Secure History",
+        "description": "Track your skin health over time with encrypted storage"
+      }
+    }
+  },
+  "patient": {
+    "dashboard": "Patient Dashboard",
+    "uploadImage": "Upload Image",
+    "dragDropImage": "Drag and drop an image here, or click to select",
+    "takePhoto": "Take Photo",
+    "selectFile": "Select File",
+    "analyzing": "Analyzing...",
+    "results": "Results",
+    "reportHistory": "Report History",
+    "viewReport": "View Report",
+    "compareReports": "Compare Reports",
+    "findDoctor": "Find Doctor",
+    "bookAppointment": "Book Appointment",
+    "myAppointments": "My Appointments",
+    "healthProfile": "Health Profile",
+    "age": "Age",
+    "skinType": "Skin Type",
+    "familyHistory": "Family History"
+  },
+  "symptomWizard": {
+    "title": "Symptom Information",
+    "step1": {
+      "title": "Lesion Location",
+      "description": "Where is the lesion located on your body?",
+      "bodyLocation": "Body Location"
+    },
+    "step2": {
+      "title": "Sensations",
+      "description": "What sensations do you experience?",
+      "itching": "Itching",
+      "pain": "Pain",
+      "burning": "Burning",
+      "numbness": "Numbness",
+      "none": "None"
+    },
+    "step3": {
+      "title": "Visual Changes",
+      "description": "What changes have you noticed?",
+      "color": "Color change",
+      "size": "Size increase",
+      "shape": "Shape change",
+      "border": "Border irregularity",
+      "none": "None"
+    }
+  },
+  "results": {
+    "title": "Analysis Results",
+    "riskLevel": "Risk Level",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent",
+    "predictions": "Cancer Type Predictions",
+    "probability": "Probability",
+    "disclaimer": "This is a 94% probability estimate. Please consult verified doctors for clinical biopsy",
+    "urgentWarning": "High-risk lesion detected. Please seek immediate medical attention.",
+    "emergencyConsultation": "Emergency Consultation",
+    "detectedLesions": "Detected Lesions",
+    "processingTime": "Processing Time"
+  },
+  "cancerTypes": {
+    "melanoma": "Melanoma",
+    "basalCellCarcinoma": "Basal Cell Carcinoma",
+    "squamousCellCarcinoma": "Squamous Cell Carcinoma",
+    "actinticKeratosis": "Actinic Keratosis",
+    "benignKeratosis": "Benign Keratosis",
+    "dermatofibroma": "Dermatofibroma",
+    "vascularLesion": "Vascular Lesion"
+  },
+  "doctor": {
+    "dashboard": "Doctor Dashboard",
+    "pendingReports": "Pending Reports",
+    "urgentCases": "Urgent Cases",
+    "viewReport": "View Report",
+    "addNotes": "Add Consultation Notes",
+    "consultationNotes": "Consultation Notes",
+    "patientInfo": "Patient Information",
+    "appointments": "Appointments",
+    "myProfile": "My Profile",
+    "clinicName": "Clinic Name",
+    "licenseNumber": "License Number",
+    "specialization": "Specialization",
+    "rating": "Rating",
+    "reviews": "Reviews"
+  },
+  "doctorLocator": {
+    "title": "Find Doctors Near You",
+    "searchPlaceholder": "Search by location...",
+    "nearbyDoctors": "Nearby Doctors",
+    "distance": "Distance",
+    "contactViaWhatsApp": "Contact via WhatsApp",
+    "bookAppointment": "Book Appointment",
+    "viewProfile": "View Profile",
+    "noResults": "No doctors found in this area"
+  },
+  "appointment": {
+    "title": "Book Appointment",
+    "selectDoctor": "Select Doctor",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "consultationType": "Consultation Type",
+    "inPerson": "In-Person",
+    "video": "Video Consultation",
+    "notes": "Additional Notes",
+    "confirmBooking": "Confirm Booking",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "upcomingAppointments": "Upcoming Appointments",
+    "pastAppointments": "Past Appointments",
+    "joinVideoCall": "Join Video Call",
+    "reschedule": "Reschedule",
+    "cancelAppointment": "Cancel Appointment"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "doctorVerification": "Doctor Verification",
+    "contentModeration": "Content Moderation",
+    "analytics": "Analytics",
+    "skinWikiEditor": "Skin-Wiki Editor",
+    "pendingVerifications": "Pending Verifications",
+    "approve": "Approve",
+    "reject": "Reject",
+    "flaggedContent": "Flagged Content",
+    "nsfwScore": "NSFW Score",
+    "reviewContent": "Review Content",
+    "dailyActiveUsers": "Daily Active Users",
+    "totalScreenings": "Total Screenings",
+    "averageProcessingTime": "Average Processing Time",
+    "usagePatterns": "Usage Patterns",
+    "createArticle": "Create Article",
+    "editArticle": "Edit Article",
+    "publishArticle": "Publish Article"
+  },
+  "education": {
+    "skinWiki": "Skin-Wiki",
+    "learnMore": "Learn More",
+    "riskFactors": "Risk Factors",
+    "symptoms": "Symptoms",
+    "treatment": "Treatment",
+    "prevention": "Prevention",
+    "selfExamination": "Self-Examination Guide",
+    "preventionTips": "Prevention Tips",
+    "uvProtection": "UV Protection",
+    "earlyDetection": "Early Detection",
+    "bodyMap": "Body Map",
+    "checkRegularly": "Check your skin regularly for changes"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAsRead": "Mark as Read",
+    "markAllAsRead": "Mark All as Read",
+    "noNotifications": "No notifications",
+    "analysisComplete": "Analysis Complete",
+    "appointmentConfirmed": "Appointment Confirmed",
+    "appointmentReminder": "Appointment Reminder",
+    "verificationApproved": "Verification Approved",
+    "followUpReminder": "Follow-up Reminder"
+  },
+  "privacy": {
+    "title": "Privacy Settings",
+    "dataSharing": "Data Sharing",
+    "optOutResearch": "Opt out of research data sharing",
+    "exportData": "Export My Data",
+    "deleteAccount": "Delete Account",
+    "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted within 30 days.",
+    "confirmDelete": "Confirm Deletion"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "networkError": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "imageQuality": "Image quality too low for accurate analysis",
+    "inappropriateContent": "Inappropriate content detected",
+    "fileTooLarge": "File size too large. Maximum size is 10MB.",
+    "invalidFormat": "Invalid file format. Please upload a JPEG or PNG image.",
+    "sessionExpired": "Your session has expired. Please log in again."
+  },
+  "error": {
+    "boundary": {
+      "title": "Something went wrong",
+      "message": "We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.",
+      "retry": "Try Again",
+      "home": "Go Home"
+    },
+    "retry": {
+      "attempting": "Retrying... (Attempt {{attempt}} of {{max}})",
+      "failed": "Operation failed after {{max}} attempts"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidAge": "Age must be between 1 and 120",
+    "invalidPhoneNumber": "Invalid phone number"
+  },
+  "followUp": {
+    "suggestion": "It's been 6 months since your last screening. Consider scheduling a follow-up.",
+    "scheduleNow": "Schedule Now"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "writeReview": "Write a Review",
+    "rating": "Rating",
+    "yourReview": "Your Review",
+    "submitReview": "Submit Review",
+    "flagReview": "Flag Review",
+    "helpful": "Helpful",
+    "notHelpful": "Not Helpful"
+  },
+  "language": {
+    "selectLanguage": "Select Language",
+    "currentLanguage": "Current Language"
+  }
+}

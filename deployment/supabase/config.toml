@@ -1,0 +1,146 @@
+# SkinGuard Supabase Production Configuration
+# This file configures the Supabase project for production
+
+[project]
+name = "skinguard-production"
+organization_id = "your-org-id"
+region = "us-east-1"
+
+# Database settings
+[db]
+port = 5432
+major_version = 15
+pooler_enabled = true
+pooler_mode = "transaction"
+pool_size = 15
+
+# Extensions
+[db.extensions]
+enabled = [
+  "uuid-ossp",
+  "postgis",
+  "pg_stat_statements",
+  "pg_trgm",
+  "btree_gin",
+  "btree_gist",
+  "citext",
+  "cube",
+  "earthdistance",
+  "fuzzystrmatch",
+  "hstore",
+  "intarray",
+  "isn",
+  "lo",
+  "ltree",
+  "pg_crypto",
+  "pgrowlocks",
+  "pg_trgm",
+  "plpgsql",
+  "tablefunc",
+  "unaccent",
+  "xml2"
+]
+
+# API settings
+[api]
+enabled = true
+port = 54321
+max_rows = 1000
+extra_search_path = ["public", "extensions"]
+
+# Auth settings
+[auth]
+enabled = true
+site_url = "https://skinguard.com"
+additional_redirect_urls = ["https://www.skinguard.com"]
+jwt_expiry = 3600
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = true
+
+[auth.external.google]
+enabled = false
+
+[auth.external.github]
+enabled = false
+
+# Storage settings
+[storage]
+enabled = true
+file_size_limit = 10485760  # 10MB
+
+[[storage.buckets]]
+name = "medical-images-prod"
+public = false
+file_size_limit = 10485760
+allowed_mime_types = ["image/jpeg", "image/png", "image/jpg"]
+
+# Realtime settings
+[realtime]
+enabled = false
+
+# Edge Functions settings
+[functions]
+enabled = false
+
+# Analytics settings
+[analytics]
+enabled = true
+
+# Logging settings
+[logging]
+level = "info"
+
+# Security settings
+[security]
+# Row Level Security
+rls_enabled = true
+
+# SSL
+ssl_enforcement = true
+
+# IP restrictions (optional)
+# allowed_ip_ranges = ["0.0.0.0/0"]
+
+# Performance settings
+[performance]
+# Connection pooling
+statement_timeout = "30s"
+idle_in_transaction_session_timeout = "60s"
+
+# Query optimization
+shared_preload_libraries = ["pg_stat_statements"]
+track_activity_query_size = 2048
+pg_stat_statements_track = "all"
+
+# Backup settings
+[backup]
+enabled = true
+schedule = "0 2 * * *"  # Daily at 2 AM UTC
+retention_days = 30
+point_in_time_recovery = true
+
+# Monitoring settings
+[monitoring]
+enabled = true
+
+[monitoring.metrics]
+enabled = true
+retention_days = 90
+
+[monitoring.logs]
+enabled = true
+retention_days = 30
+
+# Webhooks (optional)
+[[webhooks]]
+name = "deployment-webhook"
+url = "https://api.skinguard.com/webhooks/supabase"
+events = ["INSERT", "UPDATE", "DELETE"]
+tables = ["medical_reports", "appointments"]
+enabled = false

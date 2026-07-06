@@ -1,0 +1,164 @@
+@startuml SkinGuard_UseCase_Updated
+
+' Configuration
+skinparam backgroundColor #FFFFFF
+skinparam actor {
+  BackgroundColor #E8F4F8
+  BorderColor #2C5F77
+}
+skinparam usecase {
+  BackgroundColor #FFF8E1
+  BorderColor #FF6B35
+  FontSize 11
+}
+
+title SkinGuard Web Application - Use Case Diagram (Updated 2024)
+
+left to right direction
+
+' === ACTORS ===
+actor "Patient" as patient #lightblue
+actor "Hospital/Clinic\nStaff" as hospital #lightgreen
+actor "AI System\n(ViT Model)" as ai #FFA07A
+actor "Google Maps\nAPI" as maps #FFE4B5
+actor "Email\nSystem" as email #E6E6FA
+
+' === SYSTEM BOUNDARY ===
+rectangle "SkinGuard Web Application" {
+  
+  ' === PATIENT FEATURES ===
+  package "Patient Portal" #LightBlue {
+    usecase (Register Account) as UC1
+    usecase (Login) as UC2
+    usecase (Manage Health\nProfile) as UC3
+    usecase (Upload Skin\nImage) as UC5
+    usecase (Complete Symptom\nWizard) as UC6
+    usecase (View Analysis\nResults) as UC7
+    usecase (View Report\nHistory) as UC8
+    usecase (Find Nearby\nHospitals) as UC9
+    usecase (Book\nAppointment) as UC11
+    usecase (Manage\nAppointments) as UC12
+  }
+  
+  ' === HOSPITAL FEATURES ===
+  package "Hospital Dashboard" #LightGreen {
+    usecase (Manage Facility\nProfile) as UC14
+    usecase (View Pending\nReports) as UC15
+    usecase (Review Urgent\nCases) as UC17
+    usecase (View Appointment\nRequests) as UC18
+    usecase (Confirm\nAppointment) as UC19
+    usecase (Reject\nAppointment) as UC20
+    usecase (View Patient\nHealth Profile) as UC21
+    usecase (Mark Appointment\nComplete) as UC22
+  }
+  
+  ' === AI PROCESSING ===
+  package "AI Pipeline" #LightCoral {
+    usecase (Validate Image\nQuality) as UC23
+    usecase (Validate Skin\nContent 25%) as UC24
+    usecase (Detect Lesion\nHotspots) as UC25
+    usecase (Classify Cancer\n7 Types) as UC26
+    usecase (Assess Risk\n4 Levels) as UC27
+    usecase (Generate\nReport) as UC28
+  }
+  
+  ' === EXTERNAL INTEGRATIONS ===
+  package "External Services" #LightYellow {
+    usecase (Search\nHospitals) as UC29
+    usecase (Calculate\nDistance) as UC31
+    usecase (Send Confirmation\nEmail) as UC33
+    usecase (Send Cancellation\nEmail) as UC34
+  }
+}
+
+' === PATIENT CONNECTIONS ===
+patient --> UC1
+patient --> UC2
+patient --> UC3
+patient --> UC5
+patient --> UC6
+patient --> UC7
+patient --> UC8
+patient --> UC9
+patient --> UC11
+patient --> UC12
+
+' === HOSPITAL CONNECTIONS ===
+hospital --> UC2
+hospital --> UC14
+hospital --> UC15
+hospital --> UC17
+hospital --> UC18
+hospital --> UC19
+hospital --> UC20
+hospital --> UC21
+hospital --> UC22
+
+' === AI CONNECTIONS ===
+ai --> UC23
+ai --> UC24
+ai --> UC25
+ai --> UC26
+ai --> UC27
+ai --> UC28
+
+' === EXTERNAL CONNECTIONS ===
+maps --> UC29
+maps --> UC31
+email --> UC33
+email --> UC34
+
+' === INCLUDE/EXTEND RELATIONSHIPS ===
+UC5 ..> UC23 : <<include>>
+UC23 ..> UC24 : <<include>>
+UC24 ..> UC25 : <<include>>
+UC25 ..> UC26 : <<include>>
+UC26 ..> UC27 : <<include>>
+UC27 ..> UC28 : <<include>>
+
+UC9 ..> UC29 : <<include>>
+UC9 ..> UC31 : <<include>>
+
+UC19 ..> UC33 : <<include>>
+UC20 ..> UC34 : <<include>>
+
+UC21 ..> UC19 : <<extend>>\nonly after\nconfirmation
+
+' === ANNOTATIONS ===
+note right of UC24
+  **NEW: Skin Validation**
+  - Rejects posters/text
+  - Min 25% skin content
+  - Text/graphics detection
+end note
+
+note right of UC21
+  **Privacy Protection**
+  Patient data hidden
+  until appointment
+  is confirmed
+end note
+
+note right of UC15
+  **Smart Triage**
+  - Grouped by patient
+  - Collapsible sections
+  - Urgent cases first
+end note
+
+note bottom of UC26
+  **Vision Transformer**
+  - 84% Accuracy
+  - HAM10000 trained
+  - 7 cancer types
+end note
+
+legend right
+  |= Color |= Component |
+  | <#LightBlue> | Patient Features |
+  | <#LightGreen> | Hospital Features |
+  | <#LightCoral> | AI Processing |
+  | <#LightYellow> | External Services |
+endlegend
+
+@enduml

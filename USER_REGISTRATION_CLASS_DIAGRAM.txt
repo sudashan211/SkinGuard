@@ -1,0 +1,535 @@
+================================================================================
+CLASS DIAGRAM - USER REGISTRATION MODULE
+================================================================================
+
+This class diagram shows the classes involved in user registration and
+authentication for the SkinGuard system, following the format of your reference.
+
+Updated for: Patient and Hospital Staff (no Admin role)
+
+Generate at: http://www.plantuml.com/plantuml/uml/
+
+================================================================================
+PLANTUML CODE - USER REGISTRATION MODULE CLASS DIAGRAM
+================================================================================
+
+@startuml
+title Class Diagram for User Registration Module
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================================================================
+' MODEL CLASSES (Entity Classes)
+' ============================================================================
+
+class User {
+    + userId : UUID
+    + email : String
+    + passwordHash : String
+    + fullName : String
+    + role : String
+    + verified : Boolean
+    + avatarUrl : String
+    + createdAt : DateTime
+    + updatedAt : DateTime
+}
+
+class Patient {
+    + patientId : UUID
+    + userId : UUID
+    + age : Integer
+    + skinType : String
+    + familyHistory : String
+    + medicalConditions : String
+    + createdAt : DateTime
+}
+
+class HospitalStaff {
+    + staffId : UUID
+    + userId : UUID
+    + licenseNo : String
+    + clinicName : String
+    + specialization : String
+    + latitude : Float
+    + longitude : Float
+    + whatsappNo : String
+    + createdAt : DateTime
+}
+
+' ============================================================================
+' CONTROLLER CLASSES
+' ============================================================================
+
+class "<<Controller>>\nAuthController" as AuthController {
+    + register(email, password, fullName, role): User
+    + login(email, password): Token
+    + logout(token): void
+    + refreshToken(refreshToken): Token
+    + verifyEmail(token): void
+    + resendVerification(email): void
+}
+
+class "<<Controller>>\nPasswordController" as PasswordController {
+    + forgotPassword(email): void
+    + resetPassword(token, newPassword): void
+    + changePassword(userId, oldPw, newPw): void
+    + validatePasswordStrength(password): Boolean
+}
+
+class "<<Controller>>\nPatientController" as PatientController {
+    + createPatientProfile(userId, data): Patient
+    + updatePatientProfile(patientId, data): Patient
+    + getPatientProfile(userId): Patient
+    + validatePatientData(data): Boolean
+}
+
+class "<<Controller>>\nStaffController" as StaffController {
+    + createStaffProfile(userId, data): HospitalStaff
+    + updateStaffProfile(staffId, data): HospitalStaff
+    + getStaffProfile(userId): HospitalStaff
+    + verifyLicense(licenseNo): Boolean
+}
+
+' ============================================================================
+' SERVICE CLASSES
+' ============================================================================
+
+class "<<Service>>\nJWTService" as JWTService {
+    + generateAccessToken(userId, role): String
+    + generateRefreshToken(userId): String
+    + verifyToken(token): Boolean
+    + decodeToken(token): Object
+    + revokeToken(token): void
+}
+
+class "<<Service>>\nEmailService" as EmailService {
+    + sendVerificationEmail(email, token): void
+    + sendPasswordResetEmail(email, token): void
+    + sendWelcomeEmail(email, name): void
+    + validateEmailFormat(email): Boolean
+}
+
+class "<<Service>>\nPasswordService" as PasswordService {
+    + hashPassword(password): String
+    + verifyPassword(password, hash): Boolean
+    + generateResetToken(): String
+    + validateToken(token): Boolean
+}
+
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+User "1" -- "0..1" Patient : extends >
+User "1" -- "0..1" HospitalStaff : extends >
+
+AuthController ..> User : manages
+AuthController ..> JWTService : uses
+AuthController ..> EmailService : uses
+AuthController ..> PasswordService : uses
+
+PasswordController ..> User : updates
+PasswordController ..> PasswordService : uses
+PasswordController ..> EmailService : uses
+
+PatientController ..> Patient : manages
+PatientController ..> User : references
+
+StaffController ..> HospitalStaff : manages
+StaffController ..> User : references
+
+@enduml
+
+================================================================================
+SIMPLIFIED VERSION - MATCHING YOUR REFERENCE EXACTLY
+================================================================================
+
+Minimal version matching your reference diagram format:
+
+@startuml
+title Class Diagram for User Registration Module
+
+skinparam classAttributeIconSize 0
+
+class User {
+    + userId : UUID
+    + email : String
+    + password : String
+    + fullName : String
+    + phoneNumber : String
+    + verified : Boolean
+}
+
+class Patient {
+    + patientId : UUID
+    + userId : UUID
+    + age : Integer
+    + skinType : String
+    + familyHistory : String
+}
+
+class HospitalStaff {
+    + staffId : UUID
+    + userId : UUID
+    + licenseNo : String
+    + clinicName : String
+    + specialization : String
+}
+
+class "<<Controller>>\nAuthController" as AuthController {
+    + register(email, password, role): User
+    + login(email, password): Token
+    + verifyEmail(token): void
+    + logout(): void
+}
+
+class "<<Controller>>\nPasswordController" as PasswordController {
+    + forgotPassword(email): void
+    + resetPassword(token, newPw): void
+    + changePassword(oldPw, newPw): void
+}
+
+User -- AuthController
+User -- PasswordController
+User "1" -- "0..1" Patient
+User "1" -- "0..1" HospitalStaff
+
+@enduml
+
+================================================================================
+DETAILED VERSION - WITH ALL ATTRIBUTES AND METHODS
+================================================================================
+
+Complete version showing all attributes and methods:
+
+@startuml
+title Class Diagram for User Registration Module (Detailed)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================================================================
+' ENTITY CLASSES
+' ============================================================================
+
+class User <<Entity>> {
+    - userId : UUID
+    - email : String
+    - passwordHash : String
+    - fullName : String
+    - role : ENUM(patient, doctor)
+    - verified : Boolean
+    - avatarUrl : String
+    - languagePreference : String
+    - createdAt : DateTime
+    - updatedAt : DateTime
+    --
+    + register(): Boolean
+    + login(): Token
+    + logout(): void
+    + updateProfile(): void
+    + verifyEmail(): Boolean
+    + changePassword(): Boolean
+}
+
+class Patient <<Entity>> {
+    - patientId : UUID
+    - userId : UUID (FK)
+    - age : Integer
+    - skinType : ENUM(I, II, III, IV, V, VI)
+    - familyHistory : Text
+    - medicalConditions : Text
+    - currentMedications : Text
+    - allergies : Text
+    - sunExposureLevel : String
+    - createdAt : DateTime
+    - updatedAt : DateTime
+    --
+    + createProfile(): Boolean
+    + updateHealthInfo(): void
+    + getHealthHistory(): Object
+    + calculateRiskFactors(): Float
+}
+
+class HospitalStaff <<Entity>> {
+    - staffId : UUID
+    - userId : UUID (FK)
+    - licenseNo : String (Unique)
+    - clinicName : String
+    - specialization : String
+    - bio : Text
+    - education : Text
+    - certifications : Text
+    - languages : String
+    - latitude : Float
+    - longitude : Float
+    - whatsappNo : String
+    - averageRating : Float
+    - reviewCount : Integer
+    - createdAt : DateTime
+    - updatedAt : DateTime
+    --
+    + registerFacility(): Boolean
+    + updateFacilityInfo(): void
+    + verifyLicense(): Boolean
+    + getLocation(): Coordinates
+}
+
+' ============================================================================
+' CONTROLLER CLASSES
+' ============================================================================
+
+class AuthController <<Controller>> {
+    --
+    + POST register(email, password, fullName, role): User
+    + POST login(email, password): TokenResponse
+    + POST logout(token): void
+    + POST refreshToken(refreshToken): TokenResponse
+    + GET verifyEmail(token): Boolean
+    + POST resendVerification(email): void
+    + validateCredentials(email, password): Boolean
+    + checkUserExists(email): Boolean
+    + generateTokens(userId, role): TokenResponse
+}
+
+class PasswordController <<Controller>> {
+    --
+    + POST forgotPassword(email): void
+    + POST resetPassword(token, newPassword): Boolean
+    + PUT changePassword(userId, oldPw, newPw): Boolean
+    + validatePasswordStrength(password): Boolean
+    + validateResetToken(token): Boolean
+    + generateResetToken(email): String
+}
+
+class PatientController <<Controller>> {
+    --
+    + POST createProfile(userId, profileData): Patient
+    + PUT updateProfile(patientId, data): Patient
+    + GET getProfile(userId): Patient
+    + GET getHealthHistory(userId): Array
+    + validateProfileData(data): Boolean
+}
+
+class StaffController <<Controller>> {
+    --
+    + POST createStaffProfile(userId, data): HospitalStaff
+    + PUT updateStaffProfile(staffId, data): HospitalStaff
+    + GET getStaffProfile(userId): HospitalStaff
+    + POST verifyLicense(licenseNo): Boolean
+    + GET getStaffAppointments(staffId): Array
+}
+
+' ============================================================================
+' SERVICE CLASSES
+' ============================================================================
+
+class JWTService <<Service>> {
+    - secretKey : String
+    - accessTokenExpiry : Integer
+    - refreshTokenExpiry : Integer
+    --
+    + generateAccessToken(userId, role): String
+    + generateRefreshToken(userId): String
+    + verifyToken(token): Boolean
+    + decodeToken(token): Object
+    + revokeToken(token): void
+    + isTokenExpired(token): Boolean
+}
+
+class EmailService <<Service>> {
+    - smtpHost : String
+    - smtpPort : Integer
+    - senderEmail : String
+    --
+    + sendVerificationEmail(email, token): Boolean
+    + sendPasswordResetEmail(email, token): Boolean
+    + sendWelcomeEmail(email, name): Boolean
+    + validateEmailFormat(email): Boolean
+    + generateVerificationToken(): String
+}
+
+class PasswordService <<Service>> {
+    - saltRounds : Integer
+    --
+    + hashPassword(password): String
+    + verifyPassword(plainPw, hash): Boolean
+    + generateResetToken(): String
+    + validatePasswordStrength(password): Boolean
+    + checkPasswordHistory(userId, newPw): Boolean
+}
+
+class ValidationService <<Service>> {
+    --
+    + validateEmail(email): Boolean
+    + validatePassword(password): Boolean
+    + validatePhoneNumber(phone): Boolean
+    + validateAge(age): Boolean
+    + validateSkinType(type): Boolean
+    + sanitizeInput(input): String
+}
+
+' ============================================================================
+' RELATIONSHIPS
+' ============================================================================
+
+User "1" -- "0..1" Patient : has profile >
+User "1" -- "0..1" HospitalStaff : has profile >
+
+AuthController ..> User : manages
+AuthController ..> JWTService : uses
+AuthController ..> EmailService : uses
+AuthController ..> PasswordService : uses
+AuthController ..> ValidationService : uses
+
+PasswordController ..> User : updates
+PasswordController ..> PasswordService : uses
+PasswordController ..> EmailService : uses
+
+PatientController ..> Patient : manages
+PatientController ..> User : queries
+PatientController ..> ValidationService : uses
+
+StaffController ..> HospitalStaff : manages
+StaffController ..> User : queries
+StaffController ..> ValidationService : uses
+
+@enduml
+
+================================================================================
+COMPARISON: OLD vs NEW
+================================================================================
+
+YOUR REFERENCE (Old System):
+┌─────────────────────┐     ┌──────────────────────────────┐
+│       User          │────→│  <<Controller>>              │
+├─────────────────────┤     │  User Controller             │
+│ + userId : String   │     ├──────────────────────────────┤
+│ + username : String │     │ + getUser(): User            │
+│ + email : String    │     │ + checkExistingData(): void  │
+│ + password : String │     │ + changePassword(): void     │
+│ + phoneNumber : int │     │ + validate(): void           │
+└─────────────────────┘     └──────────────────────────────┘
+
+┌─────────────────────┐     ┌──────────────────────────────┐
+│       Admin         │────→│  <<Controller>>              │
+├─────────────────────┤     │  Admin Controller            │
+│ + adminID : String  │     ├──────────────────────────────┤
+│ + email : String    │     │ + getAdmin(): Admin          │
+│ + password : String │     │ + checkExistingData(): void  │
+└─────────────────────┘     │ + changePassword(): void     │
+                            └──────────────────────────────┘
+
+SKINGUARD (New System):
+┌─────────────────────┐     ┌──────────────────────────────┐
+│       User          │────→│  <<Controller>>              │
+├─────────────────────┤     │  Auth Controller             │
+│ + userId : UUID     │     ├──────────────────────────────┤
+│ + email : String    │     │ + register(): User           │✨ NEW
+│ + passwordHash:String│     │ + login(): Token            │✨ NEW
+│ + fullName : String │     │ + verifyEmail(): void       │✨ NEW
+│ + role : String     │     │ + logout(): void            │
+│ + verified : Boolean│✨ NEW│ + refreshToken(): Token      │✨ NEW
+└─────────────────────┘     └──────────────────────────────┘
+         ↑
+         │
+    ┌────┴────┐
+    │         │
+┌───┴──────┐ ┌┴────────────┐
+│ Patient  │ │HospitalStaff│
+├──────────┤ ├─────────────┤
+│+ age     │ │+ licenseNo  │
+│+ skinType│ │+ clinicName │
+└──────────┘ └─────────────┘
+
+KEY DIFFERENCES:
+✅ UUID instead of String for IDs (database best practice)
+✅ passwordHash instead of plaintext password (security)
+✅ User role field differentiates patient/staff (no separate Admin class)
+✅ verified field for email verification (modern security)
+✅ Patient and HospitalStaff extend User (inheritance)
+✅ Separate AuthController and PasswordController (separation of concerns)
+✅ JWT tokens for authentication (stateless)
+✅ Email verification workflow (security requirement)
+✅ Service layer (JWTService, EmailService, PasswordService)
+
+================================================================================
+DESCRIPTION FOR THESIS
+================================================================================
+
+Figure 2.2 presents the Class Diagram for the User Registration Module,
+illustrating the entity classes, controller classes, and their relationships
+in the authentication system. The diagram shows three main entity classes:
+User (storing core authentication data including userId, email, passwordHash,
+role, and verification status), Patient (extending User with health-specific
+attributes like age, skin type, and family history), and HospitalStaff
+(extending User with professional credentials including license number, clinic
+name, and specialization).
+
+The controller layer consists of four main controllers: AuthController
+(managing user registration, login, logout, token refresh, and email
+verification), PasswordController (handling password reset, forgot password,
+and password change operations), PatientController (managing patient profile
+creation and updates), and StaffController (handling hospital staff
+registration and license verification). These controllers interact with three
+service classes: JWTService (generating and verifying JSON Web Tokens for
+stateless authentication), EmailService (sending verification and password
+reset emails via SMTP), and PasswordService (securely hashing passwords using
+bcrypt and validating password strength).
+
+The User class serves as the base entity with a one-to-zero-or-one
+relationship to both Patient and HospitalStaff, implementing role-based access
+control through the role field (ENUM: 'patient', 'doctor'). All controllers
+depend on the service classes for cross-cutting concerns (authentication,
+email, password management), following the separation of concerns principle.
+The verified field in the User class ensures email verification before
+granting full system access, supporting security best practices. The
+passwordHash field stores bcrypt-hashed passwords rather than plaintext,
+and userId uses UUID format for global uniqueness and security against
+enumeration attacks.
+
+================================================================================
+USAGE IN THESIS
+================================================================================
+
+CHAPTER 2: SYSTEM DESIGN
+Section: 2.2.1.2 Class Diagram for User Registration Module
+
+[INSERT CLASS DIAGRAM HERE - USE SIMPLIFIED VERSION FOR CLARITY]
+
+Figure 2.2 shows the Class Diagram for User Registration Module. The diagram
+includes entity classes (User, Patient, HospitalStaff) and controller classes
+(AuthController, PasswordController) that manage the registration and
+authentication workflows. The User class acts as the base entity, with Patient
+and HospitalStaff extending it through one-to-one relationships based on the
+user's role. Controllers handle business logic for registration, login,
+password management, and profile creation, while service classes (JWTService,
+EmailService, PasswordService) provide reusable functionality for
+authentication, email notifications, and secure password handling.
+
+[Optional: Include detailed description from above]
+
+================================================================================
+WHICH VERSION TO USE?
+================================================================================
+
+FOR THESIS CHAPTER 2 (matching your reference):
+→ Use "SIMPLIFIED VERSION" - Clearest match to your reference
+
+FOR DETAILED TECHNICAL DOCUMENTATION:
+→ Use "DETAILED VERSION" - Shows all attributes and methods
+
+FOR HIGH-LEVEL ARCHITECTURE:
+→ Use "MAIN VERSION" - Good balance of detail and clarity
+
+RECOMMENDATION: Use SIMPLIFIED VERSION in main thesis body (Chapter 2),
+place DETAILED VERSION in appendix for complete technical reference.
+
+================================================================================

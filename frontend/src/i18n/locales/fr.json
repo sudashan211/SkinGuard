@@ -1,0 +1,265 @@
+{
+  "common": {
+    "appName": "SkinGuard",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "role": "Rôle",
+    "patient": "Patient",
+    "doctor": "Médecin",
+    "admin": "Administrateur",
+    "loginButton": "Se connecter",
+    "signupButton": "Créer un compte",
+    "alreadyHaveAccount": "Vous avez déjà un compte?",
+    "dontHaveAccount": "Vous n'avez pas de compte?",
+    "forgotPassword": "Mot de passe oublié?"
+  },
+  "landing": {
+    "hero": {
+      "title": "Dépistage du Cancer de la Peau par IA",
+      "subtitle": "Obtenez une analyse instantanée des lésions cutanées par IA et connectez-vous avec des dermatologues vérifiés",
+      "cta": "Commencer"
+    },
+    "features": {
+      "aiScreening": {
+        "title": "Dépistage IA",
+        "description": "L'IA avancée analyse vos lésions cutanées avec une précision de 94%"
+      },
+      "findDoctors": {
+        "title": "Trouver des Médecins",
+        "description": "Connectez-vous avec des dermatologues vérifiés près de chez vous"
+      },
+      "secureHistory": {
+        "title": "Historique Sécurisé",
+        "description": "Suivez votre santé cutanée avec un stockage crypté"
+      }
+    }
+  },
+  "patient": {
+    "dashboard": "Tableau de Bord Patient",
+    "uploadImage": "Télécharger une Image",
+    "dragDropImage": "Glissez-déposez une image ici, ou cliquez pour sélectionner",
+    "takePhoto": "Prendre une Photo",
+    "selectFile": "Sélectionner un Fichier",
+    "analyzing": "Analyse en cours...",
+    "results": "Résultats",
+    "reportHistory": "Historique des Rapports",
+    "viewReport": "Voir le Rapport",
+    "compareReports": "Comparer les Rapports",
+    "findDoctor": "Trouver un Médecin",
+    "bookAppointment": "Prendre Rendez-vous",
+    "myAppointments": "Mes Rendez-vous",
+    "healthProfile": "Profil de Santé",
+    "age": "Âge",
+    "skinType": "Type de Peau",
+    "familyHistory": "Antécédents Familiaux"
+  },
+  "symptomWizard": {
+    "title": "Informations sur les Symptômes",
+    "step1": {
+      "title": "Localisation de la Lésion",
+      "description": "Où se trouve la lésion sur votre corps?",
+      "bodyLocation": "Localisation Corporelle"
+    },
+    "step2": {
+      "title": "Sensations",
+      "description": "Quelles sensations ressentez-vous?",
+      "itching": "Démangeaisons",
+      "pain": "Douleur",
+      "burning": "Brûlure",
+      "numbness": "Engourdissement",
+      "none": "Aucune"
+    },
+    "step3": {
+      "title": "Changements Visuels",
+      "description": "Quels changements avez-vous remarqués?",
+      "color": "Changement de couleur",
+      "size": "Augmentation de taille",
+      "shape": "Changement de forme",
+      "border": "Irrégularité des bords",
+      "none": "Aucun"
+    }
+  },
+  "results": {
+    "title": "Résultats de l'Analyse",
+    "riskLevel": "Niveau de Risque",
+    "low": "Faible",
+    "medium": "Moyen",
+    "high": "Élevé",
+    "urgent": "Urgent",
+    "predictions": "Prédictions de Type de Cancer",
+    "probability": "Probabilité",
+    "disclaimer": "Ceci est une estimation de probabilité de 94%. Veuillez consulter des médecins vérifiés pour une biopsie clinique",
+    "urgentWarning": "Lésion à haut risque détectée. Veuillez consulter immédiatement un médecin.",
+    "emergencyConsultation": "Consultation d'Urgence",
+    "detectedLesions": "Lésions Détectées",
+    "processingTime": "Temps de Traitement"
+  },
+  "cancerTypes": {
+    "melanoma": "Mélanome",
+    "basalCellCarcinoma": "Carcinome Basocellulaire",
+    "squamousCellCarcinoma": "Carcinome Épidermoïde",
+    "actinticKeratosis": "Kératose Actinique",
+    "benignKeratosis": "Kératose Bénigne",
+    "dermatofibroma": "Dermatofibrome",
+    "vascularLesion": "Lésion Vasculaire"
+  },
+  "doctor": {
+    "dashboard": "Tableau de Bord Médecin",
+    "pendingReports": "Rapports en Attente",
+    "urgentCases": "Cas Urgents",
+    "viewReport": "Voir le Rapport",
+    "addNotes": "Ajouter des Notes de Consultation",
+    "consultationNotes": "Notes de Consultation",
+    "patientInfo": "Informations sur le Patient",
+    "appointments": "Rendez-vous",
+    "myProfile": "Mon Profil",
+    "clinicName": "Nom de la Clinique",
+    "licenseNumber": "Numéro de Licence",
+    "specialization": "Spécialisation",
+    "rating": "Évaluation",
+    "reviews": "Avis"
+  },
+  "doctorLocator": {
+    "title": "Trouver des Médecins Près de Vous",
+    "searchPlaceholder": "Rechercher par localisation...",
+    "nearbyDoctors": "Médecins à Proximité",
+    "distance": "Distance",
+    "contactViaWhatsApp": "Contacter via WhatsApp",
+    "bookAppointment": "Prendre Rendez-vous",
+    "viewProfile": "Voir le Profil",
+    "noResults": "Aucun médecin trouvé dans cette zone"
+  },
+  "appointment": {
+    "title": "Prendre Rendez-vous",
+    "selectDoctor": "Sélectionner un Médecin",
+    "selectDate": "Sélectionner une Date",
+    "selectTime": "Sélectionner une Heure",
+    "consultationType": "Type de Consultation",
+    "inPerson": "En Personne",
+    "video": "Consultation Vidéo",
+    "notes": "Notes Supplémentaires",
+    "confirmBooking": "Confirmer la Réservation",
+    "status": {
+      "pending": "En Attente",
+      "confirmed": "Confirmé",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "upcomingAppointments": "Rendez-vous à Venir",
+    "pastAppointments": "Rendez-vous Passés",
+    "joinVideoCall": "Rejoindre l'Appel Vidéo",
+    "reschedule": "Reprogrammer",
+    "cancelAppointment": "Annuler le Rendez-vous"
+  },
+  "admin": {
+    "dashboard": "Tableau de Bord Admin",
+    "doctorVerification": "Vérification des Médecins",
+    "contentModeration": "Modération du Contenu",
+    "analytics": "Analytiques",
+    "skinWikiEditor": "Éditeur Skin-Wiki",
+    "pendingVerifications": "Vérifications en Attente",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "flaggedContent": "Contenu Signalé",
+    "nsfwScore": "Score NSFW",
+    "reviewContent": "Examiner le Contenu",
+    "dailyActiveUsers": "Utilisateurs Actifs Quotidiens",
+    "totalScreenings": "Dépistages Totaux",
+    "averageProcessingTime": "Temps de Traitement Moyen",
+    "usagePatterns": "Modèles d'Utilisation",
+    "createArticle": "Créer un Article",
+    "editArticle": "Modifier l'Article",
+    "publishArticle": "Publier l'Article"
+  },
+  "education": {
+    "skinWiki": "Skin-Wiki",
+    "learnMore": "En Savoir Plus",
+    "riskFactors": "Facteurs de Risque",
+    "symptoms": "Symptômes",
+    "treatment": "Traitement",
+    "prevention": "Prévention",
+    "selfExamination": "Guide d'Auto-examen",
+    "preventionTips": "Conseils de Prévention",
+    "uvProtection": "Protection UV",
+    "earlyDetection": "Détection Précoce",
+    "bodyMap": "Carte Corporelle",
+    "checkRegularly": "Vérifiez régulièrement votre peau pour détecter les changements"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAsRead": "Marquer comme Lu",
+    "markAllAsRead": "Tout Marquer comme Lu",
+    "noNotifications": "Aucune notification",
+    "analysisComplete": "Analyse Terminée",
+    "appointmentConfirmed": "Rendez-vous Confirmé",
+    "appointmentReminder": "Rappel de Rendez-vous",
+    "verificationApproved": "Vérification Approuvée",
+    "followUpReminder": "Rappel de Suivi"
+  },
+  "privacy": {
+    "title": "Paramètres de Confidentialité",
+    "dataSharing": "Partage de Données",
+    "optOutResearch": "Refuser le partage de données de recherche",
+    "exportData": "Exporter Mes Données",
+    "deleteAccount": "Supprimer le Compte",
+    "deleteAccountWarning": "Cette action ne peut pas être annulée. Toutes vos données seront définitivement supprimées dans 30 jours.",
+    "confirmDelete": "Confirmer la Suppression"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
+    "imageQuality": "Qualité d'image trop faible pour une analyse précise",
+    "inappropriateContent": "Contenu inapproprié détecté",
+    "fileTooLarge": "Fichier trop volumineux. La taille maximale est de 10 Mo.",
+    "invalidFormat": "Format de fichier invalide. Veuillez télécharger une image JPEG ou PNG.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Adresse email invalide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "invalidAge": "L'âge doit être compris entre 1 et 120",
+    "invalidPhoneNumber": "Numéro de téléphone invalide"
+  },
+  "followUp": {
+    "suggestion": "Cela fait 6 mois depuis votre dernier dépistage. Envisagez de planifier un suivi.",
+    "scheduleNow": "Planifier Maintenant"
+  },
+  "reviews": {
+    "title": "Avis",
+    "writeReview": "Écrire un Avis",
+    "rating": "Évaluation",
+    "yourReview": "Votre Avis",
+    "submitReview": "Soumettre l'Avis",
+    "flagReview": "Signaler l'Avis",
+    "helpful": "Utile",
+    "notHelpful": "Pas Utile"
+  },
+  "language": {
+    "selectLanguage": "Sélectionner la Langue",
+    "currentLanguage": "Langue Actuelle"
+  }
+}

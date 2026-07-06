@@ -1,0 +1,2086 @@
+================================================================================
+COMPLETE USE CASE DESCRIPTIONS FOR SKINGUARD SYSTEM
+================================================================================
+
+Total Use Cases: 28
+System: SkinGuard Web Application - AI-Powered Skin Cancer Detection System
+Technology: React (Frontend) + FastAPI (Backend) + PostgreSQL (Database)
+
+================================================================================
+SECTION 1: AUTHENTICATION & USER MANAGEMENT (5 Use Cases)
+================================================================================
+
+================================================================================
+Table 4.3    Use Case Description for <UC001 User Registration>
+================================================================================
+
+Use Case ID         | UC001
+Use Case Name       | User Registration
+Actors              | Patient (Unregistered User)
+Description         | How a new user creates a patient account in the SkinGuard 
+                    | system to access skin analysis and hospital booking features.
+Pre-conditions      | 1. User has internet connection
+                    | 2. User has valid email address
+                    | 3. Email is not already registered in system
+Post-conditions     | 1. New patient account is created in database
+                    | 2. Password is securely hashed and stored
+                    | 3. User is redirected to login page
+                    | 4. Welcome email sent to registered email address
+Normal Flow (NF)    | 1. User navigates to registration page
+                    | 2. User enters full name, email, phone number, and password
+                    | 3. User confirms password in confirmation field
+                    | 4. User clicks "Register" button
+                    | 5. System validates email format (must contain @ and domain)
+                    | 6. System validates password strength (minimum 8 characters)
+                    | 7. System checks email uniqueness in database
+                    | 8. System hashes password using bcrypt algorithm
+                    | 9. System creates new patient record in database
+                    | 10. System displays "Registration successful" message
+                    | 11. System redirects to login page
+Alternative Flow    | AF1-UC001: Email Already Exists
+(AF)                | 1. At step 7, system finds email already registered
+                    | 2. System displays "Email already registered" message
+                    | 3. System provides link to login page
+                    | 4. System offers "Forgot Password?" option
+                    | 5. User can try with different email or go to NF-UC003
+Exception Flow (EF) | EF1: Invalid Email Format
+                    | 1. "Please enter a valid email address" message appears
+                    | 2. Email field is highlighted in red
+                    | 3. Return to step 2 of NF
+                    | 
+                    | EF2: Weak Password
+                    | 1. "Password must be at least 8 characters" message appears
+                    | 2. Password strength indicator shows "Weak"
+                    | 3. Return to step 2 of NF
+                    | 
+                    | EF3: Password Mismatch
+                    | 1. "Passwords do not match" message appears
+                    | 2. Confirmation field is highlighted in red
+                    | 3. Return to step 2 of NF
+                    | 
+                    | EF4: Missing Required Fields
+                    | 1. "Please fill in all required fields" message appears
+                    | 2. Empty fields are highlighted in red
+                    | 3. Return to step 2 of NF
+
+================================================================================
+Table 4.4    Use Case Description for <UC002 User Login>
+================================================================================
+Use Case ID         | UC002
+Use Case Name       | User Login
+Actors              | Patient (Registered User)
+Description         | How a registered patient logs into the SkinGuard system to
+                    | access personal dashboard, view analysis history, and manage
+                    | health profile.
+Pre-conditions      | 1. User has registered account in system
+                    | 2. User account is active (not suspended)
+                    | 3. User has internet connection
+Post-conditions     | 1. User is authenticated and logged into system
+                    | 2. JWT access token is generated and stored
+                    | 3. User is redirected to patient dashboard
+                    | 4. User session is tracked in database
+Normal Flow (NF)    | 1. User navigates to login page
+                    | 2. User enters registered email address
+                    | 3. User enters password
+                    | 4. User clicks "Login" button
+                    | 5. System validates email format
+                    | 6. System retrieves user record from database by email
+                    | 7. System verifies password against hashed password in database
+                    | 8. System generates JWT access token (30 min expiry)
+                    | 9. System generates refresh token (7 days expiry)
+                    | 10. System stores tokens in browser local storage
+                    | 11. System displays "Login successful" message
+                    | 12. System redirects to patient dashboard
+                    | 13. Go to AF if user forgot password
+Alternative Flow    | AF1-UC003: User Forgot Password
+(AF)                | 1. User clicks "Forgot Password?" link on login page
+                    | 2. Go to UC003 (Password Reset)
+                    | 
+                    | AF2-UC002: Remember Me Option
+                    | 1. User checks "Remember Me" checkbox before login
+                    | 2. System extends refresh token expiry to 30 days
+                    | 3. Continue to step 10 of NF
+Exception Flow (EF) | EF1: Invalid Credentials
+                    | 1. "Invalid email or password" message appears on screen
+                    | 2. Login fields are cleared for security
+                    | 3. After 5 failed attempts, account is locked for 15 minutes
+                    | 4. Return to step 2 of NF
+                    | 
+                    | EF2: Account Not Found
+                    | 1. "No account found with this email" message appears
+                    | 2. System provides link to registration page
+                    | 3. Return to step 2 of NF
+                    | 
+                    | EF3: Account Suspended
+                    | 1. "Account suspended. Contact support." message appears
+                    | 2. Login is blocked
+                    | 3. User is redirected to support contact page
+
+================================================================================
+Table 4.5    Use Case Description for <UC003 Password Reset>
+================================================================================
+
+Use Case ID         | UC003
+Use Case Name       | Password Reset
+Actors              | Patient (Registered User)
+Description         | How a user resets their forgotten password using email
+                    | verification and secure token-based password reset link.
+Pre-conditions      | 1. User has registered account with valid email
+                    | 2. Email service (SMTP) is operational
+                    | 3. User has access to registered email inbox
+Post-conditions     | 1. User password is updated in database
+                    | 2. Old password is invalidated
+                    | 3. All existing sessions are terminated for security
+                    | 4. User receives password change confirmation email
+Normal Flow (NF)    | 1. User clicks "Forgot Password?" on login page
+                    | 2. System redirects to password reset page
+                    | 3. User enters registered email address
+                    | 4. User clicks "Send Reset Link" button
+                    | 5. System validates email format
+                    | 6. System checks if email exists in database
+                    | 7. System generates secure JWT reset token (15 min expiry)
+                    | 8. System sends email with reset link containing token
+                    | 9. System displays "Reset link sent to your email" message
+                    | 10. User opens email and clicks reset link
+                    | 11. System validates token (not expired, not used)
+                    | 12. System redirects to new password entry page
+                    | 13. User enters new password
+                    | 14. User confirms new password
+                    | 15. System validates password strength (minimum 8 characters)
+                    | 16. System hashes new password using bcrypt
+                    | 17. System updates password in database
+                    | 18. System invalidates reset token
+                    | 19. System terminates all existing user sessions
+                    | 20. System sends "Password changed successfully" email
+                    | 21. System redirects to login page with success message
+Alternative Flow    | AF1-UC003: Token Expired
+(AF)                | 1. At step 11, system finds token expired (>15 minutes)
+                    | 2. System displays "Reset link expired" message
+                    | 3. System provides option to resend reset link
+                    | 4. Return to step 3 of NF
+Exception Flow (EF) | EF1: Email Not Found
+                    | 1. "No account found with this email" message appears
+                    | 2. System provides link to registration page
+                    | 3. Return to step 3 of NF
+                    | 
+                    | EF2: Weak New Password
+                    | 1. "Password must be at least 8 characters" message appears
+                    | 2. Password strength indicator shows requirements
+                    | 3. Return to step 13 of NF
+                    | 
+                    | EF3: Password Confirmation Mismatch
+                    | 1. "Passwords do not match" message appears
+                    | 2. Return to step 13 of NF
+                    | 
+                    | EF4: Email Service Unavailable
+                    | 1. "Unable to send email. Try again later." message appears
+                    | 2. System logs error for admin review
+                    | 3. Return to step 3 of NF
+
+================================================================================
+Table 4.6    Use Case Description for <UC004 Hospital/Staff Login>
+================================================================================
+
+Use Case ID         | UC004
+Use Case Name       | Hospital/Staff Login
+Actors              | Hospital/Clinic Staff (Dermatologist, Medical Staff)
+Description         | How hospital staff and dermatologists log into the facility
+                    | dashboard to review patient reports, manage appointments, and
+                    | access patient medical history.
+Pre-conditions      | 1. Staff account is created by hospital administrator
+                    | 2. Staff has valid credentials (email and password)
+                    | 3. Staff is associated with a registered hospital/clinic
+                    | 4. Staff account is active (not suspended)
+Post-conditions     | 1. Staff is authenticated and logged into hospital dashboard
+                    | 2. JWT access token with staff role is generated
+                    | 3. Staff can access patient reports based on appointment status
+                    | 4. Staff session is tracked with hospital ID
+Normal Flow (NF)    | 1. Staff navigates to hospital login page
+                    | 2. Staff enters registered email address
+                    | 3. Staff enters password
+                    | 4. Staff clicks "Login" button
+                    | 5. System validates email format
+                    | 6. System retrieves staff record from database
+                    | 7. System verifies password against hashed password
+                    | 8. System checks staff role and hospital association
+                    | 9. System generates JWT token with staff role and hospital ID
+                    | 10. System loads hospital dashboard with pending reports
+                    | 11. System displays reports organized by urgency (Urgent first)
+                    | 12. System shows appointment requests awaiting confirmation
+Alternative Flow    | AF1-UC004: First-Time Login
+(AF)                | 1. After step 9, system detects first login
+                    | 2. System displays welcome tour of dashboard features
+                    | 3. System prompts staff to update facility profile
+                    | 4. Continue to step 10 of NF
+Exception Flow (EF) | EF1: Invalid Credentials
+                    | 1. "Invalid email or password" message appears
+                    | 2. After 5 failed attempts, account locked for 30 minutes
+                    | 3. Return to step 2 of NF
+                    | 
+                    | EF2: No Hospital Association
+                    | 1. "Account not linked to any facility" message appears
+                    | 2. System prompts staff to contact administrator
+                    | 3. Login is blocked
+                    | 
+                    | EF3: Insufficient Permissions
+                    | 1. "Account has insufficient permissions" message appears
+                    | 2. System displays role requirements
+                    | 3. Login is blocked
+
+================================================================================
+Table 4.7    Use Case Description for <UC005 Logout>
+================================================================================
+Use Case ID         | UC005
+Use Case Name       | Logout
+Actors              | Patient, Hospital/Clinic Staff
+Description         | How users securely log out of the system, clearing session
+                    | tokens and protecting account security.
+Pre-conditions      | 1. User is currently logged in
+                    | 2. User has active session with valid JWT token
+Post-conditions     | 1. User session is terminated
+                    | 2. JWT tokens are removed from browser storage
+                    | 3. User is redirected to login page
+                    | 4. Session is logged in database for audit trail
+Normal Flow (NF)    | 1. User clicks "Logout" button in navigation menu
+                    | 2. System displays confirmation dialog "Are you sure?"
+                    | 3. User confirms logout
+                    | 4. System invalidates current JWT access token
+                    | 5. System removes refresh token from browser storage
+                    | 6. System clears all session data from local storage
+                    | 7. System logs logout event with timestamp
+                    | 8. System displays "Logged out successfully" message
+                    | 9. System redirects to login page
+Alternative Flow    | AF1-UC005: Auto-Logout on Token Expiry
+(AF)                | 1. JWT access token expires (30 minutes of inactivity)
+                    | 2. System detects expired token on next API request
+                    | 3. System displays "Session expired. Please log in again."
+                    | 4. System clears browser storage
+                    | 5. System redirects to login page
+                    | 
+                    | AF2-UC005: User Cancels Logout
+                    | 1. At step 3, user clicks "Cancel" on confirmation dialog
+                    | 2. Logout is cancelled
+                    | 3. User remains on current page
+                    | 4. Session continues
+Exception Flow (EF) | EF1: Network Error During Logout
+                    | 1. System unable to reach server to log logout event
+                    | 2. System clears local storage anyway (client-side logout)
+                    | 3. System displays "Logged out (offline)" message
+                    | 4. System redirects to login page
+
+================================================================================
+SECTION 2: HEALTH PROFILE MANAGEMENT (3 Use Cases)
+================================================================================
+
+================================================================================
+Table 4.8    Use Case Description for <UC006 Create Health Profile>
+================================================================================
+
+Use Case ID         | UC006
+Use Case Name       | Create Health Profile
+Actors              | Patient (Logged-in User)
+Description         | How a patient creates their comprehensive health profile with
+                    | medical history, current medications, known allergies, and
+                    | previous skin conditions for better AI risk assessment.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Patient does not have existing health profile
+                    | 3. Patient has access to medical history information
+Post-conditions     | 1. Health profile is created and stored in database
+                    | 2. Profile is linked to patient account
+                    | 3. AI analysis will consider health data in risk assessment
+                    | 4. Hospital staff can view profile after appointment confirmation
+Normal Flow (NF)    | 1. Patient navigates to "Health Profile" section
+                    | 2. System detects no existing profile
+                    | 3. System displays "Create Health Profile" form
+                    | 4. Patient enters date of birth
+                    | 5. Patient selects gender (Male/Female/Other)
+                    | 6. Patient selects skin type (Fitzpatrick scale I-VI)
+                    | 7. Patient enters medical conditions (diabetes, autoimmune, etc.)
+                    | 8. Patient lists current medications with dosages
+                    | 9. Patient lists known allergies (drugs, materials, substances)
+                    | 10. Patient describes previous skin conditions or treatments
+                    | 11. Patient indicates family history of skin cancer (Yes/No)
+                    | 12. Patient specifies sun exposure level (Low/Medium/High)
+                    | 13. Patient checks "I confirm this information is accurate"
+                    | 14. Patient clicks "Save Profile" button
+                    | 15. System validates required fields
+                    | 16. System stores profile in database linked to patient ID
+                    | 17. System displays "Health profile created successfully"
+                    | 18. System redirects to patient dashboard
+Alternative Flow    | AF1-UC006: Import from Medical Record
+(AF)                | 1. At step 3, patient clicks "Import Medical Data"
+                    | 2. System prompts patient to upload medical record file (PDF)
+                    | 3. System extracts relevant health information
+                    | 4. System pre-fills form fields
+                    | 5. Patient reviews and confirms extracted data
+                    | 6. Continue to step 14 of NF
+Exception Flow (EF) | EF1: Missing Required Fields
+                    | 1. "Please complete all required fields" message appears
+                    | 2. Missing fields are highlighted in red
+                    | 3. Return to step 4 of NF
+                    | 
+                    | EF2: Invalid Date of Birth
+                    | 1. "Invalid date or age below 13 years" message appears
+                    | 2. System requires parental consent for users under 13
+                    | 3. Return to step 4 of NF
+
+================================================================================
+Table 4.9    Use Case Description for <UC007 Update Health Profile>
+================================================================================
+
+Use Case ID         | UC007
+Use Case Name       | Update Health Profile
+Actors              | Patient (Logged-in User)
+Description         | How a patient modifies existing health profile information,
+                    | adds new medications, updates allergy information, or records
+                    | new medical conditions.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Patient has existing health profile (UC006 completed)
+Post-conditions     | 1. Health profile is updated in database with new information
+                    | 2. System tracks change history with timestamp
+                    | 3. Updated profile is used in future AI risk assessments
+Normal Flow (NF)    | 1. Patient navigates to "Health Profile" section
+                    | 2. System loads existing health profile data
+                    | 3. System displays profile in editable form
+                    | 4. Patient modifies any field (medications, allergies, etc.)
+                    | 5. Patient clicks "Save Changes" button
+                    | 6. System validates modified data
+                    | 7. System updates profile in database
+                    | 8. System creates change log entry with timestamp
+                    | 9. System displays "Profile updated successfully" message
+                    | 10. System shows updated profile with changes highlighted
+Alternative Flow    | AF1-UC007: Add New Medication
+(AF)                | 1. At step 4, patient clicks "Add Medication" button
+                    | 2. System displays medication entry form
+                    | 3. Patient enters medication name, dosage, frequency
+                    | 4. Patient clicks "Add"
+                    | 5. System appends medication to list
+                    | 6. Continue to step 5 of NF
+                    | 
+                    | AF2-UC007: Remove Medication
+                    | 1. At step 4, patient clicks "Remove" next to medication
+                    | 2. System displays confirmation "Remove this medication?"
+                    | 3. Patient confirms removal
+                    | 4. System removes medication from list
+                    | 5. Continue to step 5 of NF
+Exception Flow (EF) | EF1: No Changes Made
+                    | 1. "No changes detected" message appears
+                    | 2. Save button is disabled
+                    | 3. Patient can edit fields or cancel
+                    | 
+                    | EF2: Invalid Data Format
+                    | 1. "Please enter valid information" message appears
+                    | 2. Invalid fields are highlighted
+                    | 3. Return to step 4 of NF
+
+================================================================================
+Table 4.10   Use Case Description for <UC008 View Health Profile>
+================================================================================
+
+Use Case ID         | UC008
+Use Case Name       | View Health Profile
+Actors              | Patient (Logged-in User), Hospital/Clinic Staff (after appt.)
+Description         | How a patient views their complete health profile including
+                    | medical history, risk factors, and previous analysis results.
+                    | Hospital staff can access after appointment confirmation.
+Pre-conditions      | 1. User is logged in to system
+                    | 2. Patient has created health profile (UC006 completed)
+                    | 3. For staff: Appointment with patient is confirmed
+Post-conditions     | 1. Health profile is displayed with all information
+                    | 2. View action is logged for privacy audit trail
+Normal Flow (NF)    | 1. Patient navigates to "Health Profile" section
+                    | 2. System retrieves profile data from database
+                    | 3. System displays profile in read-only view with sections:
+                    |    - Personal information (age, gender, skin type)
+                    |    - Medical conditions
+                    |    - Current medications
+                    |    - Known allergies
+                    |    - Previous skin conditions
+                    |    - Family history
+                    |    - Sun exposure level
+                    | 4. System displays analysis history summary
+                    | 5. Patient can click "Edit Profile" to update (go to UC007)
+Alternative Flow    | AF1-UC008: Staff Views Patient Profile
+(AF)                | 1. Hospital staff clicks on confirmed appointment
+                    | 2. Staff selects "View Patient Profile" option
+                    | 3. System verifies appointment is confirmed
+                    | 4. System logs access for privacy audit
+                    | 5. System displays patient health profile to staff
+                    | 6. Staff can view full medical history for consultation
+Exception Flow (EF) | EF1: Profile Not Created
+                    | 1. "No health profile found" message appears
+                    | 2. System provides "Create Profile" button
+                    | 3. Redirect to UC006
+                    | 
+                    | EF2: Staff Access Denied (No Confirmed Appointment)
+                    | 1. "Access denied: No confirmed appointment" message appears
+                    | 2. Patient identity remains hidden
+                    | 3. Staff can only view anonymized report
+
+================================================================================
+SECTION 3: IMAGE UPLOAD & AI ANALYSIS (10 Use Cases)
+================================================================================
+
+================================================================================
+Table 4.11   Use Case Description for <UC009 Upload Skin Image>
+================================================================================
+
+Use Case ID         | UC009
+Use Case Name       | Upload Skin Image
+Actors              | Patient (Logged-in User)
+Description         | How a patient uploads a photo of their skin lesion from device
+                    | gallery for AI analysis and risk assessment.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Patient has image file of skin lesion on device
+                    | 3. Image file is in supported format (JPG, PNG, JPEG)
+                    | 4. Image file size is under 10MB
+Post-conditions     | 1. Image is uploaded to server
+                    | 2. Image passes content validation (NSFW filter)
+                    | 3. Image is ready for AI analysis
+                    | 4. Patient can proceed to symptom questionnaire
+Normal Flow (NF)    | 1. Patient navigates to "New Analysis" page
+                    | 2. System displays upload interface with guidelines:
+                    |    - Good lighting, clear image
+                    |    - Close-up of affected area
+                    |    - Skin lesion clearly visible
+                    | 3. Patient clicks "Upload Image" button
+                    | 4. System opens file browser
+                    | 5. Patient selects image file from device
+                    | 6. System validates file format (JPG, PNG, JPEG)
+                    | 7. System validates file size (< 10MB)
+                    | 8. System displays image preview
+                    | 9. Patient reviews image and confirms upload
+                    | 10. System uploads image to server
+                    | 11. System performs content validation (NSFW + skin check)
+                    | 12. System displays "Image uploaded successfully" message
+                    | 13. System enables "Continue to Questionnaire" button
+Alternative Flow    | AF1-UC010: Capture Image with Camera
+(AF)                | 1. At step 3, patient clicks "Capture Photo" instead
+                    | 2. Go to UC010 (Capture Skin Image)
+Exception Flow (EF) | EF1: Invalid File Format
+                    | 1. "Unsupported file format. Use JPG or PNG." message appears
+                    | 2. Upload is cancelled
+                    | 3. Return to step 3 of NF
+                    | 
+                    | EF2: File Size Too Large
+                    | 1. "File size exceeds 10MB limit" message appears
+                    | 2. System suggests compressing image
+                    | 3. Return to step 3 of NF
+                    | 
+                    | EF3: Image Rejected by Content Filter (UC011 or UC012)
+                    | 1. Go to UC011 or UC012 for content validation failure
+                    | 2. Upload is rejected
+                    | 3. Return to step 3 of NF
+                    | 
+                    | EF4: Upload Failed (Network Error)
+                    | 1. "Upload failed. Check internet connection." message appears
+                    | 2. System provides "Retry Upload" button
+                    | 3. Return to step 10 of NF
+
+================================================================================
+Table 4.12   Use Case Description for <UC010 Capture Skin Image>
+================================================================================
+Use Case ID         | UC010
+Use Case Name       | Capture Skin Image
+Actors              | Patient (Logged-in User)
+Description         | How a patient captures a real-time photo of skin lesion using
+                    | device camera with guidelines for proper lighting and distance.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Device has functional camera
+                    | 3. Browser has camera permission granted
+                    | 4. Patient has good lighting conditions
+Post-conditions     | 1. Image is captured and stored temporarily
+                    | 2. Image passes content validation
+                    | 3. Image is ready for AI analysis
+                    | 4. Patient can proceed to symptom questionnaire
+Normal Flow (NF)    | 1. Patient clicks "Capture Photo" on upload page
+                    | 2. System requests camera permission (if not granted)
+                    | 3. Patient grants camera access
+                    | 4. System activates camera and displays live preview
+                    | 5. System overlays capture guidelines:
+                    |    - Circle indicator for lesion placement
+                    |    - Distance indicator (too close/too far)
+                    |    - Lighting quality indicator
+                    | 6. Patient positions camera over skin lesion
+                    | 7. System provides visual feedback (green = good, red = adjust)
+                    | 8. Patient clicks "Capture" button when ready
+                    | 9. System captures image from camera
+                    | 10. System displays captured image preview
+                    | 11. Patient reviews image quality
+                    | 12. Patient clicks "Use This Photo" or "Retake"
+                    | 13. System uploads confirmed image to server
+                    | 14. System performs content validation (NSFW + skin check)
+                    | 15. System displays "Image captured successfully" message
+                    | 16. System enables "Continue to Questionnaire" button
+Alternative Flow    | AF1-UC010: Retake Photo
+(AF)                | 1. At step 12, patient clicks "Retake"
+                    | 2. System discards current capture
+                    | 3. Return to step 6 of NF
+                    | 
+                    | AF2-UC010: Switch to Upload
+                    | 1. Patient clicks "Upload from Gallery" during capture
+                    | 2. System closes camera
+                    | 3. Go to UC009 (Upload Skin Image)
+Exception Flow (EF) | EF1: Camera Permission Denied
+                    | 1. "Camera access denied" message appears
+                    | 2. System provides instructions to enable camera
+                    | 3. System provides "Upload from Gallery" alternative
+                    | 
+                    | EF2: No Camera Available
+                    | 1. "No camera detected on device" message appears
+                    | 2. System automatically switches to upload mode
+                    | 3. Go to UC009
+                    | 
+                    | EF3: Poor Lighting Detected
+                    | 1. System displays "Lighting too dark/bright" warning
+                    | 2. System suggests adjusting lighting or position
+                    | 3. Patient can ignore warning and proceed or adjust
+                    | 4. Return to step 6 of NF
+
+================================================================================
+Table 4.13   Use Case Description for <UC011 Validate Image Content>
+================================================================================
+
+Use Case ID         | UC011
+Use Case Name       | Validate Image Content
+Actors              | Vision Transformer AI System, Patient (indirect)
+Description         | How the system automatically checks uploaded images for
+                    | inappropriate content (NSFW filter) and verifies minimum 25%
+                    | skin content before allowing medical analysis.
+Pre-conditions      | 1. Image has been uploaded or captured (UC009 or UC010)
+                    | 2. Image file is in valid format
+                    | 3. NSFW detection model is loaded and operational
+Post-conditions     | 1. Image is validated as appropriate for medical analysis
+                    | 2. Image contains sufficient skin content (≥25%)
+                    | 3. Validation result is logged in database
+                    | 4. Image proceeds to AI lesion analysis (UC014)
+Normal Flow (NF)    | 1. System receives uploaded image from UC009 or UC010
+                    | 2. System converts image to RGB format if needed
+                    | 3. System preprocesses image to 224x224 pixels
+                    | 4. System calculates skin percentage using 4 criteria:
+                    |    a. RGB channel ordering (R > G > B)
+                    |    b. RGB value ranges (skin tone ranges)
+                    |    c. Brightness range (20-90%)
+                    |    d. Saturation range (10-70%)
+                    | 5. System counts pixels passing ≥3 criteria as "skin-like"
+                    | 6. System calculates total skin percentage
+                    | 7. System checks if skin percentage ≥ 25% threshold
+                    | 8. System performs text/graphics detection:
+                    |    - Edge density analysis
+                    |    - High contrast detection
+                    |    - Pure color block detection
+                    | 9. System calculates NSFW score using heuristic
+                    | 10. System checks NSFW score < 0.35 threshold
+                    | 11. All validation checks pass
+                    | 12. System logs "Validation passed" with skin percentage
+                    | 13. System returns success status
+                    | 14. Image proceeds to UC014 (AI Lesion Analysis)
+Alternative Flow    | None (Automatic system process)
+(AF)                | 
+Exception Flow (EF) | EF1: Insufficient Skin Content
+                    | 1. At step 7, skin percentage < 25%
+                    | 2. Go to UC012 (Reject Non-Skin Images)
+                    | 
+                    | EF2: Text/Graphics Detected
+                    | 1. At step 8, high edge density or contrast detected
+                    | 2. System identifies poster, document, or screenshot
+                    | 3. Go to UC012 (Reject Non-Skin Images)
+                    | 
+                    | EF3: NSFW Content Detected
+                    | 1. At step 10, NSFW score exceeds 0.35 threshold
+                    | 2. System logs "NSFW content detected"
+                    | 3. System rejects image with generic error message
+                    | 4. Display "Inappropriate content detected" to patient
+                    | 5. Patient must upload different image
+
+================================================================================
+Table 4.14   Use Case Description for <UC012 Reject Non-Skin Images>
+================================================================================
+
+Use Case ID         | UC012
+Use Case Name       | Reject Non-Skin Images
+Actors              | Vision Transformer AI System, Patient (receives rejection)
+Description         | How the system rejects posters, text documents, screenshots,
+                    | or images without sufficient skin content with clear error
+                    | messages guiding patient to upload proper skin lesion images.
+Pre-conditions      | 1. Image validation (UC011) has detected non-skin content
+                    | 2. Skin percentage < 25% OR text/graphics detected
+Post-conditions     | 1. Image is rejected and not stored in database
+                    | 2. Clear error message is displayed to patient
+                    | 3. Patient is prompted to upload valid skin image
+                    | 4. Rejection is logged for system monitoring
+Normal Flow (NF)    | 1. System detects skin percentage < 25% in UC011
+                    | 2. System logs rejection with reason:
+                    |    "Insufficient skin content (X%)" OR
+                    |    "Text/graphics detected"
+                    | 3. System displays user-friendly error message:
+                    |    "Image does not appear to contain a skin lesion.
+                    |     Please upload a clear, close-up photo of the affected
+                    |     skin area. Make sure the image shows actual skin
+                    |     (not posters, text, or other objects)."
+                    | 4. System discards uploaded image
+                    | 5. System highlights upload guidelines:
+                    |    - Must be actual skin/lesion photo
+                    |    - Clear, well-lit image
+                    |    - Close-up of affected area
+                    |    - No posters, documents, or screenshots
+                    | 6. System re-enables upload button
+                    | 7. Patient must upload new valid image
+Alternative Flow    | None (Automatic rejection process)
+(AF)                | 
+Exception Flow (EF) | EF1: False Positive (Valid Skin Image Rejected)
+                    | 1. Patient believes image is valid skin lesion
+                    | 2. System provides "Report Issue" button
+                    | 3. Patient can submit feedback with image for review
+                    | 4. System logs complaint for algorithm improvement
+                    | 5. Patient advised to try different lighting/angle
+
+
+================================================================================
+Table 4.15   Use Case Description for <UC013 Complete Symptom Questionnaire>
+================================================================================
+
+Use Case ID         | UC013
+Use Case Name       | Complete Symptom Questionnaire
+Actors              | Patient (Logged-in User)
+Description         | How a patient answers guided questions about skin lesion
+                    | symptoms including duration, pain level, itching, bleeding,
+                    | size changes, and location to provide comprehensive data for
+                    | AI risk assessment and doctor consultation.
+Pre-conditions      | 1. Patient has uploaded/captured valid skin image (UC009/UC010)
+                    | 2. Image has passed content validation (UC011)
+                    | 3. Patient is on symptom questionnaire page
+Post-conditions     | 1. All symptom responses are stored in database
+                    | 2. Questionnaire is linked to uploaded image
+                    | 3. System is ready to perform AI analysis (UC014)
+                    | 4. Doctor can review symptoms with analysis report
+Normal Flow (NF)    | 1. Patient clicks "Continue to Questionnaire" after image upload
+                    | 2. System displays symptom questionnaire form with 8 questions
+                    | 3. Q1: "How long have you noticed this lesion?"
+                    |    Patient selects: <1 week, 1-4 weeks, 1-6 months, >6 months
+                    | 4. Q2: "Has the lesion changed in size?"
+                    |    Patient selects: Growing, Shrinking, Stable, Unsure
+                    | 5. Q3: "Do you experience pain in this area?"
+                    |    Patient rates: 0 (None) to 5 (Severe) scale
+                    | 6. Q4: "Is there any itching or irritation?"
+                    |    Patient selects: None, Mild, Moderate, Severe
+                    | 7. Q5: "Has the lesion bled or oozed?"
+                    |    Patient selects: Never, Once, Occasionally, Frequently
+                    | 8. Q6: "Where is the lesion located on your body?"
+                    |    Patient selects from body map or dropdown list
+                    | 9. Q7: "Have you been exposed to excessive sun/UV?"
+                    |    Patient selects: Minimal, Moderate, High, Very High
+                    | 10. Q8: "Any additional symptoms or concerns?"
+                    |     Patient enters free text (optional, max 500 characters)
+                    | 11. Patient reviews all answers
+                    | 12. Patient clicks "Submit and Analyze" button
+                    | 13. System validates all required questions answered
+                    | 14. System stores responses in database with timestamp
+                    | 15. System links responses to uploaded image
+                    | 16. System displays "Analyzing..." progress indicator
+                    | 17. System proceeds to UC014 (AI Lesion Analysis)
+Alternative Flow    | AF1-UC013: Save as Draft
+(AF)                | 1. Patient partially completes questionnaire
+                    | 2. Patient clicks "Save Draft" button
+                    | 3. System saves current responses
+                    | 4. Patient can return later to complete
+                    | 5. System loads saved draft when patient returns
+                    | 
+                    | AF2-UC013: Edit Previous Answer
+                    | 1. Patient clicks "Back" to previous question
+                    | 2. System displays previous question
+                    | 3. Patient modifies answer
+                    | 4. Continue to next question
+Exception Flow (EF) | EF1: Incomplete Questionnaire
+                    | 1. "Please answer all required questions" message appears
+                    | 2. Unanswered questions are highlighted in red
+                    | 3. Submit button remains disabled until complete
+                    | 4. Return to unanswered questions
+                    | 
+                    | EF2: Text Input Too Long
+                    | 1. "Maximum 500 characters allowed" message appears
+                    | 2. Character counter shows: "532/500" in red
+                    | 3. Patient must shorten response
+                    | 4. Return to Q8 of NF
+
+================================================================================
+Table 4.16   Use Case Description for <UC014 AI Lesion Analysis>
+================================================================================
+
+Use Case ID         | UC014
+Use Case Name       | AI Lesion Analysis
+Actors              | Vision Transformer AI System (ViT), Patient (receives results)
+Description         | How the Vision Transformer deep learning model analyzes
+                    | validated skin images, detects and localizes lesions, and
+                    | classifies them into 7 cancer types with confidence scores
+                    | using 84% accurate AI model trained on HAM10000 dataset.
+Pre-conditions      | 1. Image has passed content validation (UC011)
+                    | 2. Symptom questionnaire completed (UC013)
+                    | 3. Vision Transformer model is loaded and operational
+                    | 4. Hugging Face API connection is active
+Post-conditions     | 1. AI analysis is complete with classification results
+                    | 2. Cancer type and confidence score are determined
+                    | 3. Lesion location is identified in image
+                    | 4. Results are stored in database
+                    | 5. System proceeds to UC015 (Display AI Results)
+Normal Flow (NF)    | 1. System receives validated image and questionnaire data
+                    | 2. System displays "Analyzing..." with progress indicator
+                    | 3. System preprocesses image for ViT model:
+                    |    - Resize to 224x224 pixels
+                    |    - Normalize pixel values to [-1, 1]
+                    |    - Convert to RGB if needed
+                    | 4. System loads Vision Transformer model from Hugging Face
+                    |    (Model: dima806/skin_cancer_detection_vit)
+                    | 5. System performs forward pass through neural network
+                    | 6. Model analyzes image features using attention mechanism
+                    | 7. Model generates probability scores for 7 cancer types:
+                    |    - Melanoma (mel)
+                    |    - Basal Cell Carcinoma (bcc)
+                    |    - Actinic Keratoses (akiec)
+                    |    - Benign Keratosis-Like Lesions (bkl)
+                    |    - Dermatofibroma (df)
+                    |    - Vascular Lesions (vasc)
+                    |    - Melanocytic Nevi/Moles (nv)
+                    | 8. System identifies highest probability as predicted class
+                    | 9. System converts probability to confidence percentage
+                    | 10. System performs lesion localization (bounding box)
+                    | 11. System stores raw predictions in database
+                    | 12. Analysis completes in <10 seconds
+                    | 13. System proceeds to UC016 (Generate Risk Assessment)
+                    | 14. System proceeds to UC015 (Display AI Results)
+Alternative Flow    | AF1-UC014: Model Loading Failed
+(AF)                | 1. System attempts to load model from Hugging Face
+                    | 2. Connection fails or model unavailable
+                    | 3. System retries up to 3 times
+                    | 4. If still fails, go to EF1
+Exception Flow (EF) | EF1: AI Model Unavailable
+                    | 1. "AI service temporarily unavailable" message appears
+                    | 2. System saves image and questionnaire for later analysis
+                    | 3. System offers to notify patient when service restored
+                    | 4. Analysis is queued for automatic retry
+                    | 
+                    | EF2: Analysis Timeout (>30 seconds)
+                    | 1. "Analysis taking longer than expected" message appears
+                    | 2. System continues processing in background
+                    | 3. Patient receives email when analysis completes
+                    | 4. Analysis result saved to patient's history
+                    | 
+                    | EF3: Low Confidence on All Classes (<40%)
+                    | 1. Analysis completes but all predictions <40% confidence
+                    | 2. System flags as "Uncertain - Manual Review Needed"
+                    | 3. System assigns Medium risk level by default
+                    | 4. Recommends professional consultation
+                    | 5. Continue to UC015 with uncertainty notice
+
+================================================================================
+Table 4.17   Use Case Description for <UC015 Display AI Results>
+================================================================================
+
+Use Case ID         | UC015
+Use Case Name       | Display AI Results
+Actors              | Patient (Logged-in User)
+Description         | How the system displays AI analysis results including cancer
+                    | type classification, confidence percentage, risk level with
+                    | color coding, recommended actions, and medical disclaimers.
+Pre-conditions      | 1. AI lesion analysis is complete (UC014)
+                    | 2. Risk assessment is generated (UC016)
+                    | 3. Results are stored in database
+Post-conditions     | 1. Patient views and understands analysis results
+                    | 2. Patient is informed of risk level and next steps
+                    | 3. Patient can download/save report
+                    | 4. Patient can proceed to book appointment (UC023)
+Normal Flow (NF)    | 1. System completes AI analysis (UC014)
+                    | 2. System generates risk assessment (UC016)
+                    | 3. System displays results page with sections:
+                    | 
+                    | SECTION 1: Risk Level Banner
+                    | 4. System shows color-coded risk level:
+                    |    - URGENT: Red banner, "Seek medical attention immediately"
+                    |    - HIGH: Orange banner, "Consult dermatologist soon"
+                    |    - MEDIUM: Yellow banner, "Schedule appointment"
+                    |    - LOW: Green banner, "Monitor and follow up if changes"
+                    | 
+                    | SECTION 2: AI Classification
+                    | 5. System displays predicted cancer type (e.g., "Melanoma")
+                    | 6. System shows confidence percentage (e.g., "87.3%")
+                    | 7. System displays confidence bar graph
+                    | 8. System shows all 7 classes with their probabilities
+                    | 
+                    | SECTION 3: Image with Lesion Localization
+                    | 9. System displays original uploaded image
+                    | 10. System overlays bounding box around detected lesion
+                    | 11. Patient can zoom in/out on image
+                    | 
+                    | SECTION 4: Symptom Summary
+                    | 12. System displays questionnaire responses summary
+                    | 13. Highlights concerning symptoms (bleeding, growth, pain)
+                    | 
+                    | SECTION 5: Recommended Actions
+                    | 14. System provides tailored recommendations based on risk:
+                    |     - Urgent: "Book appointment immediately"
+                    |     - High: "Consult dermatologist within 1-2 weeks"
+                    |     - Medium: "Schedule checkup in 2-4 weeks"
+                    |     - Low: "Monitor lesion, consult if changes occur"
+                    | 15. System shows "Find Nearby Hospitals" button (UC019)
+                    | 
+                    | SECTION 6: Medical Disclaimer
+                    | 16. System displays clear disclaimer:
+                    |     "This is a screening tool, not a diagnostic tool.
+                    |      AI accuracy: 84%. Only a qualified dermatologist
+                    |      can provide definitive diagnosis. Always consult
+                    |      a medical professional for proper evaluation."
+                    | 
+                    | 17. System provides action buttons:
+                    |     - "Find Hospitals" (UC019)
+                    |     - "Save Report" (UC017)
+                    |     - "Download PDF"
+                    |     - "Share with Doctor"
+                    | 18. Patient reviews results and decides next action
+Alternative Flow    | AF1-UC015: Download Report as PDF
+(AF)                | 1. Patient clicks "Download PDF" button
+                    | 2. System generates PDF with all results and images
+                    | 3. System includes QR code linking to digital report
+                    | 4. PDF downloads to patient's device
+                    | 5. Patient can print or email PDF to doctor
+                    | 
+                    | AF2-UC015: Share Report via Email
+                    | 1. Patient clicks "Share with Doctor" button
+                    | 2. System displays email form
+                    | 3. Patient enters doctor's email address
+                    | 4. System sends secure link to report
+                    | 5. Doctor can view report without login (read-only)
+Exception Flow (EF) | EF1: Results Display Error
+                    | 1. "Unable to display results" message appears
+                    | 2. System logs error for debugging
+                    | 3. System provides "View Raw Data" option
+                    | 4. Patient can contact support
+                    | 
+                    | EF2: PDF Generation Failed
+                    | 1. "PDF download failed" message appears
+                    | 2. System offers screenshot option instead
+                    | 3. Patient can retry download later
+
+================================================================================
+Table 4.18   Use Case Description for <UC016 Generate Risk Assessment>
+================================================================================
+
+Use Case ID         | UC016
+Use Case Name       | Generate Risk Assessment
+Actors              | Vision Transformer AI System (automated process)
+Description         | How the AI system automatically assigns risk levels (Low,
+                    | Medium, High, Urgent) based on cancer type classification and
+                    | confidence scores for clinical prioritization and triage.
+Pre-conditions      | 1. AI lesion analysis is complete (UC014)
+                    | 2. Cancer type and confidence score are determined
+                    | 3. Symptom questionnaire data is available
+Post-conditions     | 1. Risk level is assigned (Low/Medium/High/Urgent)
+                    | 2. Risk justification is generated
+                    | 3. Recommended timeline for consultation is set
+                    | 4. Hospital staff can use risk level for report prioritization
+Normal Flow (NF)    | 1. System receives AI classification results from UC014
+                    | 2. System extracts cancer type and confidence percentage
+                    | 3. System applies risk assessment algorithm:
+                    | 
+                    | URGENT Risk Assignment:
+                    | 4. IF cancer type = "Melanoma" (mel)
+                    |    OR confidence ≥ 85% AND type = dangerous (mel, bcc, akiec)
+                    |    THEN assign risk = "URGENT"
+                    |    Justification: "High-risk cancer type detected with
+                    |                   high confidence. Immediate medical
+                    |                   attention required."
+                    |    Timeline: "Within 24-48 hours"
+                    | 
+                    | HIGH Risk Assignment:
+                    | 5. IF cancer type = "Basal Cell Carcinoma" (bcc)
+                    |    OR cancer type = "Actinic Keratoses" (akiec)
+                    |    OR (confidence 70-84% AND type = mel)
+                    |    THEN assign risk = "HIGH"
+                    |    Justification: "Potentially dangerous lesion requiring
+                    |                   professional evaluation."
+                    |    Timeline: "Within 1-2 weeks"
+                    | 
+                    | MEDIUM Risk Assignment:
+                    | 6. IF cancer type = benign (bkl, df, vasc, nv)
+                    |    AND confidence 60-85%
+                    |    OR confidence 40-69% on any type
+                    |    OR symptom red flags (bleeding, rapid growth)
+                    |    THEN assign risk = "MEDIUM"
+                    |    Justification: "Moderate concern or uncertain diagnosis.
+                    |                   Professional consultation recommended."
+                    |    Timeline: "Within 2-4 weeks"
+                    | 
+                    | LOW Risk Assignment:
+                    | 7. IF cancer type = benign (nv, bkl, df)
+                    |    AND confidence ≥ 70%
+                    |    AND no concerning symptoms
+                    |    THEN assign risk = "LOW"
+                    |    Justification: "Likely benign lesion. Monitor for changes."
+                    |    Timeline: "Monitor, consult if changes occur"
+                    | 
+                    | 8. System considers symptom questionnaire data:
+                    |    - IF bleeding = "Frequently" → increase risk by 1 level
+                    |    - IF size change = "Growing" → increase risk by 1 level
+                    |    - IF pain ≥ 4/5 → increase risk by 1 level
+                    | 9. System stores final risk level in database
+                    | 10. System generates risk summary text
+                    | 11. System assigns color code: Red/Orange/Yellow/Green
+                    | 12. System calculates urgency score (0-100) for staff sorting
+                    | 13. Risk assessment complete, proceed to UC015
+Alternative Flow    | AF1-UC016: Conservative Bias Applied
+(AF)                | 1. System detects borderline case (e.g., 49% melanoma)
+                    | 2. System applies conservative bias (better false positive)
+                    | 3. System increases risk level by one step
+                    | 4. System adds note: "Assessment is precautionary"
+                    | 5. Continue to step 9 of NF
+Exception Flow (EF) | EF1: Conflicting Indicators
+                    | 1. AI says benign but symptoms suggest concern
+                    | 2. System defaults to higher risk level (safety first)
+                    | 3. System adds note: "Conflicting indicators detected"
+                    | 4. System recommends professional evaluation
+                    | 5. Continue to step 9 of NF
+                    | 
+                    | EF2: Very Low Confidence (<40% on all classes)
+                    | 1. System cannot confidently classify lesion
+                    | 2. System assigns MEDIUM risk by default (precautionary)
+                    | 3. System adds note: "Uncertain classification - 
+                    |                      professional review required"
+                    | 4. Continue to step 9 of NF
+
+================================================================================
+Table 4.19   Use Case Description for <UC017 Save Analysis Report>
+================================================================================
+
+Use Case ID         | UC017
+Use Case Name       | Save Analysis Report
+Actors              | System (automated), Patient (indirect)
+Description         | How the system automatically stores complete analysis including
+                    | image, AI predictions, symptom responses, risk assessment, and
+                    | timestamps in patient's medical history for future reference.
+Pre-conditions      | 1. AI analysis is complete (UC014)
+                    | 2. Risk assessment is generated (UC016)
+                    | 3. Results have been displayed to patient (UC015)
+Post-conditions     | 1. Complete analysis report is saved in database
+                    | 2. Report is linked to patient account
+                    | 3. Report has unique ID for reference
+                    | 4. Report is accessible in patient's history (UC018)
+                    | 5. Report can be attached to appointment booking (UC023)
+Normal Flow (NF)    | 1. System completes UC014, UC015, UC016
+                    | 2. System generates unique report ID (UUID format)
+                    | 3. System creates analysis_reports database record with:
+                    |    - report_id (unique identifier)
+                    |    - patient_id (linked to patient account)
+                    |    - image_url (path to stored image file)
+                    |    - image_thumbnail (compressed preview)
+                    |    - cancer_type (AI classification result)
+                    |    - confidence_score (percentage 0-100)
+                    |    - risk_level (Low/Medium/High/Urgent)
+                    |    - risk_justification (text explanation)
+                    |    - all_predictions (JSON with all 7 class probabilities)
+                    |    - lesion_location (bounding box coordinates)
+                    |    - symptom_responses (JSON questionnaire data)
+                    |    - created_at (timestamp)
+                    |    - model_version (ViT model version used)
+                    | 4. System stores original image file in secure storage
+                    | 5. System generates thumbnail image (200x200) for quick view
+                    | 6. System encrypts sensitive data fields
+                    | 7. System commits transaction to database
+                    | 8. System logs save operation with timestamp
+                    | 9. System returns success status
+                    | 10. Report is now available in patient history
+                    | 11. Report can be viewed via UC018
+                    | 12. Report can be attached to appointments via UC023
+Alternative Flow    | AF1-UC017: Auto-Save During Analysis
+(AF)                | 1. System saves draft report immediately after image upload
+                    | 2. Updates report with AI results when analysis completes
+                    | 3. Ensures no data loss if user navigates away
+                    | 4. Draft reports expire after 24 hours if not completed
+Exception Flow (EF) | EF1: Database Save Failed
+                    | 1. Database connection error or constraint violation
+                    | 2. System retries save operation up to 3 times
+                    | 3. If still fails, system saves to local backup
+                    | 4. System displays: "Report saved locally, will sync when
+                    |                     connection restored"
+                    | 5. System queues for automatic retry
+                    | 
+                    | EF2: Storage Quota Exceeded
+                    | 1. Patient has reached maximum storage limit
+                    | 2. System prompts: "Storage full. Delete old reports?"
+                    | 3. System shows list of oldest reports
+                    | 4. Patient can delete reports to free space
+                    | 5. After deletion, retry save operation
+
+================================================================================
+Table 4.20   Use Case Description for <UC018 View Analysis History>
+================================================================================
+
+Use Case ID         | UC018
+Use Case Name       | View Analysis History
+Actors              | Patient (Logged-in User)
+Description         | How a patient accesses all previous skin analyses with dates,
+                    | results, risk levels in chronological order, and can click to
+                    | view full report details for comparison and tracking.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Patient has at least one completed analysis (UC017)
+Post-conditions     | 1. Patient views comprehensive history of all analyses
+                    | 2. Patient can track changes over time
+                    | 3. Patient can access any previous report for review
+Normal Flow (NF)    | 1. Patient navigates to "My Analysis History" page
+                    | 2. System retrieves all reports for patient from database
+                    | 3. System sorts reports by date (newest first)
+                    | 4. System displays list with cards for each report showing:
+                    |    - Thumbnail of skin lesion image
+                    |    - Analysis date and time
+                    |    - Cancer type detected
+                    |    - Confidence percentage
+                    |    - Risk level badge (colored: Red/Orange/Yellow/Green)
+                    |    - Lesion location (body area)
+                    | 5. System shows summary statistics at top:
+                    |    - Total analyses performed
+                    |    - Urgent cases count
+                    |    - Date of first analysis
+                    | 6. Patient can scroll through history list
+                    | 7. Patient clicks on any report card to view details
+                    | 8. System displays full report (same as UC015)
+                    | 9. Patient can compare multiple reports side-by-side
+                    | 10. Patient can filter/search history (see AF)
+Alternative Flow    | AF1-UC018: Filter by Risk Level
+(AF)                | 1. At step 6, patient clicks "Filter" dropdown
+                    | 2. Patient selects risk level: All/Urgent/High/Medium/Low
+                    | 3. System filters list to show only selected risk level
+                    | 4. Patient views filtered results
+                    | 5. Patient can clear filter to see all
+                    | 
+                    | AF2-UC018: Search by Date Range
+                    | 1. Patient clicks "Date Range" filter
+                    | 2. Patient selects start and end dates
+                    | 3. System shows only reports within date range
+                    | 4. Useful for tracking specific time periods
+                    | 
+                    | AF3-UC018: Download History Report
+                    | 1. Patient clicks "Export History" button
+                    | 2. System generates PDF with all analyses
+                    | 3. PDF includes summary table and all images
+                    | 4. Patient can share history with doctor
+Exception Flow (EF) | EF1: No Analysis History
+                    | 1. "No analysis reports found" message appears
+                    | 2. System displays "Start New Analysis" button
+                    | 3. Clicking button goes to UC009 (Upload Image)
+                    | 
+                    | EF2: Report Loading Failed
+                    | 1. "Unable to load report" message on specific card
+                    | 2. System provides "Retry" button
+                    | 3. Other reports still visible and accessible
+                    | 4. System logs error for support team
+
+================================================================================
+SECTION 4: HOSPITAL FINDER & APPOINTMENTS (5 Use Cases)
+================================================================================
+
+================================================================================
+Table 4.21   Use Case Description for <UC019 Search Nearby Hospitals>
+================================================================================
+
+Use Case ID         | UC019
+Use Case Name       | Search Nearby Hospitals
+Actors              | Patient (Logged-in User), Google Maps API
+Description         | How the system uses patient's GPS location or manual address
+                    | to find dermatology hospitals and general hospitals within
+                    | 50km radius via Google Maps API for appointment booking.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Patient has completed analysis (UC014) OR wants to search
+                    | 3. Google Maps API key is valid and active
+                    | 4. Patient grants location permission OR enters address
+Post-conditions     | 1. List of nearby hospitals is displayed
+                    | 2. Hospitals are sorted by rating and distance
+                    | 3. Patient can view details and book appointments
+                    | 4. Up to 180 hospital results are retrieved
+Normal Flow (NF)    | 1. Patient clicks "Find Nearby Hospitals" button
+                    | 2. System requests location permission from browser
+                    | 3. Patient grants location permission
+                    | 4. System retrieves GPS coordinates (latitude, longitude)
+                    | 5. System displays "Searching nearby hospitals..." message
+                    | 6. System calls Google Places API with parameters:
+                    |    - Location: patient's coordinates
+                    |    - Radius: 50,000 meters (50km)
+                    |    - Type: "hospital"
+                    |    - Keyword: "dermatology" OR "skin" OR "hospital"
+                    | 7. Google Maps API returns hospital results (up to 180)
+                    | 8. System fetches additional details for each hospital:
+                    |    - Name, address, phone number
+                    |    - Rating (1-5 stars) and review count
+                    |    - Distance from patient location
+                    |    - Operating hours (open/closed status)
+                    |    - Website URL
+                    |    - Photos (if available)
+                    | 9. System goes to UC020 (Filter Hospital Results)
+                    | 10. System displays results on map view
+                    | 11. System displays results in list view below map
+                    | 12. Patient can click on hospital for details (UC021)
+Alternative Flow    | AF1-UC019: Manual Address Entry
+(AF)                | 1. At step 3, patient denies location permission
+                    | 2. System displays address input field
+                    | 3. Patient types address or postal code
+                    | 4. System uses Google Geocoding API to get coordinates
+                    | 5. Continue to step 5 of NF
+                    | 
+                    | AF2-UC019: Search from Analysis Results
+                    | 1. Patient on results page (UC015) after analysis
+                    | 2. Patient clicks "Find Hospitals" button
+                    | 3. System automatically passes risk level to search
+                    | 4. System prioritizes dermatology specialists for High/Urgent
+                    | 5. Continue to step 2 of NF
+Exception Flow (EF) | EF1: Location Permission Denied
+                    | 1. "Location access denied" message appears
+                    | 2. System shows manual address entry option
+                    | 3. Go to AF1
+                    | 
+                    | EF2: No Hospitals Found
+                    | 1. "No hospitals found within 50km" message appears
+                    | 2. System offers to expand search radius to 100km
+                    | 3. Patient can accept or enter different address
+                    | 4. If accepted, repeat search with 100km radius
+                    | 
+                    | EF3: Google Maps API Error
+                    | 1. "Unable to load hospital data" message appears
+                    | 2. System checks API key validity
+                    | 3. System provides "Retry" button
+                    | 4. System logs error for admin review
+                    | 5. System displays cached results if available
+
+================================================================================
+Table 4.22   Use Case Description for <UC020 Filter Hospital Results>
+================================================================================
+
+Use Case ID         | UC020
+Use Case Name       | Filter Hospital Results
+Actors              | System (automated), Patient (views results)
+Description         | How the system automatically filters and sorts hospital search
+                    | results displaying up to 180 hospitals sorted by rating
+                    | (4.5+ first) then distance, showing ratings, distance, and
+                    | operating hours for informed patient decision-making.
+Pre-conditions      | 1. Hospital search is complete (UC019)
+                    | 2. Google Maps API has returned hospital data
+                    | 3. Patient location is known
+Post-conditions     | 1. Hospitals are sorted by rating and distance
+                    | 2. High-rated hospitals (4.5+) appear first
+                    | 3. Patient can easily identify best options
+                    | 4. Open/closed status is visible for immediate booking
+Normal Flow (NF)    | 1. System receives hospital results from UC019
+                    | 2. System applies filtering algorithm:
+                    | 
+                    | STEP 1: Primary Sort by Rating
+                    | 3. System separates hospitals into groups:
+                    |    - Group A: Rating ≥ 4.5 stars (Excellent)
+                    |    - Group B: Rating 4.0-4.4 stars (Good)
+                    |    - Group C: Rating 3.5-3.9 stars (Average)
+                    |    - Group D: Rating < 3.5 OR no rating (Lower priority)
+                    | 
+                    | STEP 2: Secondary Sort by Distance
+                    | 4. Within each group, sort by distance (closest first)
+                    | 5. System calculates distance using haversine formula
+                    | 
+                    | STEP 3: Apply Display Filters
+                    | 6. System adds visual indicators:
+                    |    - Green dot: "Open Now"
+                    |    - Red dot: "Closed" with next opening time
+                    |    - Star rating display (★★★★★)
+                    |    - Distance in km (e.g., "2.3 km away")
+                    | 
+                    | 7. System limits display to 180 results maximum
+                    | 8. System creates result cards with:
+                    |    - Hospital name (bold)
+                    |    - Rating and review count (e.g., "4.7 ★ (234 reviews)")
+                    |    - Distance from patient
+                    |    - Open/Closed status
+                    |    - Specialties (if dermatology mentioned)
+                    |    - "View Details" button (UC021)
+                    |    - "Book Appointment" button (UC023)
+                    | 9. System displays results in two views:
+                    |    - Map View: Pins on Google Maps (red = closed, green = open)
+                    |    - List View: Scrollable cards with details
+                    | 10. Patient can switch between map and list views
+                    | 11. Patient can see all filtered and sorted results
+Alternative Flow    | AF1-UC020: Patient Applies Additional Filters
+(AF)                | 1. Patient clicks "More Filters" button
+                    | 2. System displays filter options:
+                    |    - Show only "Open Now" hospitals
+                    |    - Minimum rating (3.5, 4.0, 4.5, 5.0)
+                    |    - Maximum distance (10km, 25km, 50km)
+                    |    - Has "dermatology" specialty only
+                    | 3. Patient selects filter criteria
+                    | 4. System re-applies filters
+                    | 5. System updates result list
+                    | 6. Result count updates (e.g., "Showing 23 of 180 results")
+Exception Flow (EF) | EF1: All Hospitals Currently Closed
+                    | 1. System detects no hospitals are currently open
+                    | 2. "All hospitals currently closed" message appears
+                    | 3. System shows next opening times for each
+                    | 4. Patient can still view details and book future appointments
+                    | 
+                    | EF2: Very Few Results (<5 hospitals)
+                    | 1. "Limited hospitals in area" message appears
+                    | 2. System suggests expanding search radius
+                    | 3. System shows general hospitals as alternatives
+                    | 4. Patient can accept suggestion or search different location
+
+================================================================================
+Table 4.23   Use Case Description for <UC021 View Hospital Details>
+================================================================================
+
+Use Case ID         | UC021
+Use Case Name       | View Hospital Details
+Actors              | Patient (Logged-in User), Google Maps API
+Description         | How a patient views comprehensive facility information
+                    | including specialties, contact details, address, operating
+                    | hours, and patient reviews to make informed decision.
+Pre-conditions      | 1. Hospital search results are displayed (UC019, UC020)
+                    | 2. Patient has selected a hospital from list
+Post-conditions     | 1. Patient views complete hospital information
+                    | 2. Patient can make informed booking decision
+                    | 3. Patient can get directions (UC022) or book (UC023)
+Normal Flow (NF)    | 1. Patient clicks "View Details" on hospital card
+                    | 2. System displays hospital details modal/page with sections:
+                    | 
+                    | SECTION 1: Hospital Overview
+                    | 3. System displays:
+                    |    - Hospital name and type
+                    |    - Overall rating with star visualization
+                    |    - Total number of Google reviews
+                    |    - Current status: "Open Now" or "Closed - Opens at [time]"
+                    |    - Hospital photo(s) from Google Places
+                    | 
+                    | SECTION 2: Contact Information
+                    | 4. System displays:
+                    |    - Full address with postal code
+                    |    - Phone number (clickable to call)
+                    |    - Website URL (clickable link)
+                    |    - Email address (if available)
+                    | 
+                    | SECTION 3: Operating Hours
+                    | 5. System displays weekly schedule:
+                    |    Monday:    9:00 AM - 5:00 PM
+                    |    Tuesday:   9:00 AM - 5:00 PM
+                    |    ... (all 7 days)
+                    | 6. System highlights current day
+                    | 7. System shows "Open Now" or time until next opening
+                    | 
+                    | SECTION 4: Services & Specialties
+                    | 8. System displays available services:
+                    |    - Dermatology specialist (if applicable)
+                    |    - Skin cancer screening
+                    |    - General medicine
+                    |    - Emergency services (if available)
+                    | 
+                    | SECTION 5: Patient Reviews
+                    | 9. System displays recent Google reviews:
+                    |    - Reviewer name and rating
+                    |    - Review text (first 200 characters)
+                    |    - Review date
+                    | 10. Patient can click "Read All Reviews" for full list
+                    | 
+                    | SECTION 6: Location & Distance
+                    | 11. System displays embedded Google Map
+                    | 12. System shows distance from patient: "3.2 km away"
+                    | 13. System estimates travel time: "10 min by car"
+                    | 
+                    | SECTION 7: Action Buttons
+                    | 14. System provides buttons:
+                    |     - "Get Directions" (UC022)
+                    |     - "Book Appointment" (UC023)
+                    |     - "Call Hospital" (opens phone dialer)
+                    |     - "Visit Website" (opens external link)
+                    | 15. Patient reviews information and decides action
+Alternative Flow    | AF1-UC021: View More Photos
+(AF)                | 1. Patient clicks on hospital photo
+                    | 2. System opens photo gallery with all available images
+                    | 3. Patient can browse through facility photos
+                    | 4. Patient closes gallery to return to details
+Exception Flow (EF) | EF1: Incomplete Hospital Information
+                    | 1. Some details unavailable from Google Places
+                    | 2. System displays "Information not available" for missing data
+                    | 3. System suggests calling hospital for more details
+                    | 
+                    | EF2: Hospital No Longer Exists
+                    | 1. Google Places marks hospital as "Permanently Closed"
+                    | 2. System displays warning banner: "This facility may be closed"
+                    | 3. System disables "Book Appointment" button
+                    | 4. System suggests alternative hospitals
+
+================================================================================
+Table 4.24   Use Case Description for <UC022 Get Navigation Directions>
+================================================================================
+
+Use Case ID         | UC022
+Use Case Name       | Get Navigation Directions
+Actors              | Patient (Logged-in User), Google Maps API
+Description         | How the system provides turn-by-turn directions from patient's
+                    | location to selected hospital using Google Maps integration
+                    | with multiple route options and travel time estimates.
+Pre-conditions      | 1. Patient is viewing hospital details (UC021)
+                    | 2. Patient's location is known (GPS or address)
+                    | 3. Hospital address is valid
+                    | 4. Google Maps Directions API is operational
+Post-conditions     | 1. Turn-by-turn directions are displayed
+                    | 2. Patient knows exact route to hospital
+                    | 3. Patient can start navigation in Google Maps app
+Normal Flow (NF)    | 1. Patient clicks "Get Directions" button
+                    | 2. System retrieves patient's current location
+                    | 3. System retrieves hospital's address coordinates
+                    | 4. System calls Google Directions API with:
+                    |    - Origin: patient's coordinates
+                    |    - Destination: hospital coordinates
+                    |    - Mode: driving (default)
+                    |    - Alternatives: true (multiple routes)
+                    | 5. Google Maps API returns route information:
+                    |    - Turn-by-turn directions
+                    |    - Distance in km
+                    |    - Estimated travel time
+                    |    - Traffic conditions (if available)
+                    | 6. System displays route options (usually 2-3 routes):
+                    |    Route 1 (Fastest): 3.2 km, 10 min, via Main St
+                    |    Route 2 (Shortest): 2.8 km, 12 min, via Park Ave
+                    | 7. System displays route on embedded map with:
+                    |    - Blue line showing route path
+                    |    - Start marker (patient location)
+                    |    - End marker (hospital location)
+                    |    - Traffic colors (green/yellow/red if available)
+                    | 8. Patient selects preferred route
+                    | 9. System displays step-by-step directions:
+                    |    1. Head north on Main St (0.5 km)
+                    |    2. Turn right onto Park Ave (1.2 km)
+                    |    3. Turn left onto Hospital Dr (0.8 km)
+                    |    4. Destination on right
+                    | 10. System provides buttons:
+                    |     - "Open in Google Maps" (native app)
+                    |     - "Start Navigation"
+                    |     - "Share Directions" (via SMS/email)
+Alternative Flow    | AF1-UC022: Choose Different Travel Mode
+(AF)                | 1. At step 4, patient clicks travel mode selector
+                    | 2. Patient chooses: Driving/Transit/Walking/Bicycling
+                    | 3. System re-fetches directions with selected mode
+                    | 4. Travel time updates based on mode
+                    | 5. Continue to step 6 of NF
+                    | 
+                    | AF2-UC022: Open in Google Maps App
+                    | 1. Patient clicks "Open in Google Maps"
+                    | 2. System generates Google Maps URL with directions
+                    | 3. System opens URL (launches Google Maps app or website)
+                    | 4. Patient uses native Google Maps for navigation
+Exception Flow (EF) | EF1: Directions API Error
+                    | 1. "Unable to load directions" message appears
+                    | 2. System provides manual address for GPS entry
+                    | 3. System provides hospital phone number
+                    | 4. Patient can call for directions
+                    | 
+                    | EF2: No Route Found
+                    | 1. "No route available" message appears
+                    | 2. System displays hospital address for manual lookup
+                    | 3. Patient can try different travel mode
+
+================================================================================
+Table 4.25   Use Case Description for <UC023 Book Appointment>
+================================================================================
+
+Use Case ID         | UC023
+Use Case Name       | Book Appointment
+Actors              | Patient (Logged-in User)
+Description         | How a patient selects a hospital, chooses preferred date and
+                    | time, attaches analysis report, and submits appointment
+                    | request with urgency level for hospital staff confirmation.
+Pre-conditions      | 1. Patient is logged in to system
+                    | 2. Patient has selected hospital (from UC019/UC020/UC021)
+                    | 3. Patient has completed analysis report (UC014-UC017)
+                    | 4. Hospital is registered in system
+Post-conditions     | 1. Appointment request is submitted to hospital
+                    | 2. Hospital staff receives notification
+                    | 3. Patient identity remains hidden until staff confirms (UC027)
+                    | 4. Patient receives confirmation of request submission
+                    | 5. Appointment status is "Pending" awaiting staff action
+Normal Flow (NF)    | 1. Patient clicks "Book Appointment" on hospital card/details
+                    | 2. System displays appointment booking form
+                    | 3. System pre-fills hospital name and address (read-only)
+                    | 4. System displays "Select Analysis Report" dropdown
+                    | 5. Patient selects report from analysis history
+                    | 6. System displays report summary:
+                    |    - Cancer type detected
+                    |    - Risk level (with color badge)
+                    |    - Analysis date
+                    | 7. System auto-suggests urgency based on risk level:
+                    |    - Urgent → "Within 24-48 hours"
+                    |    - High → "Within 1-2 weeks"
+                    |    - Medium → "Within 2-4 weeks"
+                    |    - Low → "Routine checkup"
+                    | 8. Patient selects preferred date (calendar picker)
+                    | 9. Patient selects preferred time slot:
+                    |    Morning (9AM-12PM), Afternoon (1PM-5PM), Evening (5PM-8PM)
+                    | 10. System validates date is not in the past
+                    | 11. Patient enters additional notes (optional, max 300 chars):
+                    |     - Specific concerns
+                    |     - Symptoms
+                    |     - Availability constraints
+                    | 12. System displays appointment summary for review:
+                    |     - Hospital: [Name]
+                    |     - Report: [Cancer Type] - [Risk Level]
+                    |     - Preferred Date: [Date]
+                    |     - Preferred Time: [Time Slot]
+                    |     - Notes: [Patient Notes]
+                    | 13. Patient checks "I confirm this information is correct"
+                    | 14. Patient clicks "Submit Appointment Request" button
+                    | 15. System validates all required fields
+                    | 16. System creates appointment record in database:
+                    |     - appointment_id (unique)
+                    |     - patient_id (linked to patient)
+                    |     - hospital_id (linked to hospital)
+                    |     - report_id (linked to analysis)
+                    |     - preferred_date, preferred_time
+                    |     - urgency_level (based on risk)
+                    |     - patient_notes
+                    |     - status: "Pending"
+                    |     - created_at (timestamp)
+                    | 17. System notifies hospital staff (email notification)
+                    | 18. System displays success message:
+                    |     "Appointment request submitted successfully!
+                    |      Hospital will review and confirm within 24-48 hours.
+                    |      You will receive email when confirmed."
+                    | 19. System redirects to "My Appointments" page
+                    | 20. Patient can view appointment status: "Pending"
+Alternative Flow    | AF1-UC023: Book Without Analysis Report
+(AF)                | 1. Patient wants to book without AI analysis
+                    | 2. At step 5, patient selects "General Consultation"
+                    | 3. System allows booking without report attachment
+                    | 4. Patient must provide reason for visit in notes
+                    | 5. Continue to step 8 of NF
+                    | 
+                    | AF2-UC023: Urgent Case Fast-Track
+                    | 1. Analysis shows "Urgent" risk level
+                    | 2. System displays warning: "This is an urgent case"
+                    | 3. System suggests calling hospital directly
+                    | 4. System provides hospital phone number
+                    | 5. Patient can still submit request online if preferred
+                    | 6. Continue to step 8 of NF
+Exception Flow (EF) | EF1: Date in the Past Selected
+                    | 1. "Please select a future date" message appears
+                    | 2. Date field is highlighted in red
+                    | 3. Return to step 8 of NF
+                    | 
+                    | EF2: No Analysis Reports Available
+                    | 1. "No analysis reports found" message appears
+                    | 2. System provides "Start New Analysis" button
+                    | 3. Patient can create new analysis (UC009) or
+                    | 4. Patient can book general consultation (AF1)
+                    | 
+                    | EF3: Hospital Not Registered in System
+                    | 1. "This hospital cannot accept online appointments"
+                    | 2. System displays hospital phone number
+                    | 3. System suggests calling to book manually
+                    | 4. Booking form is disabled
+
+================================================================================
+SECTION 5: REPORT REVIEW (HOSPITAL STAFF) (4 Use Cases)
+================================================================================
+
+================================================================================
+Table 4.26   Use Case Description for <UC024 View Reports by Urgency>
+================================================================================
+
+Use Case ID         | UC024
+Use Case Name       | View Reports by Urgency
+Actors              | Hospital/Clinic Staff (Dermatologist, Medical Staff)
+Description         | How hospital staff views incoming patient appointment requests
+                    | and analysis reports organized by risk level (Urgent → High →
+                    | Medium → Low) with color coding for quick visual triage.
+Pre-conditions      | 1. Staff is logged in to hospital dashboard (UC004)
+                    | 2. Hospital has received appointment requests
+                    | 3. Patients have submitted analysis reports
+Post-conditions     | 1. Staff views prioritized list of patient reports
+                    | 2. Staff can identify urgent cases immediately
+                    | 3. Staff can click on report for detailed review (UC025)
+                    | 4. Patient identity remains hidden until appointment confirmed
+Normal Flow (NF)    | 1. Staff logs into hospital dashboard (UC004)
+                    | 2. System displays "Pending Appointments" dashboard
+                    | 3. System retrieves all pending appointments for this hospital
+                    | 4. System organizes reports by urgency score (0-100):
+                    |    - Urgent (score 80-100): Red section at top
+                    |    - High (score 60-79): Orange section
+                    |    - Medium (score 40-59): Yellow section
+                    |    - Low (score 0-39): Green section at bottom
+                    | 5. System displays each section with count:
+                    |    🔴 Urgent (3 cases)
+                    |    🟠 High (7 cases)
+                    |    🟡 Medium (12 cases)
+                    |    🟢 Low (5 cases)
+                    | 6. Within each urgency level, reports show:
+                    |    - Report ID (anonymized: REP-12345)
+                    |    - Submission date and time
+                    |    - Cancer type detected (e.g., "Melanoma")
+                    |    - AI confidence percentage (e.g., "87.3%")
+                    |    - Risk level badge (color-coded)
+                    |    - Preferred appointment date/time
+                    |    - Days waiting (e.g., "2 days ago")
+                    |    - Lesion thumbnail image
+                    | 7. Patient name, contact, and medical history HIDDEN
+                    | 8. Each report card has buttons:
+                    |    - "Review Report" (UC025)
+                    |    - "Confirm Appointment" (UC027)
+                    |    - "Reject" (UC028)
+                    | 9. Staff can filter view:
+                    |    - Show only: Urgent / High / Medium / Low / All
+                    |    - Sort by: Date / Confidence / Wait Time
+                    | 10. Staff clicks on report to review details (UC025)
+Alternative Flow    | AF1-UC024: Auto-Refresh Dashboard
+(AF)                | 1. Dashboard auto-refreshes every 5 minutes
+                    | 2. New appointments appear automatically
+                    | 3. System shows notification: "2 new urgent cases"
+                    | 4. Notification badge updates in navigation
+                    | 
+                    | AF2-UC024: Email Notification for Urgent Cases
+                    | 1. New urgent case submitted
+                    | 2. System immediately sends email to all hospital staff
+                    | 3. Email subject: "🔴 URGENT: New skin cancer case"
+                    | 4. Staff can click link to review immediately
+Exception Flow (EF) | EF1: No Pending Appointments
+                    | 1. "No pending appointments" message appears
+                    | 2. Dashboard shows empty state with illustration
+                    | 3. System displays statistics of completed appointments
+                    | 
+                    | EF2: Dashboard Load Error
+                    | 1. "Unable to load appointments" message appears
+                    | 2. System provides "Retry" button
+                    | 3. System logs error for admin review
+                    | 4. Staff can refresh page manually
+
+================================================================================
+Table 4.27   Use Case Description for <UC025 Review Patient Report>
+================================================================================
+
+Use Case ID         | UC025
+Use Case Name       | Review Patient Report
+Actors              | Hospital/Clinic Staff (Dermatologist, Medical Staff)
+Description         | How hospital staff reviews AI analysis results, skin lesion
+                    | images, and symptom questionnaire responses while patient
+                    | identity remains hidden until appointment is confirmed.
+Pre-conditions      | 1. Staff is viewing urgency dashboard (UC024)
+                    | 2. Staff has selected a report to review
+                    | 3. Appointment status is "Pending"
+Post-conditions     | 1. Staff has reviewed complete analysis report
+                    | 2. Staff can decide to confirm (UC027) or reject (UC028)
+                    | 3. Staff has professional context for consultation
+                    | 4. Patient identity still protected until confirmation
+Normal Flow (NF)    | 1. Staff clicks "Review Report" on report card (UC024)
+                    | 2. System opens report review modal/page with sections:
+                    | 
+                    | SECTION 1: Risk Assessment Summary
+                    | 3. System displays prominent risk level banner:
+                    |    - URGENT: Red, large warning icon
+                    |    - HIGH: Orange, attention icon
+                    |    - MEDIUM: Yellow, caution icon
+                    |    - LOW: Green, info icon
+                    | 4. System shows recommended timeline for consultation
+                    | 
+                    | SECTION 2: AI Analysis Results
+                    | 5. System displays:
+                    |    - Predicted cancer type (e.g., "Melanoma")
+                    |    - Confidence percentage with bar graph
+                    |    - All 7 class probabilities in table format
+                    |    - Model accuracy note: "84% accuracy (HAM10000 dataset)"
+                    |    - Analysis date and time
+                    | 
+                    | SECTION 3: Lesion Images
+                    | 6. System displays skin lesion image(s):
+                    |    - Original uploaded image (full resolution)
+                    |    - Lesion localization overlay (bounding box)
+                    |    - Zoom controls for detailed examination
+                    |    - Download image option
+                    | 7. Staff can examine image closely
+                    | 
+                    | SECTION 4: Symptom Questionnaire Responses
+                    | 8. System displays patient's symptom responses:
+                    |    - Duration noticed: [Response]
+                    |    - Size changes: [Response]
+                    |    - Pain level: [0-5 rating]
+                    |    - Itching/irritation: [Response]
+                    |    - Bleeding/oozing: [Response]
+                    |    - Lesion location: [Body area]
+                    |    - Sun/UV exposure: [Response]
+                    |    - Additional notes: [Free text]
+                    | 9. System highlights concerning symptoms in red:
+                    |    - Frequent bleeding
+                    |    - Rapid growth
+                    |    - Severe pain
+                    | 
+                    | SECTION 5: Appointment Request Details
+                    | 10. System displays:
+                    |     - Preferred date and time
+                    |     - Days waiting for response
+                    |     - Patient notes/concerns
+                    |     - Urgency level justification
+                    | 
+                    | SECTION 6: Privacy Notice
+                    | 11. System displays notice:
+                    |     "⚠️ PATIENT IDENTITY PROTECTED
+                    |      Patient name and contact information will be revealed
+                    |      only after you confirm this appointment.
+                    |      Medical history access granted after confirmation."
+                    | 
+                    | SECTION 7: Action Buttons
+                    | 12. System provides decision buttons:
+                    |     - "Confirm Appointment" (UC027) - Green button
+                    |     - "Reject Request" (UC028) - Red button
+                    |     - "Request More Information" - Yellow button
+                    |     - "Print Report" - Gray button
+                    | 13. Staff reviews all information thoroughly
+                    | 14. Staff decides whether to confirm or reject appointment
+Alternative Flow    | AF1-UC025: Download Report as PDF
+(AF)                | 1. Staff clicks "Print Report" button
+                    | 2. System generates PDF with all report sections
+                    | 3. Patient identity remains anonymized in PDF
+                    | 4. Staff can print for physical file review
+                    | 
+                    | AF2-UC025: Request More Information
+                    | 1. Staff clicks "Request More Information" button
+                    | 2. System displays message form
+                    | 3. Staff enters questions for patient
+                    | 4. System sends email to patient (anonymous)
+                    | 5. Patient can respond via system
+                    | 6. Staff receives notification when patient responds
+Exception Flow (EF) | EF1: Image Load Failed
+                    | 1. "Unable to load image" message appears
+                    | 2. System provides download link as alternative
+                    | 3. Staff can still review text information
+                    | 4. Staff can request patient to re-upload
+                    | 
+                    | EF2: Incomplete Report Data
+                    | 1. System detects missing symptom responses
+                    | 2. Warning: "Some information incomplete"
+                    | 3. Staff can still proceed or request completion
+
+================================================================================
+Table 4.28   Use Case Description for <UC026 Access Patient History>
+================================================================================
+
+Use Case ID         | UC026
+Use Case Name       | Access Patient History
+Actors              | Hospital/Clinic Staff (after appointment confirmation)
+Description         | How hospital staff accesses patient's complete medical history,
+                    | health profile, previous analyses, and medication information
+                    | ONLY AFTER confirming appointment for consultation preparation.
+Pre-conditions      | 1. Appointment has been CONFIRMED by staff (UC027 completed)
+                    | 2. Patient identity is now revealed to staff
+                    | 3. Staff is preparing for upcoming consultation
+                    | 4. Patient has created health profile (UC006)
+Post-conditions     | 1. Staff has complete medical context for consultation
+                    | 2. Staff can provide informed care
+                    | 3. Access is logged for privacy audit trail
+                    | 4. Patient is notified of medical history access
+Normal Flow (NF)    | 1. Staff views confirmed appointment in dashboard
+                    | 2. Appointment status shows "Confirmed"
+                    | 3. Patient name and contact now visible
+                    | 4. Staff clicks "View Patient Medical History" button
+                    | 5. System verifies appointment is confirmed
+                    | 6. System logs access event:
+                    |    - staff_id, patient_id, timestamp
+                    |    - Purpose: "Pre-consultation review"
+                    | 7. System displays patient health profile with sections:
+                    | 
+                    | SECTION 1: Patient Demographics
+                    | 8. System displays:
+                    |    - Full name, age, gender
+                    |    - Contact: phone, email
+                    |    - Skin type (Fitzpatrick scale I-VI)
+                    | 
+                    | SECTION 2: Medical Conditions
+                    | 9. System lists current conditions:
+                    |    - Diabetes, autoimmune disorders, etc.
+                    |    - Diagnosis dates if available
+                    |    - Status: Active/Controlled/Past
+                    | 
+                    | SECTION 3: Current Medications
+                    | 10. System displays medication list:
+                    |     - Medication name
+                    |     - Dosage and frequency
+                    |     - Start date
+                    |     - Purpose/indication
+                    | 11. System highlights medications affecting skin:
+                    |     - Photosensitive drugs
+                    |     - Immunosuppressants
+                    | 
+                    | SECTION 4: Allergies
+                    | 12. System displays known allergies:
+                    |     - Drug allergies (important for prescriptions)
+                    |     - Material allergies (adhesives, latex)
+                    |     - Substance allergies
+                    |     - Severity: Mild/Moderate/Severe/Anaphylaxis
+                    | 13. Critical allergies highlighted in RED
+                    | 
+                    | SECTION 5: Previous Skin Conditions
+                    | 14. System shows skin history:
+                    |     - Past skin lesions or treatments
+                    |     - Previous diagnoses
+                    |     - Treatment outcomes
+                    |     - Dates and details
+                    | 
+                    | SECTION 6: Risk Factors
+                    | 15. System displays risk factors:
+                    |     - Family history of skin cancer (Yes/No with details)
+                    |     - Sun exposure level (Low/Medium/High/Very High)
+                    |     - History of sunburns
+                    |     - Tanning bed use
+                    | 
+                    | SECTION 7: Previous AI Analyses
+                    | 16. System shows all past skin analyses:
+                    |     - Date, lesion location, cancer type detected
+                    |     - Risk levels over time
+                    |     - Any patterns or trends
+                    |     - Timeline visualization
+                    | 17. Staff can compare current case with past analyses
+                    | 
+                    | 18. System provides action buttons:
+                    |     - "Print Medical Summary"
+                    |     - "Add Clinical Notes" (for staff records)
+                    |     - "Request Additional Information" from patient
+                    | 19. Staff reviews all information for consultation prep
+                    | 20. System sends email to patient:
+                    |     "Your medical history was accessed by [Hospital Name]
+                    |      on [Date] at [Time] for your upcoming appointment."
+Alternative Flow    | AF1-UC026: Patient Has No Health Profile
+(AF)                | 1. At step 7, system detects no health profile created
+                    | 2. System displays: "Patient has not created health profile"
+                    | 3. System shows only: name, contact, analysis reports
+                    | 4. Staff can request patient complete profile before visit
+                    | 5. System sends reminder email to patient
+Exception Flow (EF) | EF1: Access Denied (No Confirmed Appointment)
+                    | 1. Staff attempts access without confirmed appointment
+                    | 2. "Access denied: Patient privacy protected" message
+                    | 3. System explains: Confirm appointment first to access
+                    | 4. System logs unauthorized access attempt
+                    | 5. Access is blocked
+                    | 
+                    | EF2: Incomplete Medical History
+                    | 1. Some health profile sections are empty
+                    | 2. System displays: "Some information unavailable"
+                    | 3. Staff can work with available data
+                    | 4. Staff can gather missing info during consultation
+
+================================================================================
+SECTION 6: APPOINTMENT MANAGEMENT (5 Use Cases)
+================================================================================
+
+================================================================================
+Table 4.29   Use Case Description for <UC027 Confirm Appointment>
+================================================================================
+
+Use Case ID         | UC027
+Use Case Name       | Confirm Appointment
+Actors              | Hospital/Clinic Staff, Email System (SMTP), Patient (receives)
+Description         | How hospital staff accepts appointment request, selects
+                    | available time slot, and system automatically sends
+                    | confirmation email revealing patient identity and granting
+                    | access to full medical history.
+Pre-conditions      | 1. Staff has reviewed patient report (UC025)
+                    | 2. Staff decides to accept appointment
+                    | 3. Appointment status is currently "Pending"
+                    | 4. Hospital has availability for consultation
+Post-conditions     | 1. Appointment status changes to "Confirmed"
+                    | 2. Patient identity and contact revealed to staff
+                    | 3. Staff gains access to full medical history (UC026)
+                    | 4. Patient receives confirmation email automatically
+                    | 5. Appointment added to hospital calendar
+                    | 6. Patient receives calendar invite (.ics file)
+Normal Flow (NF)    | 1. Staff reviews report (UC025) and decides to accept
+                    | 2. Staff clicks "Confirm Appointment" button
+                    | 3. System displays appointment confirmation form:
+                    | 
+                    | SECTION 1: Appointment Details Review
+                    | 4. System shows:
+                    |    - Report summary (cancer type, risk level)
+                    |    - Patient's preferred date/time
+                    |    - Days patient has been waiting
+                    | 
+                    | SECTION 2: Schedule Selection
+                    | 5. System displays hospital's calendar availability
+                    | 6. Staff selects confirmed date from available slots
+                    | 7. Staff selects confirmed time (specific hour, e.g., 2:00 PM)
+                    | 8. Staff can use preferred date or suggest alternative
+                    | 9. System validates selected slot is not double-booked
+                    | 
+                    | SECTION 3: Consultation Details
+                    | 10. Staff selects consultation type:
+                    |     - Initial screening
+                    |     - Follow-up examination
+                    |     - Biopsy required
+                    |     - General consultation
+                    | 11. Staff estimates consultation duration: 15/30/45/60 min
+                    | 12. Staff assigns dermatologist (if multiple doctors)
+                    | 13. Staff adds internal notes (not visible to patient)
+                    | 
+                    | SECTION 4: Patient Communication
+                    | 14. Staff enters confirmation message (optional):
+                    |     - Special instructions for patient
+                    |     - What to bring (ID, insurance, previous records)
+                    |     - Preparation instructions (e.g., no makeup on lesion)
+                    | 15. Staff reviews all confirmation details
+                    | 16. Staff clicks "Confirm and Notify Patient" button
+                    | 
+                    | SECTION 5: System Processing
+                    | 17. System updates appointment record:
+                    |     - status: "Pending" → "Confirmed"
+                    |     - confirmed_date: [Selected date]
+                    |     - confirmed_time: [Selected time]
+                    |     - consultation_type, duration, assigned_doctor
+                    |     - confirmed_at: [Current timestamp]
+                    |     - confirmed_by: [Staff ID]
+                    | 18. System reveals patient identity to staff:
+                    |     - Full name, phone, email now visible
+                    | 19. System grants staff access to patient history (UC026)
+                    | 20. System adds appointment to hospital calendar
+                    | 21. System sends confirmation email to patient via SMTP:
+                    |     
+                    |     Subject: "✅ Appointment Confirmed - [Hospital Name]"
+                    |     
+                    |     Body:
+                    |     "Dear [Patient Name],
+                    |     
+                    |     Your appointment has been confirmed!
+                    |     
+                    |     Hospital: [Hospital Name]
+                    |     Address: [Full Address]
+                    |     Date: [Confirmed Date]
+                    |     Time: [Confirmed Time]
+                    |     Doctor: [Assigned Doctor Name]
+                    |     Duration: [Estimated Duration]
+                    |     
+                    |     What to bring:
+                    |     - Photo ID
+                    |     - Insurance card (if applicable)
+                    |     [Staff's additional instructions]
+                    |     
+                    |     Report Summary:
+                    |     - Cancer Type: [AI Classification]
+                    |     - Risk Level: [Low/Medium/High/Urgent]
+                    |     
+                    |     Please arrive 10 minutes early to complete paperwork.
+                    |     
+                    |     Need to reschedule? Contact us at [Hospital Phone]
+                    |     
+                    |     Get Directions: [Google Maps Link]
+                    |     
+                    |     Thank you,
+                    |     [Hospital Name] Team"
+                    |     
+                    |     Attachments: 
+                    |     - Calendar invite (.ics file)
+                    |     - Hospital location map
+                    | 
+                    | 22. System displays success message to staff:
+                    |     "Appointment confirmed! Patient has been notified."
+                    | 23. Appointment moves to "Confirmed Appointments" list
+                    | 24. Appointment removed from "Pending" dashboard
+Alternative Flow    | AF1-UC027: Suggest Alternative Date
+(AF)                | 1. At step 6, preferred date is not available
+                    | 2. Staff selects alternative date close to preference
+                    | 3. Email includes note: "We've scheduled you for [new date]
+                    |    instead of requested [preferred date]. Please contact
+                    |    us if this doesn't work for you."
+                    | 4. Continue to step 17 of NF
+                    | 
+                    | AF2-UC027: Urgent Case Priority
+                    | 1. Report has "Urgent" risk level
+                    | 2. System highlights case in red
+                    | 3. Staff prioritizes booking within 24-48 hours
+                    | 4. Staff may call patient directly before email
+                    | 5. Email marked as urgent with priority flag
+                    | 6. Continue to step 17 of NF
+Exception Flow (EF) | EF1: Email Send Failed
+                    | 1. SMTP server error or patient email invalid
+                    | 2. System displays: "Confirmation email failed to send"
+                    | 3. Appointment still confirmed in database
+                    | 4. System logs error and queues for retry
+                    | 5. Staff sees warning: "Contact patient by phone"
+                    | 6. System provides patient phone number
+                    | 7. Staff must call patient to confirm verbally
+                    | 
+                    | EF2: Calendar Slot Already Booked
+                    | 1. Between step 6 and 16, another staff member books slot
+                    | 2. "This time slot is no longer available" message
+                    | 3. System refreshes calendar
+                    | 4. Staff selects different time slot
+                    | 5. Return to step 6 of NF
+
+================================================================================
+Table 4.30   Use Case Description for <UC028 Reject Appointment>
+================================================================================
+
+Use Case ID         | UC028
+Use Case Name       | Reject Appointment
+Actors              | Hospital/Clinic Staff, Email System (SMTP), Patient (receives)
+Description         | How hospital staff declines appointment requests with reason
+                    | (fully booked, requires different specialist, etc.) and system
+                    | sends rejection email with suggestions for alternative
+                    | hospitals nearby to help patient find care.
+Pre-conditions      | 1. Staff has reviewed patient report (UC025)
+                    | 2. Staff decides to decline appointment
+                    | 3. Appointment status is currently "Pending"
+                    | 4. Valid reason for rejection exists
+Post-conditions     | 1. Appointment status changes to "Rejected"
+                    | 2. Patient receives rejection email with reason
+                    | 3. Patient identity remains HIDDEN (never revealed)
+                    | 4. Report remains available for patient to book elsewhere
+                    | 5. System suggests alternative hospitals to patient
+Normal Flow (NF)    | 1. Staff reviews report (UC025) and decides to decline
+                    | 2. Staff clicks "Reject Request" button
+                    | 3. System displays rejection form with sections:
+                    | 
+                    | SECTION 1: Rejection Reason (Required)
+                    | 4. Staff selects reason from dropdown:
+                    |    - Fully booked / No availability
+                    |    - Requires specialized dermatologist not available
+                    |    - Case requires hospital equipment we don't have
+                    |    - Patient location too far from hospital
+                    |    - Requires emergency care (urgent case)
+                    |    - Other (specify)
+                    | 5. If "Other" selected, staff enters custom reason
+                    | 
+                    | SECTION 2: Explanation Message (Optional)
+                    | 6. Staff can add personalized message to patient:
+                    |    - Apologize for inconvenience
+                    |    - Explain situation in detail
+                    |    - Offer specific recommendations
+                    |    - Provide contact for questions
+                    | 7. System provides template messages based on reason
+                    | 
+                    | SECTION 3: Alternative Recommendations
+                    | 8. System automatically finds nearby alternative hospitals:
+                    |    - Within same 50km radius
+                    |    - Similar or better ratings
+                    |    - Dermatology specialists
+                    | 9. Staff can select up to 3 hospitals to recommend
+                    | 10. System will include these in rejection email
+                    | 
+                    | 11. Staff reviews rejection details
+                    | 12. Staff clicks "Confirm Rejection and Notify Patient"
+                    | 
+                    | SECTION 4: System Processing
+                    | 13. System updates appointment record:
+                    |     - status: "Pending" → "Rejected"
+                    |     - rejection_reason: [Selected reason]
+                    |     - rejection_message: [Staff message]
+                    |     - rejected_at: [Current timestamp]
+                    |     - rejected_by: [Staff ID]
+                    | 14. Patient identity remains HIDDEN (never revealed to staff)
+                    | 15. System removes from staff's pending dashboard
+                    | 16. Report remains in patient's history for other bookings
+                    | 17. System sends rejection email to patient via SMTP:
+                    |     
+                    |     Subject: "Appointment Request Update - [Hospital Name]"
+                    |     
+                    |     Body:
+                    |     "Dear Patient,
+                    |     
+                    |     Thank you for your appointment request with
+                    |     [Hospital Name].
+                    |     
+                    |     Unfortunately, we are unable to accommodate your
+                    |     appointment at this time.
+                    |     
+                    |     Reason: [Rejection Reason]
+                    |     
+                    |     [Staff's personalized message if provided]
+                    |     
+                    |     We understand this may be disappointing, especially
+                    |     given your analysis shows [Risk Level] priority.
+                    |     
+                    |     WE RECOMMEND THESE ALTERNATIVE HOSPITALS:
+                    |     
+                    |     1. [Hospital Name] - 2.5km away - ★★★★★ 4.8
+                    |        [Address] | [Phone] | [Website]
+                    |        [Quick book link]
+                    |     
+                    |     2. [Hospital Name] - 4.1km away - ★★★★★ 4.7
+                    |        [Address] | [Phone] | [Website]
+                    |        [Quick book link]
+                    |     
+                    |     3. [Hospital Name] - 6.3km away - ★★★★★ 4.6
+                    |        [Address] | [Phone] | [Website]
+                    |        [Quick book link]
+                    |     
+                    |     Your analysis report remains saved in your account
+                    |     and can be used to book with another hospital.
+                    |     
+                    |     [For URGENT cases: "⚠️ IMPORTANT: Your case is marked
+                    |     as URGENT. Please seek consultation as soon as
+                    |     possible. Consider calling hospitals directly for
+                    |     immediate availability."]
+                    |     
+                    |     If you have questions: [Hospital Phone/Email]
+                    |     
+                    |     Thank you for understanding.
+                    |     [Hospital Name] Team"
+                    | 
+                    | 18. System displays success to staff:
+                    |     "Appointment rejected. Patient notified with alternatives."
+                    | 19. Case removed from staff's pending queue
+Alternative Flow    | AF1-UC028: Refer to Specific Specialist
+(AF)                | 1. At step 4, staff selects "Requires specialized care"
+                    | 2. Staff can specify type of specialist needed:
+                    |    - Mohs surgery specialist
+                    |    - Pediatric dermatologist
+                    |    - Cosmetic dermatologist
+                    | 3. System filters alternative hospitals by specialty
+                    | 4. Email includes: "This case requires [specialty].
+                    |    We've recommended hospitals with this expertise."
+                    | 5. Continue to step 11 of NF
+                    | 
+                    | AF2-UC028: Urgent Case Emergency Referral
+                    | 1. Report shows "Urgent" risk level
+                    | 2. Staff selects "Requires emergency care"
+                    | 3. System automatically includes emergency dermatology
+                    |    clinics and hospital ERs in recommendations
+                    | 4. Email marked with high priority
+                    | 5. Email includes: "⚠️ URGENT: Please seek immediate
+                    |    medical attention. Consider emergency room if
+                    |    symptoms worsen."
+                    | 6. System may trigger automatic call to patient (if enabled)
+                    | 7. Continue to step 13 of NF
+Exception Flow (EF) | EF1: No Alternative Hospitals Found
+                    | 1. System cannot find suitable alternatives
+                    | 2. System searches broader 100km radius
+                    | 3. If still none, email includes general guidance:
+                    |    "Please use online search or contact local health
+                    |    department for dermatology referrals."
+                    | 4. Email includes emergency hotline numbers
+                    | 
+                    | EF2: Email Send Failed
+                    | 1. SMTP error or invalid email address
+                    | 2. System logs error and queues for retry
+                    | 3. System displays warning to staff
+                    | 4. Rejection still processed in database
+                    | 5. Patient will see rejection in account dashboard
+                    | 
+                    | EF3: No Rejection Reason Selected
+                    | 1. "Please select a rejection reason" message appears
+                    | 2. Submit button remains disabled
+                    | 3. Reason is required for patient transparency
+                    | 4. Return to step 4 of NF
+
+================================================================================
+END OF USE CASE DESCRIPTIONS
+================================================================================
+
+SUMMARY:
+- Total Use Cases: 28 (All detailed descriptions completed)
+- Format: Pre-conditions, Post-conditions, Normal Flow, Alternative Flow, Exception Flow
+- Organized in 6 functional sections:
+  1. Authentication & User Management (UC001-UC005)
+  2. Health Profile Management (UC006-UC008)
+  3. Image Upload & AI Analysis (UC009-UC018)
+  4. Hospital Finder & Appointments (UC019-UC023)
+  5. Report Review - Hospital Staff (UC024-UC026)
+  6. Appointment Management (UC027-UC028)
+
+FILES CREATED:
+✅ USE_CASE_DESCRIPTIONS_ALL.txt - Complete detailed descriptions (THIS FILE)
+✅ ALL_28_USE_CASES_SUMMARY.txt - Overview and summary
+✅ TABLE_4.1_GOOGLE_DOCS.txt - Functional Requirements Table
+✅ TABLE_4.2_GOOGLE_DOCS.txt - Actor Description Table
+
+READY FOR THESIS DOCUMENTATION!

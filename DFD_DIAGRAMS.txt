@@ -1,0 +1,992 @@
+================================================================================
+DATA FLOW DIAGRAMS (DFD) FOR SKINGUARD SYSTEM
+================================================================================
+
+This document contains 2 DFD levels:
+1. Level 0: Context Diagram (high-level system overview)
+2. Level 1: Detailed DFD (internal processes and data flows)
+
+Following the same format as your reference diagram with:
+- External entities (rectangles)
+- Processes (rounded rectangles with P# labels)
+- Data stores (open rectangles with D# labels)
+- Data flows (arrows with labels)
+
+================================================================================
+LEVEL 0: CONTEXT DIAGRAM (DFD-0)
+================================================================================
+
+Shows the SkinGuard system as a single process with external entities
+
+External Entities:
+- Patient
+- Hospital Staff
+- Vision Transformer AI (Hugging Face)
+- Google Maps API
+- Email System (SMTP)
+
+Main Inputs:
+- Login credentials
+- Skin lesion images
+- Symptom responses
+- Hospital search requests
+- Appointment requests
+
+Main Outputs:
+- AI analysis results
+- Risk assessment
+- Hospital list
+- Appointment confirmations
+- Email notifications
+
+@startuml
+title Level 0: Context Diagram - SkinGuard System
+
+!define RECTANGLE rectangle
+!define ENTITY rectangle
+
+skinparam rectangle {
+    BackgroundColor LightYellow
+    BorderColor Black
+}
+
+skinparam actor {
+    BackgroundColor LightBlue
+    BorderColor Black
+}
+
+left to right direction
+
+actor Patient
+actor "Hospital Staff" as Staff
+actor "Vision Transformer AI\n(Hugging Face)" as AI
+actor "Google Maps API" as Maps
+actor "Email System\n(SMTP)" as Email
+
+rectangle "SkinGuard\nSkin Cancer Detection System" as System {
+}
+
+Patient --> System : Login Credentials
+Patient --> System : Skin Lesion Images
+Patient --> System : Symptom Responses
+Patient --> System : Hospital Search Request
+Patient --> System : Appointment Request
+
+System --> Patient : AI Analysis Results
+System --> Patient : Risk Assessment
+System --> Patient : Hospital List
+System --> Patient : Appointment Status
+
+Staff --> System : Login Credentials
+Staff --> System : Appointment Decision
+Staff --> System : Medical Notes
+
+System --> Staff : Pending Reports
+System --> Staff : Patient Medical History
+System --> Staff : Dashboard Data
+
+System --> AI : Image Data
+AI --> System : Cancer Classification
+AI --> System : Confidence Scores
+
+System --> Maps : Location + Search Params
+Maps --> System : Hospital Data + Directions
+
+System --> Email : Email Request
+Email --> System : Delivery Status
+
+@enduml
+
+================================================================================
+LEVEL 1: DETAILED DFD (DFD-1)
+================================================================================
+
+Shows internal processes, data stores, and data flows in detail
+Matches the style of your reference diagram
+
+NOTATION:
+- External Entities: Rectangles (Patient, Hospital Staff, etc.)
+- Processes: Rounded rectangles with P# labels (P1, P2, etc.)
+- Data Stores: Open rectangles with D# labels (D1, D2, etc.)
+- Data Flows: Arrows with descriptive labels
+
+PROCESSES:
+P1: Authentication & User Management
+P2: Image Upload & Validation
+P3: AI Analysis & Risk Assessment
+P4: Hospital Search & Navigation
+P5: Appointment Management
+P6: Notification Service
+P7: Audit & Logging
+
+DATA STORES:
+D1: User Accounts
+D2: Patient Profiles
+D3: Analysis Reports
+D4: Image Storage
+D5: Appointments
+D6: Hospitals
+D7: Email Queue
+D8: Audit Logs
+
+================================================================================
+PLANTUML CODE - LEVEL 1 DFD
+================================================================================
+
+Note: This will create a detailed DFD similar to your reference diagram.
+For best results, you may need to draw this manually in a drawing tool
+like draw.io, Visio, or PowerPoint to match the exact layout style.
+
+Below is the textual representation and component descriptions:
+
+================================================================================
+SKINGUARD LEVEL 1 DFD - TEXTUAL DESCRIPTION
+================================================================================
+
+EXTERNAL ENTITIES:
+┌─────────────────┐
+│    Patient      │
+└─────────────────┘
+
+┌─────────────────┐
+│ Hospital Staff  │
+└─────────────────┘
+
+┌─────────────────────────┐
+│ Vision Transformer AI   │
+│   (Hugging Face)        │
+└─────────────────────────┘
+
+┌─────────────────┐
+│ Google Maps API │
+└─────────────────┘
+
+┌─────────────────┐
+│  Email System   │
+│    (SMTP)       │
+└─────────────────┘
+
+================================================================================
+PROCESSES (P#) WITH DATA FLOWS:
+================================================================================
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P1: AUTHENTICATION & USER MANAGEMENT                                     ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• Patient → P1: Login Credentials (email, password)
+• Hospital Staff → P1: Login Credentials (email, password)
+
+PROCESS ACTIVITIES:
+• Validate email format
+• Verify password against hash
+• Generate JWT tokens (access + refresh)
+• Track failed login attempts
+• Lock account after 5 failed attempts
+
+OUTPUT DATA FLOWS:
+• P1 → D1: Store login event, timestamp
+• P1 → D8: Log authentication attempt
+• P1 → Patient: Authentication Token, User Role
+• P1 → Hospital Staff: Authentication Token, User Role
+
+DATA STORE ACCESS:
+• D1 (User Accounts): Read user credentials, Write login events
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P2: IMAGE UPLOAD & VALIDATION (NSFW Filter)                              ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• Patient → P2: Skin Lesion Image File
+• Patient → P2: Image Metadata (capture date, location)
+
+PROCESS ACTIVITIES:
+• Validate file format (JPG, PNG)
+• Validate file size (<10MB)
+• Preprocess image (224x224, normalize)
+• Calculate skin percentage (4 criteria)
+• Detect text/graphics (edge density, contrast)
+• Check NSFW score (<0.35 threshold)
+
+OUTPUT DATA FLOWS:
+• P2 → D4: Store validated image
+• P2 → P3: Validated Image Data (if passed)
+• P2 → Patient: Validation Result (pass/fail)
+• P2 → Patient: Error Message (if rejected - poster, low skin %)
+• P2 → D8: Log validation result
+
+DATA STORE ACCESS:
+• D4 (Image Storage): Write validated images
+• D8 (Audit Logs): Write validation events
+
+VALIDATION REJECTIONS:
+• Skin percentage < 25% → "Not a skin lesion image"
+• Text/graphics detected → "Poster/document detected"
+• NSFW score > 0.35 → "Inappropriate content"
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P3: AI ANALYSIS & RISK ASSESSMENT                                        ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• P2 → P3: Validated Image Data
+• Patient → P3: Symptom Questionnaire Responses (8 questions)
+• D2 → P3: Patient Health Profile (medical history, risk factors)
+
+EXTERNAL SERVICE CALL:
+• P3 → Vision Transformer AI: Preprocessed Image
+• Vision Transformer AI → P3: Predictions (7 cancer types with probabilities)
+
+PROCESS ACTIVITIES:
+• Load Vision Transformer model from Hugging Face
+• Perform neural network forward pass
+• Generate probabilities for 7 cancer types:
+  - Melanoma (mel)
+  - Basal Cell Carcinoma (bcc)
+  - Actinic Keratoses (akiec)
+  - Benign Keratosis (bkl)
+  - Dermatofibroma (df)
+  - Vascular Lesions (vasc)
+  - Melanocytic Nevi (nv)
+• Identify highest probability as prediction
+• Convert to confidence percentage
+• Perform lesion localization (bounding box)
+• Calculate risk level based on:
+  - Melanoma OR Confidence ≥85% → URGENT (Red)
+  - Basal Cell OR Actinic Keratoses → HIGH (Orange)
+  - Confidence 60-85% OR Symptoms → MEDIUM (Yellow)
+  - Benign with high confidence → LOW (Green)
+• Generate risk justification text
+• Calculate urgency score (0-100)
+
+OUTPUT DATA FLOWS:
+• P3 → D3: Save Complete Analysis Report
+• P3 → Patient: AI Results (cancer type, confidence, risk level)
+• P3 → Patient: Recommended Actions
+• P3 → D8: Log analysis completion
+
+DATA STORE ACCESS:
+• D2 (Patient Profiles): Read health history
+• D3 (Analysis Reports): Write analysis results
+• D4 (Image Storage): Read/Write lesion images with bounding box
+• D8 (Audit Logs): Write analysis events
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P4: HOSPITAL SEARCH & NAVIGATION                                         ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• Patient → P4: GPS Location (latitude, longitude)
+• Patient → P4: Manual Address Input
+• Patient → P4: Search Filters (radius, rating threshold)
+
+EXTERNAL SERVICE CALL:
+• P4 → Google Maps API: Search Parameters (location, radius=50km, type="hospital")
+• Google Maps API → P4: Hospital List (up to 180 results)
+• P4 → Google Maps API: Place ID (for details)
+• Google Maps API → P4: Hospital Details (rating, hours, reviews)
+• P4 → Google Maps API: Directions Request (origin, destination)
+• Google Maps API → P4: Route Data (distance, duration, steps)
+
+PROCESS ACTIVITIES:
+• Geocode address to coordinates (if manual entry)
+• Search hospitals within 50km radius
+• Filter for dermatology specialists + general hospitals
+• Fetch detailed info for each hospital
+• Sort by rating (4.5+ first) then distance
+• Calculate travel time and distance
+• Generate turn-by-turn directions
+
+OUTPUT DATA FLOWS:
+• P4 → D6: Cache hospital data
+• P4 → Patient: Hospital List (sorted by rating + distance)
+• P4 → Patient: Hospital Details (address, phone, hours, rating)
+• P4 → Patient: Navigation Directions (map, routes, steps)
+
+DATA STORE ACCESS:
+• D6 (Hospitals): Write/Read cached hospital data
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P5: APPOINTMENT MANAGEMENT                                               ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• Patient → P5: Appointment Request (hospital, date, time, report)
+• Patient → P5: Patient Notes
+• Hospital Staff → P5: Appointment Decision (confirm/reject)
+• Hospital Staff → P5: Confirmed Date/Time
+• Hospital Staff → P5: Staff Notes
+• D3 → P5: Analysis Report Data
+• D6 → P5: Hospital Information
+
+PROCESS ACTIVITIES:
+• Validate appointment request
+• Create appointment record (status: Pending)
+• Link patient, hospital, and analysis report
+• Calculate urgency level from risk assessment
+• Organize reports by urgency for staff dashboard
+• Update appointment status (Pending → Confirmed/Rejected)
+• Reveal patient identity ONLY after confirmation
+• Grant staff access to patient medical history
+• Add appointment to hospital calendar
+
+OUTPUT DATA FLOWS:
+• P5 → D5: Store appointment record
+• P5 → D2: Update patient profile access permissions
+• P5 → P6: Trigger staff notification (new request)
+• P5 → P6: Trigger confirmation email (if confirmed)
+• P5 → P6: Trigger rejection email (if rejected)
+• P5 → Patient: Appointment Status Update
+• P5 → Hospital Staff: Pending Reports Dashboard (organized by urgency)
+• P5 → Hospital Staff: Patient Medical History (after confirmation)
+• P5 → D8: Log appointment events
+• P5 → D8: Log privacy access (staff views patient data)
+
+DATA STORE ACCESS:
+• D2 (Patient Profiles): Read medical history (after confirmation)
+• D3 (Analysis Reports): Read report data
+• D5 (Appointments): Write/Update appointment records
+• D6 (Hospitals): Read hospital information
+• D7 (Email Queue): Write email notification requests
+• D8 (Audit Logs): Write appointment events, privacy access logs
+
+PRIVACY PROTECTION:
+• Patient identity HIDDEN until appointment confirmed
+• Medical history accessible ONLY after confirmation
+• All access logged in audit trail
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P6: NOTIFICATION SERVICE                                                 ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• P5 → P6: Staff Notification Request (new appointment)
+• P5 → P6: Confirmation Email Request (appointment confirmed)
+• P5 → P6: Rejection Email Request (appointment rejected)
+• P1 → P6: Password Reset Email Request
+• D1 → P6: User email addresses
+• D5 → P6: Appointment details
+
+EXTERNAL SERVICE CALL:
+• P6 → Email System (SMTP): Email Request (to, subject, body, attachments)
+• Email System (SMTP) → P6: Delivery Status (sent/failed)
+
+PROCESS ACTIVITIES:
+• Compose email from template
+• Insert dynamic data (patient name, hospital, date/time)
+• Generate calendar invite (.ics file) for confirmations
+• Include hospital directions and map link
+• Send email via SMTP server
+• Retry failed emails (up to 3 attempts)
+• Track delivery status
+
+OUTPUT DATA FLOWS:
+• P6 → D7: Store email in queue
+• P6 → D7: Update email status (pending/sent/failed)
+• P6 → Patient: Email Notification
+• P6 → Hospital Staff: Email Notification
+• P6 → D8: Log email events
+
+EMAIL TYPES:
+1. Staff Notification: "New appointment request - URGENT/HIGH/MEDIUM/LOW"
+2. Confirmation Email: "Appointment Confirmed" + calendar invite + directions
+3. Rejection Email: "Appointment Request Update" + alternative hospitals
+4. Password Reset: "Reset Your Password" + secure JWT token link
+5. Reminder Email: "Appointment Reminder" (24 hours before)
+
+DATA STORE ACCESS:
+• D1 (User Accounts): Read email addresses
+• D5 (Appointments): Read appointment details
+• D7 (Email Queue): Write/Update email records
+• D8 (Audit Logs): Write email events
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  P7: AUDIT & LOGGING                                                      ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+INPUT DATA FLOWS:
+• P1 → P7: Authentication Events
+• P2 → P7: Image Validation Events
+• P3 → P7: AI Analysis Events
+• P5 → P7: Appointment Events
+• P5 → P7: Privacy Access Events (staff views patient history)
+• P6 → P7: Email Events
+
+PROCESS ACTIVITIES:
+• Log all user actions with timestamp
+• Track login attempts (successful/failed)
+• Log image validation results (passed/rejected with reason)
+• Log AI analysis completions
+• Log appointment status changes
+• Log privacy-sensitive access (CRITICAL for GDPR compliance)
+• Record IP addresses and user agents
+• Generate audit reports
+• Monitor system performance metrics
+
+OUTPUT DATA FLOWS:
+• P7 → D8: Store audit log entries
+• P7 → Hospital Staff (Admin): Audit Reports
+• P7 → Hospital Staff (Admin): System Performance Metrics
+
+DATA STORE ACCESS:
+• D8 (Audit Logs): Write all system events
+
+AUDIT LOG CATEGORIES:
+1. Authentication Logs: Login, logout, password reset
+2. Validation Logs: Image acceptance/rejection with reasons
+3. Analysis Logs: AI predictions, risk assessments
+4. Appointment Logs: Request, confirmation, rejection, cancellation
+5. Privacy Access Logs: Staff accessing patient medical history
+6. Email Logs: Sent, failed, retry attempts
+7. Error Logs: System errors, API failures
+
+================================================================================
+DATA STORES (D#) DETAILED DESCRIPTIONS:
+================================================================================
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D1: USER ACCOUNTS                                                        ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• User ID (UUID)
+• Email (unique)
+• Password Hash (bcrypt)
+• Full Name
+• Role (patient, hospital_staff)
+• Verified (boolean)
+• Avatar URL
+• Language Preference
+• Created At
+• Updated At
+• Last Login
+• Failed Login Attempts
+• Account Locked Until
+
+READ BY:
+• P1 (Authentication): Verify credentials, check account status
+• P6 (Notification): Get email addresses for notifications
+
+WRITTEN BY:
+• P1 (Authentication): Update login timestamps, failed attempts, lock status
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D2: PATIENT PROFILES                                                     ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Profile ID (UUID)
+• User ID (foreign key to D1)
+• Age
+• Gender
+• Skin Type (Fitzpatrick I-VI)
+• Medical Conditions (diabetes, autoimmune, etc.)
+• Current Medications
+• Allergies (drugs, materials, substances)
+• Previous Skin Conditions
+• Family History of Skin Cancer
+• Sun Exposure Level (Low/Medium/High/Very High)
+• Created At
+• Updated At
+
+READ BY:
+• P3 (AI Analysis): Consider health history in risk assessment
+• P5 (Appointment): Provide medical history to staff (after confirmation)
+
+WRITTEN BY:
+• Patient (via UI): Create and update health profile
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D3: ANALYSIS REPORTS                                                     ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Report ID (UUID)
+• Patient ID (foreign key to D1)
+• Image URL (link to D4)
+• Image Thumbnail
+• Cancer Type (mel, bcc, akiec, bkl, df, vasc, nv)
+• Confidence Score (0-100%)
+• Risk Level (Low, Medium, High, Urgent)
+• Risk Justification (text)
+• All Predictions (JSON with 7 class probabilities)
+• Lesion Location Coordinates (bounding box)
+• Body Location (face, arm, leg, torso, etc.)
+• Symptom Responses (JSON from questionnaire)
+• Model Version (e.g., "dima806/skin_cancer_detection_vit")
+• Status (pending, completed)
+• Created At
+• Updated At
+
+READ BY:
+• P5 (Appointment): Attach report to appointment request
+• Patient (via UI): View analysis history
+
+WRITTEN BY:
+• P3 (AI Analysis): Save complete analysis results
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D4: IMAGE STORAGE                                                        ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Image ID (UUID)
+• Original Image File (binary/blob)
+• Thumbnail Image (200x200)
+• Image with Bounding Box (lesion localization overlay)
+• File Format (JPG, PNG)
+• File Size (bytes)
+• Upload Date
+• Validation Status (passed, rejected)
+• Rejection Reason (if rejected)
+• Skin Percentage (calculated by P2)
+• NSFW Score (calculated by P2)
+
+READ BY:
+• P3 (AI Analysis): Retrieve image for AI processing
+• Patient (via UI): Display images in reports
+• Hospital Staff (via UI): View lesion images in dashboard
+
+WRITTEN BY:
+• P2 (Image Validation): Store validated images with metadata
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D5: APPOINTMENTS                                                         ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Appointment ID (UUID)
+• Patient ID (foreign key to D1)
+• Hospital ID (foreign key to D6)
+• Report ID (foreign key to D3)
+• Preferred Date
+• Preferred Time Slot
+• Confirmed Date
+• Confirmed Time
+• Consultation Type (Initial/Follow-up/Biopsy/General)
+• Duration (15/30/45/60 minutes)
+• Patient Notes (symptoms, concerns)
+• Staff Notes (internal notes, not visible to patient)
+• Status (Pending, Confirmed, Cancelled, Completed)
+• Urgency Level (Low, Medium, High, Urgent)
+• Created At
+• Confirmed At
+• Confirmed By Staff ID
+
+READ BY:
+• P5 (Appointment): Display pending appointments to staff
+• P5 (Appointment): Show confirmed appointments to patient
+• P6 (Notification): Get appointment details for emails
+
+WRITTEN BY:
+• P5 (Appointment): Create appointment requests, update status
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D6: HOSPITALS                                                            ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Hospital ID (UUID)
+• Google Place ID (unique from Google Maps)
+• Name
+• Address
+• Phone
+• Email
+• Website
+• Latitude
+• Longitude
+• Rating (1-5 stars)
+• Review Count
+• Operating Hours (JSON - daily schedule)
+• Specialties (JSON - dermatology, general medicine, etc.)
+• Distance from Patient (calculated dynamically)
+• Is Open Now (boolean, calculated from operating hours)
+• Photos (array of URLs)
+• Created At
+• Updated At
+• Last Synced (from Google Maps)
+
+READ BY:
+• P4 (Hospital Search): Display hospital list to patient
+• P5 (Appointment): Show hospital details in appointment
+
+WRITTEN BY:
+• P4 (Hospital Search): Cache hospital data from Google Maps API
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D7: EMAIL QUEUE                                                          ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Email ID (UUID)
+• Recipient Email
+• Recipient Name
+• Subject
+• Body (HTML)
+• Template Name (confirmation, rejection, password_reset, reminder)
+• Template Data (JSON)
+• Attachments (calendar invite .ics file, etc.)
+• Status (Pending, Sent, Failed, Retry)
+• Retry Count (0-3)
+• Error Message (if failed)
+• Sent At
+• Created At
+
+READ BY:
+• P6 (Notification): Process pending emails from queue
+
+WRITTEN BY:
+• P6 (Notification): Add emails to queue, update status
+
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  D8: AUDIT LOGS                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+CONTENTS:
+• Log ID (UUID)
+• User ID (foreign key to D1, nullable for system events)
+• Action (login, logout, upload_image, analyze, book_appointment, etc.)
+• Resource Type (user, patient_profile, analysis_report, appointment)
+• Resource ID (UUID of the resource)
+• IP Address
+• User Agent (browser, device info)
+• Metadata (JSON - additional context)
+• Timestamp (precise datetime)
+
+CATEGORIES:
+1. Authentication Logs:
+   - Action: login_success, login_failed, logout, password_reset
+   - Metadata: {failed_attempts, lock_status, reset_token_sent}
+
+2. Image Validation Logs:
+   - Action: image_uploaded, validation_passed, validation_rejected
+   - Metadata: {skin_percentage, nsfw_score, rejection_reason}
+
+3. AI Analysis Logs:
+   - Action: analysis_started, analysis_completed, analysis_failed
+   - Metadata: {cancer_type, confidence, risk_level, model_version}
+
+4. Appointment Logs:
+   - Action: appointment_requested, appointment_confirmed, appointment_rejected
+   - Metadata: {hospital_id, urgency_level, staff_id}
+
+5. Privacy Access Logs (CRITICAL):
+   - Action: staff_accessed_patient_history
+   - Metadata: {staff_id, patient_id, appointment_id, accessed_at}
+
+6. Email Logs:
+   - Action: email_sent, email_failed, email_retry
+   - Metadata: {recipient, template, retry_count, error}
+
+READ BY:
+• P7 (Audit & Logging): Generate audit reports
+• Hospital Staff (Admin): Review system activity
+• System Administrators: Monitor security events
+
+WRITTEN BY:
+• P1, P2, P3, P5, P6 (All Processes): Log all significant events
+
+RETENTION POLICY:
+• Keep for 7 years (compliance with healthcare data regulations)
+• Privacy access logs: Permanent retention
+
+================================================================================
+COMPLETE DATA FLOW SUMMARY:
+================================================================================
+
+MAIN DATA FLOWS BY ACTOR:
+--------------------------
+
+PATIENT DATA FLOWS:
+1. Patient → P1: Login Credentials
+2. P1 → Patient: Authentication Token
+3. Patient → P2: Skin Lesion Image
+4. P2 → Patient: Validation Result
+5. Patient → P3: Symptom Responses
+6. P3 → Patient: AI Analysis Results + Risk Level
+7. Patient → P4: Location/Address
+8. P4 → Patient: Hospital List + Directions
+9. Patient → P5: Appointment Request
+10. P5 → Patient: Appointment Status
+11. P6 → Patient: Email Notifications
+
+HOSPITAL STAFF DATA FLOWS:
+1. Hospital Staff → P1: Login Credentials
+2. P1 → Hospital Staff: Authentication Token
+3. P5 → Hospital Staff: Pending Reports Dashboard (organized by urgency)
+4. Hospital Staff → P5: Appointment Decision (Confirm/Reject)
+5. P5 → Hospital Staff: Patient Medical History (after confirmation)
+6. P6 → Hospital Staff: Email Notifications
+7. P7 → Hospital Staff: Audit Reports
+
+EXTERNAL SERVICE DATA FLOWS:
+1. P3 ↔ Vision Transformer AI: Image Data ↔ Cancer Classification
+2. P4 ↔ Google Maps API: Search Parameters ↔ Hospital Data
+3. P6 ↔ Email System (SMTP): Email Request ↔ Delivery Status
+
+DATA STORE INTERACTIONS:
+• D1 (User Accounts): Used by P1, P6
+• D2 (Patient Profiles): Used by P3, P5
+• D3 (Analysis Reports): Used by P3, P5
+• D4 (Image Storage): Used by P2, P3
+• D5 (Appointments): Used by P5, P6
+• D6 (Hospitals): Used by P4, P5
+• D7 (Email Queue): Used by P6
+• D8 (Audit Logs): Used by ALL processes (P1-P7)
+
+================================================================================
+KEY FEATURES HIGHLIGHTED IN DFD:
+================================================================================
+
+1. SECURITY & PRIVACY:
+   ✅ Password hashing (P1)
+   ✅ JWT token authentication (P1)
+   ✅ Account locking after failed attempts (P1)
+   ✅ Patient identity hidden until confirmation (P5)
+   ✅ Privacy access logging (P7 → D8)
+
+2. IMAGE VALIDATION (YOUR POSTER DETECTION):
+   ✅ Skin percentage calculation (P2)
+   ✅ Text/graphics detection (P2)
+   ✅ NSFW filtering (P2)
+   ✅ 25% skin content threshold (P2)
+
+3. AI ANALYSIS:
+   ✅ Vision Transformer integration (P3)
+   ✅ 7 cancer type classification (P3)
+   ✅ Risk level assessment (P3)
+   ✅ Urgency scoring (P3)
+
+4. HOSPITAL INTEGRATION:
+   ✅ Google Maps API integration (P4)
+   ✅ 50km radius search (P4)
+   ✅ Sorting by rating + distance (P4)
+   ✅ Navigation directions (P4)
+
+5. APPOINTMENT WORKFLOW:
+   ✅ Request → Pending → Confirmed/Rejected (P5)
+   ✅ Urgency-based prioritization (P5)
+   ✅ Privacy protection until confirmation (P5)
+   ✅ Medical history access grant (P5)
+
+6. NOTIFICATIONS:
+   ✅ Email templates (P6)
+   ✅ Calendar invites (P6)
+   ✅ Retry mechanism (P6)
+   ✅ Alternative hospital suggestions (P6)
+
+7. AUDIT TRAIL:
+   ✅ Complete logging of all actions (P7)
+   ✅ Privacy access tracking (P7)
+   ✅ Compliance with regulations (P7)
+
+================================================================================
+HOW TO CREATE THE DFD DIAGRAM:
+================================================================================
+
+RECOMMENDED TOOLS:
+1. draw.io (diagrams.net) - FREE, web-based or desktop
+2. Microsoft Visio - Professional diagramming tool
+3. Lucidchart - Web-based collaborative tool
+4. PowerPoint - Manual drawing with shapes
+
+STEP-BY-STEP INSTRUCTIONS (draw.io):
+================================================================================
+
+1. OPEN DRAW.IO:
+   - Go to: https://app.diagrams.net/
+   - Create New Diagram
+   - Choose "Blank Diagram"
+
+2. CREATE EXTERNAL ENTITIES (Rectangles):
+   - Insert → Shape → Rectangle
+   - Label: Patient
+   - Label: Hospital Staff
+   - Label: Vision Transformer AI (Hugging Face)
+   - Label: Google Maps API
+   - Label: Email System (SMTP)
+   - Style: Border = Solid, Fill = Light Gray
+
+3. CREATE PROCESSES (Rounded Rectangles):
+   - Insert → Shape → Rounded Rectangle
+   - Label format: "P1\nAuthentication & User Management"
+   - Create 7 processes: P1, P2, P3, P4, P5, P6, P7
+   - Style: Border = Solid, Fill = Light Blue
+
+4. CREATE DATA STORES (Open-ended Rectangles):
+   - Insert → Shape → Rectangle (remove right border)
+   - OR use two parallel horizontal lines
+   - Label format: "D1    User Accounts"
+   - Create 8 data stores: D1, D2, D3, D4, D5, D6, D7, D8
+   - Style: Border = Solid (left only), Fill = White
+
+5. CREATE DATA FLOWS (Arrows):
+   - Insert → Arrow → Straight/Curved Connector
+   - Label arrows with data flow descriptions
+   - Examples:
+     * "Login Credentials"
+     * "Validated Image Data"
+     * "AI Analysis Results"
+     * "Appointment Status"
+   - Style: Arrow = Solid line with arrowhead
+
+6. LAYOUT SUGGESTIONS:
+   - Place External Entities on the edges (left, right, top, bottom)
+   - Place Processes in the middle area
+   - Place Data Stores between processes they connect
+   - Group related components together
+   - Use vertical or horizontal alignment for clarity
+
+7. RECOMMENDED LAYOUT:
+   ```
+   ┌──────────────────────────────────────────────────────────────┐
+   │                                                              │
+   │  Patient ──→ P1 ──→ D1                    D8 ←── P7        │
+   │              ↓                              ↑                │
+   │              ↓                              ↑                │
+   │  Patient ──→ P2 ──→ D4                     ↑                │
+   │              ↓                              ↑                │
+   │              ↓                              ↑                │
+   │  Patient ──→ P3 ←→ ViT AI                  ↑                │
+   │              ↓                              ↑                │
+   │              ↓──→ D3                        ↑                │
+   │              ↓                              ↑                │
+   │  Patient ──→ P4 ←→ Google Maps             ↑                │
+   │              ↓                              ↑                │
+   │              ↓──→ D6                        ↑                │
+   │              ↓                              ↑                │
+   │  Patient ──→ P5 ←──→ Staff                 ↑                │
+   │              ↓                              ↑                │
+   │              ↓──→ D5 ──→ D2                 ↑                │
+   │              ↓                              ↑                │
+   │              ↓──→ P6 ←→ Email System        ↑                │
+   │                   ↓                         ↑                │
+   │                   ↓──→ D7                   ↑                │
+   │                   ↓                         ↑                │
+   │                   ↓─────────────────────────┘                │
+   │                                                              │
+   └──────────────────────────────────────────────────────────────┘
+   ```
+
+8. ADD COLORS FOR CLARITY:
+   - External Entities: Light Gray
+   - Processes: Light Blue
+   - Data Stores: Light Yellow
+   - Critical Data Flows: Red (e.g., Patient Identity Reveal)
+   - External API Calls: Green
+
+9. ADD A LEGEND:
+   - Rectangle = External Entity
+   - Rounded Rectangle = Process
+   - Open-ended Rectangle = Data Store
+   - Arrow = Data Flow
+
+10. ADD TITLE AND LABELS:
+    - Title: "Level 1 DFD - SkinGuard Skin Cancer Detection System"
+    - Include your name and date
+    - Add "Figure 4.X: Data Flow Diagram" caption
+
+================================================================================
+ALTERNATIVE: USE THE TEXTUAL DESCRIPTIONS
+================================================================================
+
+If drawing tools are difficult, you can also:
+
+1. CREATE TABLE FORMAT:
+   - List all processes with inputs/outputs in table format
+   - List all data stores with access patterns
+   - This is acceptable for thesis documentation
+
+2. USE THE DETAILED TEXTUAL DESCRIPTION:
+   - The textual descriptions in this file are comprehensive
+   - Can be included as supporting documentation
+   - Explains all data flows clearly
+
+3. REFERENCE DIAGRAM:
+   - Draw a simplified version similar to your reference
+   - Focus on main flows only
+   - Add detailed descriptions in text
+
+================================================================================
+THESIS PLACEMENT
+================================================================================
+
+CHAPTER 4: SYSTEM DESIGN
+├── 4.1 Use Case Diagram
+├── 4.2 Use Case Descriptions
+├── 4.3 Activity Diagrams (5 diagrams)
+├── 4.4 Sequence Diagrams (4 diagrams)
+├── 4.5 Class Diagram
+├── 4.6 Data Flow Diagrams ⭐ NEW
+│   ├── Figure 4.12: Level 0 - Context Diagram
+│   └── Figure 4.13: Level 1 - Detailed DFD
+└── 4.7 System Architecture Diagram
+
+EXPLANATORY TEXT TO WRITE:
+
+"Figure 4.12 shows the Context Diagram (Level 0 DFD) illustrating the 
+SkinGuard system as a single process interacting with five external entities: 
+Patient, Hospital Staff, Vision Transformer AI, Google Maps API, and Email 
+System. The diagram demonstrates the main inputs (login credentials, skin 
+images, symptom responses) and outputs (AI analysis results, risk assessments, 
+notifications) of the system.
+
+Figure 4.13 presents the Level 1 DFD, decomposing the system into seven key 
+processes: P1 (Authentication & User Management), P2 (Image Upload & 
+Validation), P3 (AI Analysis & Risk Assessment), P4 (Hospital Search & 
+Navigation), P5 (Appointment Management), P6 (Notification Service), and P7 
+(Audit & Logging). The diagram shows eight data stores (D1-D8) and the 
+detailed data flows between processes, external entities, and data stores. 
+Notable features include the NSFW filter validation in P2 (ensuring only 
+legitimate skin lesion images are analyzed), the integration with Vision 
+Transformer AI in P3 for cancer classification, the Google Maps API 
+integration in P4 for hospital search, and the comprehensive audit logging 
+in P7 for privacy and security compliance."
+
+================================================================================
+FILES CREATED
+================================================================================
+
+✅ DFD_DIAGRAMS.txt - This file with complete DFD documentation
+
+Previous files:
+✅ CLASS_DIAGRAM.txt - UML class diagram
+✅ SEQUENCE_DIAGRAMS.txt - 4 sequence diagrams
+✅ ACTIVITY_DIAGRAMS_FIXED.txt - 5 activity diagrams
+✅ USE_CASE_DESCRIPTIONS_ALL.txt - 28 use case descriptions
+✅ TABLE_4.1_GOOGLE_DOCS.txt - Functional Requirements
+✅ TABLE_4.2_GOOGLE_DOCS.txt - Actor Descriptions
+✅ use_case_diagram.puml - Use Case Diagram
+
+COMPLETE SYSTEM DOCUMENTATION:
+- Use Case Diagram: 1 diagram
+- Activity Diagrams: 5 diagrams
+- Sequence Diagrams: 4 diagrams
+- Class Diagram: 1 diagram
+- Data Flow Diagrams: 2 diagrams (Level 0 + Level 1)
+- TOTAL: 13 comprehensive system diagrams
+
+ALL READY FOR YOUR THESIS! 🎓
+
+SUMMARY OF DFD:
+- 5 External Entities (Patient, Staff, ViT AI, Google Maps, Email)
+- 7 Processes (Authentication, Validation, AI Analysis, Hospital Search, 
+               Appointment, Notification, Audit)
+- 8 Data Stores (Users, Profiles, Reports, Images, Appointments, Hospitals,
+                 Email Queue, Audit Logs)
+- Complete data flow documentation with detailed descriptions

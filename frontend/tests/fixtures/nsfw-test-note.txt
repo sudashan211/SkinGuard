@@ -1,0 +1,22 @@
+NSFW Test Image Note
+====================
+
+For testing NSFW content filtering, you have two options:
+
+1. Use a mock/stub for the NSFW detection service in tests
+2. Create a synthetic test image that triggers the NSFW detector
+
+DO NOT commit actual inappropriate images to the repository.
+
+For option 2, you can create a simple test image:
+- Create a plain colored image
+- Add metadata or markers that the NSFW detector recognizes
+- Or configure your test to mock the NSFW score response
+
+Example mock in test:
+  await page.route('**/api/analyze-skin', route => {
+    route.fulfill({
+      status: 403,
+      body: JSON.stringify({ error: 'Inappropriate content detected' })
+    })
+  })

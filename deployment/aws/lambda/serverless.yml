@@ -1,0 +1,141 @@
+# SkinGuard Backend - AWS Lambda Serverless Configuration
+# Deploy with: serverless deploy --stage production
+
+service: skinguard-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.10
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  memorySize: 3008  # Maximum for Lambda
+  timeout: 30
+  
+  # IAM Role
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource: "arn:aws:s3:::skinguard-models-${self:provider.stage}/*"
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+  
+  # Environment variables
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SUPABASE_URL: ${env:SUPABASE_URL}
+    SUPABASE_KEY: ${env:SUPABASE_KEY}
+    SUPABASE_SERVICE_KEY: ${env:SUPABASE_SERVICE_KEY}
+    JWT_SECRET_KEY: ${env:JWT_SECRET_KEY}
+    SENDGRID_API_KEY: ${env:SENDGRID_API_KEY}
+    MODEL_CACHE_DIR: /tmp/models
+    LOG_LEVEL: INFO
+  
+  # API Gateway
+  apiGateway:
+    shouldStartNameWithService: true
+    binaryMediaTypes:
+      - 'multipart/form-data'
+      - 'image/jpeg'
+      - 'image/png'
+
+# Lambda Functions
+functions:
+  api:
+    handler: backend.app.lambda_handler.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: 'https://skinguard.com'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
+    layers:
+      - arn:aws:lambda:us-east-1:123456789012:layer:pytorch:1
+    reservedConcurrency: 10
+    provisionedConcurrency: 2  # Keep 2 instances warm
+
+# Plugins
+plugins:
+  - serverless-python-requirements
+  - serverless-plugin-warmup
+  - serverless-domain-manager
+
+# Custom configuration
+custom:
+  # Python requirements
+  pythonRequirements:
+    dockerizePip: true
+    layer: true
+    slim: true
+    strip: false
+    zip: true
+    fileName: backend/requirements.txt
+    
+  # Warmup configuration
+  warmup:
+    default:
+      enabled: true
+      events:
+        - schedule: 'rate(5 minutes)'
+      concurrency: 2
+      
+  # Custom domain
+  customDomain:
+    domainName: api.skinguard.com
+    certificateName: '*.skinguard.com'
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+
+# Package configuration
+package:
+  individually: false
+  exclude:
+    - node_modules/**
+    - venv/**
+    - .venv/**
+    - tests/**
+    - .pytest_cache/**
+    - __pycache__/**
+    - '*.pyc'
+    - .git/**
+    - .github/**
+    - frontend/**
+    - deployment/**
+    - docs/**
+
+# Resources
+resources:
+  Resources:
+    # S3 Bucket for AI Models
+    ModelsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: skinguard-models-${self:provider.stage}
+        VersioningConfiguration:
+          Status: Enabled
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+    
+    # CloudWatch Log Group
+    ApiLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:service}-${self:provider.stage}-api
+        RetentionInDays: 30

@@ -1,0 +1,115 @@
+Table 4.2    Actor Description
+
+Actor	Role
+
+Patient	Registered users who can upload skin lesion images, complete symptom questionnaires, view AI analysis results, manage their health profile, search for nearby hospitals, and book appointments with dermatology clinics for consultation.
+
+Hospital/Clinic Staff	Dermatologists and medical staff who can review patient reports organized by urgency, access patient medical history (after appointment confirmation), confirm or reject appointment requests, and manage their facility profile information.
+
+Vision Transformer AI System (ViT)	An advanced deep learning model that validates uploaded images for skin content, detects and localizes skin lesions, classifies them into 7 cancer types (Melanoma, Basal Cell Carcinoma, Actinic Keratoses, Benign Keratosis, Dermatofibroma, Vascular Lesions, Melanocytic Nevi) with 84% accuracy, and assesses risk levels (low, medium, high, urgent) for clinical prioritization.
+
+Google Maps API	External mapping service that uses the patient's GPS location or manual address input to search for dermatology hospitals and general hospitals within a 50km radius, displays hospital ratings and distances, calculates navigation routes, and provides up to 180 nearby medical facilities sorted by rating and proximity.
+
+Email System (SMTP)	Automated notification service that sends appointment confirmation emails when hospitals accept patient requests, appointment cancellation notifications with reasons, password reset links with secure JWT tokens for account recovery, and other system notifications to patients and hospital staff.
+
+
+===== HOW TO USE IN MICROSOFT WORD =====
+
+METHOD 1: QUICK TABLE CREATION
+1. Open Microsoft Word
+2. Go to: Insert → Table
+3. Create: 2 columns × 6 rows (including header)
+4. Copy the table data below into Word cells
+
+METHOD 2: CONVERT TEXT TO TABLE
+1. Copy the "TAB-SEPARATED VERSION" below
+2. Paste into Word
+3. Select all pasted text
+4. Go to: Insert → Table → Convert Text to Table
+5. Choose "Separate text at: Tabs"
+6. Click OK
+
+===== TAB-SEPARATED VERSION =====
+
+Actor	Role
+Patient	Registered users who can upload skin lesion images, complete symptom questionnaires, view AI analysis results, manage their health profile, search for nearby hospitals, and book appointments with dermatology clinics for consultation.
+Hospital/Clinic Staff	Dermatologists and medical staff who can review patient reports organized by urgency, access patient medical history (after appointment confirmation), confirm or reject appointment requests, and manage their facility profile information.
+Vision Transformer AI System (ViT)	An advanced deep learning model that validates uploaded images for skin content, detects and localizes skin lesions, classifies them into 7 cancer types (Melanoma, Basal Cell Carcinoma, Actinic Keratoses, Benign Keratosis, Dermatofibroma, Vascular Lesions, Melanocytic Nevi) with 84% accuracy, and assesses risk levels (low, medium, high, urgent) for clinical prioritization.
+Google Maps API	External mapping service that uses the patient's GPS location or manual address input to search for dermatology hospitals and general hospitals within a 50km radius, displays hospital ratings and distances, calculates navigation routes, and provides up to 180 nearby medical facilities sorted by rating and proximity.
+Email System (SMTP)	Automated notification service that sends appointment confirmation emails when hospitals accept patient requests, appointment cancellation notifications with reasons, password reset links with secure JWT tokens for account recovery, and other system notifications to patients and hospital staff.
+
+===== FORMATTING GUIDE =====
+
+Table Style:
+- Header Row: Bold, Blue background (#4472C4), White text, Centered
+- Data Rows: Regular font, White background, Left-aligned
+- Borders: All borders visible (0.5pt black)
+
+Column Widths:
+- Column 1 (Actor): 5 cm, Bold text
+- Column 2 (Role): 12 cm, Justified text
+
+Font:
+- Header: Arial 11pt Bold
+- Content: Arial 10pt Regular
+
+Row Height:
+- Header: 1.5 cm
+- Data rows: Auto (or minimum 2.5 cm for readability)
+
+Additional Formatting:
+1. Select table → Right-click → Table Properties
+2. Set "Text wrapping" to "None"
+3. Set "Alignment" to "Center"
+4. Check "Repeat as header row at the top of each page"
+
+===== SHORTENED VERSION (IF SPACE LIMITED) =====
+
+Actor	Role
+Patient	Users who upload skin images, view AI analysis, manage health profiles, find hospitals, and book appointments.
+Hospital/Clinic Staff	Medical professionals who review reports, confirm appointments, access patient history, and manage facility profiles.
+Vision Transformer AI (ViT)	Deep learning model that validates skin images, classifies 7 cancer types with 84% accuracy, and assesses risk levels.
+Google Maps API	Mapping service that searches nearby hospitals within 50km radius and provides navigation with ratings and distance.
+Email System (SMTP)	Notification service that sends appointment confirmations, cancellations, and password reset emails automatically.
+
+===== KEY CHANGES FROM OLD TABLE =====
+
+Removed:
+- Admin (no admin role in current system)
+- "User" term (now specifically "Patient")
+
+Added:
+- Hospital/Clinic Staff (new actor - facility-based system)
+- Email System/SMTP (automated notifications)
+
+Updated:
+- "Pre-Trained Skin Cancer Module" → "Vision Transformer AI System" (more accurate)
+- Enhanced descriptions with specific features:
+  * 7 cancer types (not just generic "skin cancer")
+  * 84% accuracy metric
+  * 4 risk levels (low/medium/high/urgent)
+  * Privacy protection details
+  * Up to 180 hospital results
+  * 50km search radius
+
+===== ACTOR SUMMARY =====
+
+Total Actors: 5
+
+Human Actors:
+1. Patient (primary user)
+2. Hospital/Clinic Staff (medical professionals)
+
+System Actors (Automated):
+3. Vision Transformer AI System
+4. Google Maps API
+5. Email System (SMTP)
+
+Technology Stack:
+- AI: Vision Transformer (Hugging Face)
+- Maps: Google Places API
+- Email: SMTP (configurable)
+- Database: PostgreSQL
+- Backend: FastAPI (Python)
+- Frontend: React (JavaScript)
+
