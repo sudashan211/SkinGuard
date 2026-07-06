@@ -25,7 +25,7 @@ httpx==0.25.2
 # Image processing (headless version for server deployment)
 Pillow==10.2.0
 numpy==1.26.3
-opencv-python-headless==4.9.0.80  # Headless version - no GUI dependencies required
+# opencv-python-headless==4.9.0.80  # Temporarily disabled - will re-enable after cache clear
 
 # AI/ML Libraries
 torch==2.2.0
