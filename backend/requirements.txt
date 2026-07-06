@@ -1,4 +1,5 @@
 # SkinGuard Backend Dependencies
+# Updated: 2026-07-06 - Added transformers for ViT model
 # FastAPI and server
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
