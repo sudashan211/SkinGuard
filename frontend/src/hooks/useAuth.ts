@@ -90,10 +90,20 @@ export function useAuth() {
         message: 'Logged out successfully',
       })
     },
-    onError: () => {
-      // Logout locally even if API call fails
+    onError: (error: any) => {
+      // Logout locally even if API call fails (e.g., token expired = 401)
+      // This is expected behavior for JWT-based auth - logout is client-side
       logoutStore()
       navigate(ROUTES.LOGIN)
+      
+      // Only show error toast if it's not a 401 (unauthorized)
+      // 401 just means token expired, which is normal
+      if (error?.response?.status !== 401) {
+        addToast({
+          type: 'info',
+          message: 'Logged out successfully',
+        })
+      }
     },
   })
 
