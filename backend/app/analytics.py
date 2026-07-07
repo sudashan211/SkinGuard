@@ -66,10 +66,10 @@ class AnalyticsService:
             
             # Get total screenings (all medical reports)
             total_result = supabase.table("medical_reports")\
-                .select("id", count="exact")\
+                .select("*")\
                 .execute()
             
-            total_screenings = total_result.count if total_result.count is not None else 0
+            total_screenings = len(total_result.data) if total_result.data else 0
             
             # Get average processing time from audit logs
             # Processing times are logged in audit_logs with action="ai_processing"
