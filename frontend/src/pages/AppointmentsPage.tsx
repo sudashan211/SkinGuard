@@ -197,13 +197,13 @@ export default function AppointmentsPage() {
                   <div className="flex items-center mb-2">
                     <User className="text-primary-600 mr-2" size={20} />
                     <h3 className="text-lg font-semibold">Doctor</h3>
-                    <span className="ml-3 text-sm text-gray-600">{appointment.consultation_type}</span>
+                    <span className="ml-3 text-sm text-gray-600">{appointment.consultationType}</span>
                   </div>
 
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex items-center">
                       <Calendar className="mr-2" size={16} />
-                      {formatDate(appointment.scheduled_at)}
+                      {formatDate(appointment.scheduledAt)}
                     </div>
                     <div className="flex items-center">
                       <Clock className="mr-2" size={16} />
