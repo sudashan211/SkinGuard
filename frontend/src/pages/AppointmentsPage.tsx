@@ -28,23 +28,39 @@ export default function AppointmentsPage() {
     queryFn: appointmentService.getAppointments,
   })
 
+  // Debug logging
+  console.log('=== APPOINTMENTS DEBUG ===')
+  console.log('All appointments:', allAppointments)
+  console.log('Number of appointments:', allAppointments.length)
+  if (allAppointments.length > 0) {
+    console.log('First appointment:', allAppointments[0])
+    console.log('scheduledAt:', allAppointments[0].scheduledAt)
+    console.log('scheduled_at:', allAppointments[0].scheduled_at)
+  }
+
+  // Split appointments into upcoming and past
+  const now = new Date()
+  const appointments = {
+    upcoming: allAppointments.filter((apt: any) => {
+      const aptDate = new Date(apt.scheduledAt || apt.scheduled_at)
+      console.log('Checking appointment:', apt.id, 'scheduled:', aptDate, 'now:', now, 'future?', aptDate >= now)
+      return aptDate >= now && apt.status !== 'cancelled' && apt.status !== 'completed'
+    }),
+    past: allAppointments.filter((apt: any) => {
+      const aptDate = new Date(apt.scheduledAt || apt.scheduled_at)
+      return aptDate < now || apt.status === 'cancelled' || apt.status === 'completed'
+    }),
+  }
+  
+  console.log('Upcoming appointments:', appointments.upcoming.length)
+  console.log('Past appointments:', appointments.past.length)
+
   // Fetch doctors for booking
   const { data: doctors = [] } = useQuery({
     queryKey: ['doctors'],
     queryFn: () => doctorService.getNearbyDoctors({ lat: 0, lng: 0, radius: 50 }),
     enabled: showBooking,
   })
-
-  // Split appointments into upcoming and past
-  const now = new Date()
-  const appointments = {
-    upcoming: allAppointments.filter((apt: any) => 
-      new Date(apt.scheduled_at) >= now && apt.status !== 'cancelled' && apt.status !== 'completed'
-    ),
-    past: allAppointments.filter((apt: any) => 
-      new Date(apt.scheduled_at) < now || apt.status === 'cancelled' || apt.status === 'completed'
-    ),
-  }
 
   // Cancel appointment mutation
   const cancelMutation = useMutation({
