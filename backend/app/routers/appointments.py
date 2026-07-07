@@ -278,12 +278,37 @@ async def get_appointments(
         
         # Production mode
         if current_user["role"] == "patient":
-            # Get patient's appointments with doctor info
+            # Get patient's appointments - fetch doctor info separately
             result = supabase.table("appointments")\
-                .select("*, doctors(clinic_name, specialization, user_id), medical_reports(risk_level)")\
+                .select("*")\
                 .eq("patient_id", current_user["id"])\
                 .order("scheduled_at", desc=False)\
                 .execute()
+            
+            # Manually fetch doctor and report details for each appointment
+            if result.data:
+                for appointment in result.data:
+                    # Fetch doctor details
+                    doctor_id = appointment.get("doctor_id")
+                    if doctor_id:
+                        doctor_result = supabase.table("doctors")\
+                            .select("clinic_name, specialization, user_id")\
+                            .eq("id", doctor_id)\
+                            .execute()
+                        
+                        if doctor_result.data and len(doctor_result.data) > 0:
+                            appointment["doctor"] = doctor_result.data[0]
+                    
+                    # Fetch report details
+                    report_id = appointment.get("report_id")
+                    if report_id:
+                        report_result = supabase.table("medical_reports")\
+                            .select("risk_level")\
+                            .eq("id", report_id)\
+                            .execute()
+                        
+                        if report_result.data and len(report_result.data) > 0:
+                            appointment["report"] = report_result.data[0]
         
         elif current_user["role"] == "doctor":
             # Get doctor's appointments with patient info - need to find doctor record first
