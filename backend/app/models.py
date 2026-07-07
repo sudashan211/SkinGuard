@@ -503,12 +503,12 @@ class AppointmentResponse(BaseModel):
     created_at: datetime = Field(..., alias='createdAt')
     updated_at: datetime = Field(..., alias='updatedAt')
     patient: Optional[dict] = None  # Patient details (fullName, email)
+    doctor: Optional[dict] = None   # Doctor details (clinic_name, specialization)
     report: Optional[dict] = None   # Report details (risk_level)
     
     class Config:
         from_attributes = True
         populate_by_name = True
-        by_alias = True
 
 
 # ============================================================================

@@ -223,7 +223,7 @@ async def create_appointment(
 
 @router.get(
     "",
-    response_model=list[AppointmentResponse],
+    response_model=list,
     responses={
         401: {"model": ErrorResponse, "description": "Unauthorized"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
@@ -403,21 +403,28 @@ async def get_appointments(
         if not result.data:
             return []
         
-        # Transform data to match response model aliases
+        # Transform data to match response model aliases and convert to camelCase for frontend
         appointments = []
         for appointment in result.data:
             try:
-                # Create a copy to avoid modifying original data
-                apt_data = dict(appointment)
+                # Transform snake_case to camelCase for frontend compatibility
+                transformed = {
+                    "id": appointment.get("id"),
+                    "patientId": appointment.get("patient_id"),
+                    "doctorId": appointment.get("doctor_id"),
+                    "reportId": appointment.get("report_id"),
+                    "scheduledAt": appointment.get("scheduled_at"),
+                    "status": appointment.get("status"),
+                    "consultationType": appointment.get("consultation_type"),
+                    "videoRoomUrl": appointment.get("video_room_url"),
+                    "createdAt": appointment.get("created_at"),
+                    "updatedAt": appointment.get("updated_at"),
+                    "patient": appointment.get("patient"),
+                    "doctor": appointment.get("doctor"),
+                    "report": appointment.get("report"),
+                }
                 
-                # The model uses snake_case internally but expects certain fields
-                # Ensure all expected fields exist with default values if missing
-                apt_data.setdefault('patient', None)
-                apt_data.setdefault('report', None)
-                apt_data.setdefault('video_room_url', None)
-                apt_data.setdefault('report_id', None)
-                
-                appointments.append(AppointmentResponse(**apt_data))
+                appointments.append(transformed)
             except Exception as e:
                 logger.error(f"Error parsing appointment {appointment.get('id')}: {str(e)}")
                 logger.error(f"Appointment data: {appointment}")
