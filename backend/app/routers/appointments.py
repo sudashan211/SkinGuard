@@ -378,11 +378,33 @@ async def get_appointments(
         if not result.data:
             return []
         
-        return [AppointmentResponse(**appointment) for appointment in result.data]
+        # Transform data to match response model aliases
+        appointments = []
+        for appointment in result.data:
+            try:
+                # Create a copy to avoid modifying original data
+                apt_data = dict(appointment)
+                
+                # The model uses snake_case internally but expects certain fields
+                # Ensure all expected fields exist with default values if missing
+                apt_data.setdefault('patient', None)
+                apt_data.setdefault('report', None)
+                apt_data.setdefault('video_room_url', None)
+                apt_data.setdefault('report_id', None)
+                
+                appointments.append(AppointmentResponse(**apt_data))
+            except Exception as e:
+                logger.error(f"Error parsing appointment {appointment.get('id')}: {str(e)}")
+                logger.error(f"Appointment data: {appointment}")
+                # Skip this appointment but continue with others
+                continue
+        
+        return appointments
         
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error fetching appointments for user {current_user['id']}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
