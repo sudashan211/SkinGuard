@@ -1,0 +1,169 @@
+================================================================================
+          SKINGUARD DEPLOYMENT FIX CHECKLIST
+================================================================================
+
+Date: July 7, 2026
+Issue: Backend DATABASE_URL malformed, Frontend using old URL
+
+================================================================================
+STEP 1: FIX RAILWAY DATABASE_URL (CRITICAL - DO THIS FIRST!)
+================================================================================
+
+[Step 1.1] Get correct DATABASE_URL from Supabase
+  [ ] Open https://supabase.com/dashboard
+  [ ] Click project: fqvxrlltwymecsuqfzcg
+  [ ] Go to: Settings → Database → Connection String
+  [ ] Click "URI" tab
+  [ ] Copy connection string (replace [YOUR-PASSWORD] with actual password)
+  
+  Format should be:
+  postgresql://postgres:[PASSWORD]@db.fqvxrlltwymecsuqfzcg.supabase.co:5432/postgres
+
+[Step 1.2] Update Railway environment variable
+  [ ] Open https://railway.app/dashboard
+  [ ] Click: skinguard-production project
+  [ ] Click: backend service
+  [ ] Click: Variables tab
+  [ ] Find: DATABASE_URL
+  [ ] Click three dots → Edit
+  [ ] Paste corrected connection string
+  [ ] Click: Update
+  
+[Step 1.3] Wait for Railway to redeploy
+  [ ] Watch Deployments tab
+  [ ] Wait for "Success" status
+  [ ] Check logs (should see no "port" errors)
+
+================================================================================
+STEP 2: FIX VERCEL FRONTEND URL (AFTER RAILWAY IS FIXED)
+================================================================================
+
+[Step 2.1] Delete old environment variable (clears cache)
+  [ ] Open https://vercel.com/dashboard
+  [ ] Click: skin-guard-4kxr project
+  [ ] Click: Settings → Environment Variables
+  [ ] Find: VITE_API_URL
+  [ ] Click three dots → Delete
+  [ ] Confirm deletion
+
+[Step 2.2] Add fresh environment variable
+  [ ] Click: Add New Variable button
+  [ ] Enter Key: VITE_API_URL
+  [ ] Enter Value: https://skinguard-production-b846.up.railway.app
+  [ ] Check: Production ✓ (ONLY Production)
+  [ ] Uncheck: Development and Preview
+  [ ] Click: Save
+
+[Step 2.3] Force fresh deployment
+  [ ] Go to: Deployments tab
+  [ ] Click three dots on latest deployment
+  [ ] Click: Redeploy
+  [ ] UNCHECK: "Use existing Build Cache"
+  [ ] Click: Redeploy button
+  [ ] Wait for deployment to complete
+
+================================================================================
+STEP 3: VERIFY EVERYTHING WORKS
+================================================================================
+
+[Step 3.1] Test Backend Health
+  [ ] Open browser
+  [ ] Go to: https://skinguard-production-b846.up.railway.app/api/health
+  [ ] Should see: {"status":"healthy",...}
+  [ ] If 404 or error, check Railway logs
+
+[Step 3.2] Check Railway Logs
+  [ ] Open Railway Dashboard → Backend Service → Logs
+  [ ] Should NOT see: "invalid integer value 'port'"
+  [ ] Should see: "Application startup complete"
+  [ ] Should see: "Uvicorn running on http://0.0.0.0:8080"
+
+[Step 3.3] Test Frontend
+  [ ] Open: https://skin-guard-4kxr.vercel.app
+  [ ] Press F12 (open DevTools)
+  [ ] Go to Console tab
+  [ ] Try to login or signup
+  [ ] Check Network tab
+  [ ] API requests should go to: ...production-b846...
+  [ ] Should NOT see CORS errors
+  [ ] Should NOT see 500 errors
+
+================================================================================
+STEP 4: PUSH CODE UPDATES (ALREADY DONE, BUT VERIFY)
+================================================================================
+
+[Step 4.1] Verify Git status
+  [ ] Open terminal: cd d:\SkinGuard
+  [ ] Run: git status
+  [ ] Should see: "nothing to commit, working tree clean"
+  [ ] Latest commit has postgres_db.py fixes
+
+[Step 4.2] Verify Railway auto-deployed
+  [ ] Check Railway Deployments tab
+  [ ] Should see deployment from latest GitHub commit
+  [ ] Commit message: "Fix PostgreSQL wrapper: add lt, lte, gt, gte..."
+
+================================================================================
+OPTIONAL: UPDATE CORS (RECOMMENDED FOR PRODUCTION)
+================================================================================
+
+[Optional 1] Update CORS_ORIGINS in Railway
+  [ ] Railway → Backend Service → Variables
+  [ ] Find: CORS_ORIGINS
+  [ ] Edit to: http://localhost:3000,http://localhost:5173,https://skin-guard-4kxr.vercel.app
+  [ ] Save
+  [ ] Wait for redeploy
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+If Backend Still Shows "port" Error:
+  → Double-check DATABASE_URL format (no spaces, :5432 at end)
+  → Verify password is correct
+  → Check Supabase database is not paused
+  → Try connecting with same URL from local backend
+
+If Frontend Still Shows Old URL:
+  → Clear browser cache (Ctrl + Shift + R)
+  → Try incognito window
+  → Check Vercel deployment logs for which API_URL was used
+  → Delete variable again and re-add
+
+If Login Returns 500:
+  → Check Railway logs for actual error
+  → Verify DATABASE_URL connects successfully
+  → Test health endpoint first
+  → Check Supabase is accessible
+
+================================================================================
+IMPORTANT URLS
+================================================================================
+
+Backend:  https://skinguard-production-b846.up.railway.app
+Frontend: https://skin-guard-4kxr.vercel.app
+GitHub:   https://github.com/sudashan211/SkinGuard
+
+Railway:  https://railway.app/dashboard
+Vercel:   https://vercel.com/dashboard
+Supabase: https://supabase.com/dashboard
+
+================================================================================
+COMPLETION CHECKLIST
+================================================================================
+
+[ ] DATABASE_URL fixed in Railway
+[ ] Railway redeployed successfully
+[ ] No more "port" errors in Railway logs
+[ ] Backend health endpoint returns 200
+[ ] VITE_API_URL deleted from Vercel
+[ ] VITE_API_URL re-added to Vercel (Production only)
+[ ] Vercel redeployed without cache
+[ ] Frontend loads without errors
+[ ] Login/signup works without 500 errors
+[ ] No CORS errors in browser console
+[ ] postgres_db.py changes committed and pushed
+
+================================================================================
+END OF CHECKLIST
+================================================================================
