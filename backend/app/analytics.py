@@ -50,24 +50,19 @@ class AnalyticsService:
             cutoff_date = (datetime.utcnow() - timedelta(days=30)).isoformat()
             
             # Get daily active users (unique users who created reports in last 30 days)
-            daily_users_result = supabase.rpc(
-                'get_daily_active_users',
-                {'since_timestamp': cutoff_date}
-            ).execute()
+            # Note: RPC calls don't work with our PostgreSQL wrapper, so use fallback
+            daily_users_result = None  # supabase.rpc returns None for our custom wrapper
             
             daily_active_users = 0
-            if daily_users_result.data is not None:
-                daily_active_users = daily_users_result.data
-            else:
-                # Fallback: count distinct patient_ids from recent reports
-                reports_result = supabase.table("medical_reports")\
-                    .select("patient_id")\
-                    .gte("created_at", cutoff_date)\
-                    .execute()
-                
-                if reports_result.data:
-                    unique_patients = set(r["patient_id"] for r in reports_result.data)
-                    daily_active_users = len(unique_patients)
+            # Always use fallback: count distinct patient_ids from recent reports
+            reports_result = supabase.table("medical_reports")\
+                .select("patient_id")\
+                .gte("created_at", cutoff_date)\
+                .execute()
+            
+            if reports_result.data:
+                unique_patients = set(r["patient_id"] for r in reports_result.data)
+                daily_active_users = len(unique_patients)
             
             # Get total screenings (all medical reports)
             total_result = supabase.table("medical_reports")\
