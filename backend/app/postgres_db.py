@@ -84,6 +84,52 @@ class TableQuery:
             self._where_values.extend(values)
         return self
     
+    def lt(self, column: str, value: Any):
+        """Add WHERE column < value condition (less than)"""
+        self._where_conditions.append(f"{column} < %s")
+        self._where_values.append(value)
+        return self
+    
+    def lte(self, column: str, value: Any):
+        """Add WHERE column <= value condition (less than or equal)"""
+        self._where_conditions.append(f"{column} <= %s")
+        self._where_values.append(value)
+        return self
+    
+    def gt(self, column: str, value: Any):
+        """Add WHERE column > value condition (greater than)"""
+        self._where_conditions.append(f"{column} > %s")
+        self._where_values.append(value)
+        return self
+    
+    def gte(self, column: str, value: Any):
+        """Add WHERE column >= value condition (greater than or equal)"""
+        self._where_conditions.append(f"{column} >= %s")
+        self._where_values.append(value)
+        return self
+    
+    def is_(self, column: str, value: Any):
+        """Add WHERE column IS value condition (for NULL checks)"""
+        negate = getattr(self, '_negate_next', False)
+        if negate:
+            self._negate_next = False  # Reset flag
+            if value is None or value == "null":
+                self._where_conditions.append(f"{column} IS NOT NULL")
+            else:
+                self._where_conditions.append(f"{column} IS NULL")
+        else:
+            if value is None or value == "null":
+                self._where_conditions.append(f"{column} IS NULL")
+            else:
+                self._where_conditions.append(f"{column} IS NOT NULL")
+        return self
+    
+    @property
+    def not_(self):
+        """Return self for chaining NOT conditions"""
+        self._negate_next = True
+        return self
+    
     def order(self, column: str, desc: bool = False):
         """Add ORDER BY clause"""
         direction = "DESC" if desc else "ASC"
