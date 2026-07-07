@@ -32,7 +32,7 @@ class AnalyticsService:
         
         Returns:
             Dict containing:
-            - daily_active_users: Number of unique users active in the last 24 hours
+            - daily_active_users: Number of unique users active in the last 30 days
             - total_screenings: Total number of medical reports created
             - average_processing_time: Average AI processing time in seconds
         """
@@ -45,13 +45,14 @@ class AnalyticsService:
             }
         
         try:
-            # Calculate 24 hours ago
-            yesterday = (datetime.utcnow() - timedelta(days=1)).isoformat()
+            # Calculate 30 days ago (changed from 24 hours for better visibility)
+            # This shows active users in the last 30 days instead of just 24 hours
+            cutoff_date = (datetime.utcnow() - timedelta(days=30)).isoformat()
             
-            # Get daily active users (unique users who created reports in last 24 hours)
+            # Get daily active users (unique users who created reports in last 30 days)
             daily_users_result = supabase.rpc(
                 'get_daily_active_users',
-                {'since_timestamp': yesterday}
+                {'since_timestamp': cutoff_date}
             ).execute()
             
             daily_active_users = 0
@@ -61,7 +62,7 @@ class AnalyticsService:
                 # Fallback: count distinct patient_ids from recent reports
                 reports_result = supabase.table("medical_reports")\
                     .select("patient_id")\
-                    .gte("created_at", yesterday)\
+                    .gte("created_at", cutoff_date)\
                     .execute()
                 
                 if reports_result.data:

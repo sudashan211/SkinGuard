@@ -50,7 +50,7 @@ export default function AnalyticsDashboard() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Daily Active Users</p>
+              <p className="text-sm text-gray-600 mb-1">Active Users (30 Days)</p>
               <p className="text-3xl font-bold text-primary-600">
                 {analytics.dailyActiveUsers.toLocaleString()}
               </p>
