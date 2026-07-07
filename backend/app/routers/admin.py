@@ -764,6 +764,76 @@ async def get_analytics_dashboard(current_user: dict = Depends(get_current_admin
 
 
 @router.get(
+    "/analytics/debug",
+    response_model=dict,
+    responses={
+        200: {"description": "Debug analytics data with raw database info"},
+        401: {"model": ErrorResponse, "description": "Unauthorized"},
+        403: {"model": ErrorResponse, "description": "Forbidden - requires admin role"},
+    }
+)
+async def get_analytics_debug(current_user: dict = Depends(get_current_admin)):
+    """
+    Debug endpoint to see raw analytics data and database state
+    Shows actual report timestamps to help troubleshoot why daily active users might be 0
+    
+    Args:
+        current_user: Current authenticated admin user
+        
+    Returns:
+        dict: Debug data including:
+            - current_time_utc: Current server time
+            - cutoff_time_24h_ago: 24-hour cutoff timestamp
+            - total_reports_all_time: Total number of reports
+            - total_reports_last_24h: Reports created in last 24 hours
+            - unique_patients_last_24h: Count of unique patients
+            - most_recent_reports: List of most recent reports with timestamps
+    """
+    try:
+        yesterday = (datetime.utcnow() - timedelta(days=1)).isoformat()
+        
+        # Get all medical reports with timestamps
+        all_reports = supabase.table("medical_reports")\
+            .select("id, patient_id, created_at")\
+            .order("created_at", desc=True)\
+            .limit(100)\
+            .execute()
+        
+        # Get recent reports (last 24 hours)
+        recent_reports = supabase.table("medical_reports")\
+            .select("id, patient_id, created_at")\
+            .gte("created_at", yesterday)\
+            .execute()
+        
+        # Count unique patients in last 24 hours
+        unique_recent_patients = []
+        if recent_reports.data:
+            unique_recent_patients = list(set(r["patient_id"] for r in recent_reports.data))
+        
+        debug_data = {
+            "current_time_utc": datetime.utcnow().isoformat(),
+            "cutoff_time_24h_ago": yesterday,
+            "total_reports_all_time": len(all_reports.data) if all_reports.data else 0,
+            "total_reports_last_24h": len(recent_reports.data) if recent_reports.data else 0,
+            "unique_patients_last_24h": len(unique_recent_patients),
+            "unique_patient_ids": unique_recent_patients,
+            "most_recent_reports": all_reports.data[:10] if all_reports.data else [],
+            "recent_24h_reports": recent_reports.data if recent_reports.data else [],
+        }
+        
+        logger.info(f"Admin {current_user['id']} accessed analytics debug endpoint")
+        return debug_data
+        
+    except Exception as e:
+        logger.error(f"Error in analytics debug: {str(e)}", exc_info=True)
+        return {
+            "error": str(e),
+            "message": "Failed to fetch debug data",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+
+@router.get(
     "/metrics/error-rate",
     response_model=dict,
     responses={
